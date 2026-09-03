@@ -84,8 +84,25 @@ Qingyun_arm
 
 **算法与电机控制接口约定:**
 
-算法To电机：
-|   | 关节角度 |
+算法（运动控制）To 电机（驱动）——同进程函数调用，2号对 `MotorController` 接口编程，3号负责实现（`motor_control.py`），测试用 Mock 驱动实现同一接口：
+
+| | 关节角度指令 | 夹爪开合 | 状态反馈 | 停止 |
+|:---:|:-------:|:------:|:-------:|:---:|
+| 接口 | `send_action(joints_deg, gripper_pct)` | 同左，`gripper_pct` 参数 | `get_feedback() -> JointFeedback` | `emergency_stop()` |
+| 物理单位 | deg（5个姿态关节角） | 0~100（百分比） | deg / (deg/s) / mA | - |
+| 数据类型 | `np.float64` 的 `np.array`（shape `(5,)`） | `float` | `JointFeedback` 数据类 | - |
+
+配套接口：`wait_until_settled(timeout_s, tol_deg) -> bool`（阻塞等待关节静止）。
+
+约定细则：
+1. **`send_action` 必须非阻塞**：写入串口缓冲立即返回，内部禁止 `sleep`；内部先做关节行程软限位钳位（最后一道安全闸）再写总线。
+2. **时钟节拍归算法侧（2号）**：30Hz 回放循环与绝对时间对齐由 2号维护，电机侧不持有定时循环。
+3. **反馈同步读取**：`get_feedback` 一次返回 6 舵机（含夹爪）的角度、转速、电流。
+4. **`emergency_stop` = freeze**：以当前实测角度持续下发锁定输出；物理急停按钮由 3号接入舵机供电回路直接断电，不经软件。
+
+使用 `MotorController` Protocol（定义于 `common_interface.py`）约束双方实现。
+
+详细设计见 `docs/机械臂运动控制模块技术文档.md`。
 
 ### 4. 使用git和github管理开发
 
