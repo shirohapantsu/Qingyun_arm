@@ -1,0 +1,63 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Large files & Model weights (按照团队 readme 4.4 铁律 3)
+*.pt
+*.pth
+*.onnx
+*.rknn
+*.engine
+*.bag
+*.mp4
+*.avi
+*.mkv
+
+# Local Windows OpenNI DLLs & Drivers (本地调试动态库，不提交至仓库)
+OpenNI2.dll
+OpenNI.ini
+OpenNI2/
+*.exe
+*.zip
+*.tar.gz
+
+# IDE
+.idea/
+*.swp
+
+# Local temporary debug scripts (个人本地调试草稿，不提交至团队仓库)
+tests/local_*
+tests/temp_*
+
