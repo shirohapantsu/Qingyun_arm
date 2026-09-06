@@ -49,9 +49,11 @@ venv.bak/
 OpenNI2.dll
 OpenNI.ini
 OpenNI2/
+OpenNI_*/
 *.exe
 *.zip
 *.tar.gz
+*.rar
 
 # IDE
 .idea/
@@ -61,3 +63,7 @@ OpenNI2/
 tests/local_*
 tests/temp_*
 
+docs/skill.md
+docs/OrangePi_5_RK3588S_用户手册_v2.2(1).pdf
+docs/skill.md
+docs/OrangePi_5_RK3588S_用户手册_v2.2(1).pdf
