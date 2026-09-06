@@ -123,7 +123,7 @@ class STS3215MotorController:
             read_retries=SERVO_READ_RETRIES,
             ack_peek_s=SERVO_ACK_PEEK_S,
         )
-        # ---- freeze 状态（emergency_stop 后台线程）
+        # ---- freeze 状态（emergency_stop 后台线程） 急停冻结
         self._freeze_lock = threading.RLock()
         self._freeze_thread: threading.Thread | None = None
         self._freeze_stop = threading.Event()
@@ -182,7 +182,7 @@ class STS3215MotorController:
             print(f"[诊断] {online}/{len(self.configs)} 个舵机全部在线")
 
     # ================================================================ 反馈（本里程碑核心）
-    def get_feedback(self) -> JointFeedback:
+    def get_feedback(self) -> JointFeedback: #把 6 台舵机的原始量变成关节量
         """同步读 6 舵机角度/速度/电流（冻结契约）。
 
         每舵机 1 次整块寄存器读（Present_Position..Present_Current，15B），
@@ -203,7 +203,7 @@ class STS3215MotorController:
             currents[i] = raw["current"] * CURRENT_MA_PER_BIT
         return JointFeedback(angles_deg=angles, speeds_deg_s=speeds, currents_ma=currents)
 
-    def _read_raw_state(self, cfg: ServoJointConfig) -> dict:
+    def _read_raw_state(self, cfg: ServoJointConfig) -> dict: #底层拆包
         """单舵机整块读反馈寄存器，返回原始量 dict（含标定与调参用细节）。"""
         data = self._bus.read_block(cfg.servo_id, FEEDBACK_START_ADDR, FEEDBACK_LEN)
         return {
@@ -261,7 +261,7 @@ class STS3215MotorController:
         self._bus.write(cfg.servo_id, REG_GOAL_POSITION, [raw & 0xFF, (raw >> 8) & 0xFF])
 
     # ================================================================ 阻塞/停止原语
-    def wait_until_settled(self, timeout_s: float, tol_deg: float) -> bool:
+    def wait_until_settled(self, timeout_s: float, tol_deg: float) -> bool:  
         """阻塞等待全部关节静止（角度变化率 < tol_deg，单位 deg/s，按冻结契约“变化率”解释），
         超时返回 False。实现：位置差分测速（不依赖速度寄存器换算，抗单位不确定）。"""
         deadline = time.monotonic() + float(timeout_s)
@@ -269,18 +269,18 @@ class STS3215MotorController:
         prev_t = 0.0
         stable_rounds = 0
         while True:
-            fb = self.get_feedback()
+            fb = self.get_feedback()           # 读一次全臂状态
             now_t = time.monotonic()
-            now = fb.angles_deg
+            now = fb.angles_deg                # 当前 6 关节角度
             if prev is not None and now_t > prev_t:
-                rates = np.abs(now - prev) / (now_t - prev_t)
-                if float(np.max(rates)) < float(tol_deg):
+                rates = np.abs(now - prev) / (now_t - prev_t)    # 逐关节速度(deg/s)
+                if float(np.max(rates)) < float(tol_deg):        # 最慢的那个关节……
                     stable_rounds += 1
                     if stable_rounds >= 2:      # 连续两次静止判据，滤抖
                         return True
                 else:
                     stable_rounds = 0
-            prev, prev_t = now, now_t
+            prev, prev_t = now, now_t           # 存下本次读数，供下次差分
             remaining = deadline - time.monotonic()
             if remaining <= 0:
                 return False
