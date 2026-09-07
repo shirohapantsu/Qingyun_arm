@@ -1,84 +1,113 @@
-# 顶抓姿态构造：R = Rz(yaw) · R_top_down
+# 顶抓姿态构造与 TCP 标定约定
 
-> **文档定位**：机械臂运动控制模块（同学 B）的姿态策略设计文档。阐明 SO-101 五自由度机械臂如何用"顶抓 + 偏航"恰定策略编码末端姿态，以及 R_top_down 常数矩阵的真机标定流程。
->
-> 接口约定：`move_cartesian_top_down(xyz, yaw_deg, duration)`，其中 `xyz` 为基座系坐标（米），`yaw_deg` 为水平面内物体相对摆放姿态的偏航角（度）。
+> 配套：[运动控制](机械臂运动控制模块技术文档.md)、[标定指南](真机参数测量与标定指南.md)、[公共接口](../configs/common_interface.py)。本文定义目标中心、工具姿态和配置放置位姿之间的数学关系。
 
----
+## 1. 坐标系
 
-## 1. 问题：5 自由度怎么装下 6 维位姿
+- B：`base_link`，右手系，+Z 竖直向上。
+- E：URDF `gripper_frame_link`。
+- O：物体中心系，+X 沿水平长轴代表方向，+Z 与基座 +Z 平行。
+- TCP：指垫接触区域中心，+X 为夹爪闭合方向的固定代表方向，+Z 为接近方向，+Y=`+Z × +X`。
 
-SO-101 为 5 个姿态关节 + 1 个夹爪关节。末端位姿 6 维（位置 3 + 姿态 3），而 IK 可用的自由度只有 5 个，视觉上游（`VisionInterface`）只提供 1 个姿态参数 `yaw_deg`。
+`T_A_B` 将 B 系中的点变换到 A 系；矩阵中的平移单位 m。VisionInterface.position 和 PlacePose.position 都是物体中心，top_down_pose 的位置参数则是 TCP。
 
-约束分配方案（**顶抓 + 偏航恰定策略**）：
+物体 yaw 是其水平长轴相对基座 +X 的角度，绕 +Z 右手为正，模 180°，范围 `[-90,90)`。TCP yaw 是工具闭合轴相对基座 +X 的有向角。实际工具方向由物体 yaw 与固定配置 `grasp.yaw_offset_deg` 相加确定。
 
-| 约束 | 维度 |
-| :--- | :--- |
-| 末端位置 (x, y, z) | 3 |
-| 顶抓方向（夹爪接近轴竖直向下） | 2 |
-| 偏航角 yaw（绕竖直轴） | 1 |
-| **合计** | **5 = 关节数，恰定** |
+视觉按该固定夹持方向及已标定工作区确定可抓取目标。控制保持下发目标与夹持方向不变，求解并校验对应关节轨迹。
 
-夹爪开合与末端姿态解耦，由独立逻辑控制（闭爪段电流闭环）。
+## 2. R_TOP_DOWN 和目标位姿
 
-## 2. 旋转矩阵的分解构造
-
-任何顶抓姿态的旋转矩阵都能唯一分解为"先转到顶抓，再绕竖直轴转 yaw"：
-
-$$R = R_z(\text{yaw}) \cdot R_{td}$$
-
-- **R_top_down**（常数矩阵）：把末端从"URDF 零位姿态"转到"竖直向下"的旋转。只取决于机械结构与装配，装好后不变。
-- **Rz(yaw)**：绕基座系 z 轴的旋转，只编码"腕往哪个方向拧"。绕竖直轴转多少度，"朝下"这个方向都不受影响——两分量正交。
-
-乘法顺序的含义：`Rz · Rtd` 读作"先施加 Rtd（转成朝下），再在世界系里绕 z 转 yaw"，因此 yaw 可以独立控制而不污染顶抓分量。
-
-## 3. 数值形式
-
-以 URDF 中 SO-101 夹爪零位（接近方向大致水平指向 +x）为例：
-
-$$R_{td} = R_x(\alpha) \cdot R_y(90°) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & \cos\alpha & -\sin\alpha \\ 0 & \sin\alpha & \cos\alpha \end{bmatrix} \begin{bmatrix} 0 & 0 & 1 \\ 0 & 1 & 0 \\ -1 & 0 & 0 \end{bmatrix}$$
-
-其中 α 为夹爪开口平面相对水平面的倾角，取决于夹爪装配朝向。具体数值以真机标定为准，不以 URDF 琑合值为准。
-
-## 4. 为什么必须真机标定
-
-打印件装配公差、舵机零位偏差会让"URDF 认为的顶抓"与"真机顶抓"相差数度。标定流程（一次性，写进工具脚本）：
-
-1. 力矩释放状态下手动把机械臂摆成**肉眼确认的顶抓姿态**：夹爪两指张开、竖直向下悬于桌面上方。
-2. 读 6 关节实测角 `q_meas`（`MotorController.get_feedback()`）。
-3. `R_urdf = FK(q_meas)`：URDF 模型对该关节角声称的末端姿态。
-4. 构造真实顶抓姿态 `R_true`：接近轴 n̂ = [0, 0, −1]，滑动轴 ŝ（开指方向）水平、对齐选定参考方向（如基座 +x）。
-5. 修正矩阵：`R_corr = R_true · R_urdfᵀ`（常数旋转，度量模型与真机的整体姿态偏差）。
-6. 之后所有目标姿态：`R_target = Rz(yaw) · R_top_down`，其中 `R_top_down := R_corr · R_urdf_top_down`（一步到位合并为总常数）。
-
-## 5. 标定中的 yaw 偏移坑
-
-R_corr 含有一个绕竖直轴的分量，该分量**直接叠加进 yaw**——标定出的"yaw = 0"未必对应视觉定义的"yaw_deg = 0"。必须显式登记为 `yaw_offset_deg`：
+零偏航顶抓时，TCP +X 沿 B +X，TCP +Y 沿 B -Y，TCP +Z 沿 B -Z。
 
 ```python
-R_target = Rz(yaw_deg + yaw_offset_deg) @ R_top_down
-```
+import numpy as np
 
-不改的症状：所有抓取的偏航系统性偏同一角度，联调时易误判为视觉 yaw 计算错误。
+R_TOP_DOWN = np.diag([1.0, -1.0, -1.0])
 
-## 6. 求解与权重策略
+def rz_deg(angle_deg: float) -> np.ndarray:
+    a = np.deg2rad(angle_deg)
+    c, s = np.cos(a), np.sin(a)
+    return np.array([[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]])
 
-```python
-def build_target_pose(xyz, yaw_deg, R_top_down, yaw_offset_deg=0.0):
+def top_down_pose(tcp_xyz: np.ndarray, tcp_yaw_deg: float) -> np.ndarray:
     T = np.eye(4)
-    T[:3, :3] = Rz(yaw_deg + yaw_offset_deg) @ R_top_down
-    T[:3, 3] = xyz
+    T[:3, :3] = rz_deg(tcp_yaw_deg) @ R_TOP_DOWN
+    T[:3, 3] = tcp_xyz
     return T
 ```
 
-喂给 `solve_ik(q_init, T)`，软约束权重：**位置 1.0、姿态 0.5 起步**。负载下垂、连杆柔顺会使 5 个约束不能同时精确满足，软约束下求解器优先保位置——梨的姿态可歪半度，但位置必须到。
+R_TOP_DOWN 是工具坐标约定产生的常数，满足正交性、det=+1。任意 yaw 下，旋转矩阵第三列均为 `[0,0,-1]`。实机工具安装旋转通过 tool.rotation_e_tcp 表达。
 
-## 7. 与执行架构的衔接
+从目标中心构造抓取 TCP：
 
-本姿态策略服务于 Plan-Validate-Play 执行架构中的**规划阶段**：
+```python
+p_grasp = target.position + rz_deg(target.yaw_deg) @ params.grasp.center_offset_object_m
+theta_grasp = target.yaw_deg + params.grasp.yaw_offset_deg
+T_B_TCP_grasp = top_down_pose(p_grasp, theta_grasp)
+```
 
-1. 规划：下潜段/放置段按 `build_target_pose` 采样路点，链式 warm-start IK 全解完；搬运段为关节空间 S 曲线。
-2. 校验：关节限位、相邻帧步长限幅、FK 回放误差（对每个解出的 q 做 FK，离路点 < 容差）。
-3. 回放：30Hz 绝对时间索引查表下发，反馈仅用于监控（偏差超限 → freeze + abort）。
+center_offset_object_m 在 O 系中表达；yaw_offset_deg 是固定夹持角度偏移，不用于补偿关节零位或相机外参。采用单动指夹爪时，theta 和 theta+180° 的实际接触几何可能不同；实现使用配置定义的方向。
 
-顶抓姿态 + 偏航恰定是下潜段"垂直直线、不犁到果实"与放置段"yaw 对齐入盒"的数学基础。
+## 3. 开度相关的工具变换
+
+固定旋转 tool.rotation_e_tcp 定义工具轴在 E 系中的方向，平移由 tool.translation_samples 按开度分段线性插值：
+
+```text
+translation_samples = [
+  {gripper_pct: g0, xyz_m: [x0,y0,z0]},
+  {gripper_pct: g1, xyz_m: [x1,y1,z1]}, ...
+]
+T_E_TCP(g) = [rotation_e_tcp, interpolate_translation(g); 0,0,0,1]
+```
+
+样本开度严格递增，禁止外插；表覆盖预张开、接触和释放开度。活动指的关节角由 gripper.angle_table 供碰撞模型使用，TCP 轴固定在工具主体上。
+
+```python
+T_B_TCP = FK_E(q_urdf_deg) @ tool_transform(g, params.tool)
+T_B_E_target = T_B_TCP_target @ inverse(tool_transform(g, params.tool))
+```
+
+FK_E 使用五个姿态关节角。工具中心测量和插值验证方法见标定指南；工具几何包络同时覆盖实际活动指、固定指与指垫。
+
+## 4. 夹持关系与配置放置位姿
+
+闭爪时五关节保持，夹爪开度变化会改变 TCP 位置。接触稳定后读取 q_close、g_close，建立名义物体相对工具变换：
+
+```python
+T_B_O_grasp = np.eye(4)
+T_B_O_grasp[:3, :3] = rz_deg(target.yaw_deg)
+T_B_O_grasp[:3, 3] = target.position
+T_TCP_O = inverse(FK_TCP(q_close, g_close)) @ T_B_O_grasp
+
+place = params.places[place_id]
+T_B_O_place = np.eye(4)
+T_B_O_place[:3, :3] = rz_deg(place.yaw_deg)
+T_B_O_place[:3, 3] = place.position
+T_B_TCP_place = T_B_O_place @ inverse(T_TCP_O)
+```
+
+该关系在一次持物过程中固定。闭合推动与持物滑移的测量上界纳入 grasp.object_shift_bound_m 和碰撞/定位误差预算。放置 TCP 以此完整变换为准，其位置一般不等于配置中的物体中心。
+
+下降和抬升沿基座 Z 轴，段内固定完整 TCP 姿态；横向搬运与姿态调整在配置安全高度及中转路径上完成。
+
+## 5. IK 验收
+
+SO-ARM101 有五个姿态关节。指定位置、接近方向和 yaw 分别形成 3、2、1 个标量条件；实际可达性取决于结构、关节范围及这些条件的几何关系。标定覆盖视觉允许下发的位置与角度域，运行时检验实际 IK 结果。
+
+令 T_act 为实际关节解的完整 TCP FK，T_des 为目标：
+
+- `e_pos = norm(p_act-p_des)`，m。
+- `e_tilt = degrees(acos(clip(dot(R_act[:,2],R_des[:,2]),-1,1)))`，deg。
+- 工具 +X 投影到基座 XY 后用 atan2 计算 yaw，`e_yaw=abs((yaw_act-yaw_des+180)%360-180)`，deg；投影退化时解无效。
+
+同时满足 ik.position_tol_m、ik.tilt_tol_deg 和 ik.yaw_tol_deg 才接受。夹持后更新的目标姿态可能含允许范围内的工具倾角，还需检查其接近轴与 `[0,0,-1]` 的偏差不超过 ik.tilt_tol_deg。位置或姿态未达标返回 IK_FAILED，不修改视觉目标。
+
+关节解需要满足有效限位和路径连续性；备用初值用于求解同一目标。物体长轴的离线标定误差按模 180° 计算，工具实际方向误差按模 360° 计算。
+
+## 6. 标定分工与数学检查
+
+电机原始读数经 joints.sign、joints.zero_offset_deg 转成 q_urdf；FK_E 与 T_E_TCP 组成工具位姿。相机到基座的转换由视觉完成，控制直接使用下发中心。
+
+关节零位用多个已知构型测量；工具旋转/中心用刚性夹具、多姿态和不同开度测量；独立测量验证点用于检查实际工具精度与抓取域覆盖。
+
+必要数学检查：R_TOP_DOWN 与 rz_deg 的正交性和方向；工具变换与逆变换往返；TCP 插值端点与中点；目标中心到配置放置中心的刚体关系往返；合法关节 FK/IK 残差。具体输入输出与函数名称和标定指南保持一致。
