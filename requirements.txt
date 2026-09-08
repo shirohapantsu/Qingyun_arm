@@ -1,0 +1,26 @@
+# 青云智臂——运行与开发依赖锁定
+#
+# 说明见 libs/so_arm_core/SOURCE.md 第 2 节。安装：
+#     conda activate Qingyun
+#     pip install -r requirements.txt
+#
+# 目标平台：Ubuntu 22.04 / arm64（香橙派 5）与 x86_64 开发机。
+# placo、pin、cmeel-* 在 PyPI 上均提供 manylinux aarch64 与 x86_64 轮子。
+
+# --- 运动学（docs/机械臂运动控制模块技术文档.md 第二节要求 placo + numpy） ---
+numpy>=1.26,<3
+placo>=0.9.6,<0.9.17
+
+# placo 0.9.16 / pin 3.4.0 链接的是 urdfdom soname 4.0 与 tinyxml2 soname 10。
+# 这两个版本约束是必须的：不钉住时 pip 会解析到 cmeel-urdfdom 6.0.0 /
+# cmeel-tinyxml2 11.0.0，导致 `import placo` 抛 ImportError。
+cmeel-urdfdom==4.0.1
+cmeel-tinyxml2==10.0.0
+
+# --- 真机 STS3215 串口驱动 ---
+# 只在 mode="real" 时真正使用；未安装时 qingyun.grabbing.motor_control 仍可
+# import（串口对象在构造真机驱动时才延迟导入）。
+pyserial>=3.5
+
+# --- 开发期测试 ---
+pytest>=8
