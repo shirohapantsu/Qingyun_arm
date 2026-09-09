@@ -218,6 +218,36 @@ def test_放置位姿不可达时在CHECK就被拒绝(params):
         params.places["default"] = original
 
 
+def test_仅真实链式放置路径被阻挡时在CHECK就被拒绝(params):
+    """FINAL-P1-001 复现：CHECK 预规划必须按实际执行的链式起点校验整条路线。
+
+    旧实现把 lift/transfer/lower/retreat/return 全部以接触位形 q_ref（抓取区）
+    为起点构建校验，实际执行却从上一段终点接力——放置区的竖直下降路径在动作前
+    校验中完全缺失。这里在放置点正上方放一根只挡住"真实 lower 竖直段"的柱子
+    （低于 transfer 终点持物盒下沿，端点检查放行；远离抓取区，链前段放行）：
+    修复前 CHECK 放行、抓住并搬运后才在 LOWER 报 COLLISION；修复后必须在臂未动、
+    没发过任何指令时就在 CHECK 拒绝。
+    """
+    from configs.motion_params import Obstacle
+    column = Obstacle(id="test_place_column",
+                      bounds_m=np.array([[0.308, 0.043, 0.030], [0.332, 0.064, 0.046]]))
+    original = params.workspace.obstacles
+    object.__setattr__(params.workspace, "obstacles", tuple(original) + (column,))
+    try:
+        arm, st, motor = make_arm(params)
+        motor.place_object(0.022)
+        r = arm.grasp_and_place(graspable(params, 0.38, -0.05), place_id="default")
+        assert r.status is GraspStatus.COLLISION, r
+        assert r.stage == AC.STAGE_CHECK, (
+            f"放置区竖直路径的碰撞必须在 CHECK 就暴露，实际 stage={r.stage}")
+        assert r.recovery_required is False, (
+            "CHECK 拒绝时臂未动，不得要求人工复位")
+        assert motor.command_count == 0, "CHECK 拒绝前不应提交任何指令"
+        assert arm._fault_latched is False
+    finally:
+        object.__setattr__(params.workspace, "obstacles", original)
+
+
 def test_入参校验失败不锁存公开原语(params):
     """P2-4：shape/限位/竖直性校验失败发生在臂未动时，不得要求 reset_fault。"""
     arm, st, motor = make_arm(params)

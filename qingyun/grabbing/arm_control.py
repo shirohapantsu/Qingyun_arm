@@ -499,11 +499,15 @@ class ArmController:
                 float(T_grasp[2, 3] - self.model.fk_tcp(q_from, g_open)[2, 3]),
                 self.params)],
         )
-        # 预规划阶段就把这两段全部校验掉（含碰撞与 FK 残差）。
+        # 预规划阶段就把这两段全部校验掉（含碰撞与 FK 残差）。校验起点按执行
+        # 顺序链式传播：descend 从 approach 的规划终点构建，才是实际会执行的那
+        # 条抓取区竖直线（以 q_now 构建校验的是 home  XY 上的另一条线）。
+        q_plan = np.asarray(q_now, float)
         for step in (approach, descend):
-            for seg in step.build(q_now):
+            for seg in step.build(q_plan):
                 self._validate([seg], step.stage, obb_for_node=step.obb_for_node,
                                contact_allowed=step.contact_allowed)
+                q_plan = np.asarray(seg.end_joints, float)
 
         # 抓取之后的整条路线：按接触开度区间两端各校验一遍。
         gp = self.params.gripper
@@ -606,10 +610,16 @@ class ArmController:
                                                    self.params.workspace.home_joints_deg,
                                                    g_release),
         )
+        # 按实际执行顺序链式构建并校验：每段以"上一段规划终点"为起点，与运行期
+        # _execute_step 逐段从实测起点重建接力的路线一致（文档 5.3"预规划、校验
+        # 整条名义路线"）。若各段都从同一 q_ref 构建，校验的是与实际执行不同的
+        # 路线，放置区竖直下降/撤离路径的碰撞要到执行期才首次暴露（FINAL-P1-001）。
+        q_chain = np.asarray(q_ref, float)
         for step in (lift, transfer, lower, retreat, return_home):
-            for seg in step.build(q_ref):
+            for seg in step.build(q_chain):
                 self._validate([seg], step.stage, obb_for_node=step.obb_for_node,
                                contact_allowed=step.contact_allowed)
+                q_chain = np.asarray(seg.end_joints, float)
         return _PostGraspPlan(lift=lift, transfer=transfer, lower=lower,
                              retreat=retreat, return_home=return_home)
 

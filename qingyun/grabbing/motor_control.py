@@ -62,6 +62,7 @@ from configs.common_interface import (
     FloatArray,
     JointFeedback,
     MotorCommunicationError,
+    MotorError,
     MotorLimitError,
     MotorStateError,
 )
@@ -129,11 +130,12 @@ _POLLS_BEFORE_BLOCK = 4
 _POLL_SLEEP_S = 0.0002
 
 # 初始化阶段的整次调用预算（秒）。为什么不用 timing.write_timeout_s：
-# 初始化要做 6 台 ×（PING + 型号 + 固件 + 力矩）≈ 30 次事务，而
-# write_timeout_s 是按"每个控制 tick 一次同步写"测出来的周期预算，拿它套初始化
-# 只会得到必然超时。但它仍然是**一个绝对 deadline 覆盖全部内部事务**，
-# 不会退化成"每台一个超时"（技术文档 4.2 的总时限原则）。真值要在 timing 阶段
-# 实测（标定指南 8.2），这里给一个明显宽松的保守值。
+# 初始化要做 6 台 ×（应答配置读回 + PING + 型号 + 固件×2 + 力矩）≈ 36 次事务
+# （verify_identity=False 时少 18 次），而 write_timeout_s 是按"每个控制 tick
+# 一次同步写"测出来的周期预算，拿它套初始化只会得到必然超时。但它仍然是
+# **一个绝对 deadline 覆盖全部内部事务**，不会退化成"每台一个超时"
+# （技术文档 4.2 的总时限原则）。真值要在 timing 阶段实测（标定指南 8.2），
+# 这里给一个明显宽松的保守值。
 _INIT_TIMEOUT_S = 2.0
 
 # pyserial 适配器的阻塞读分片（秒）。为什么用一个很小的常数而不是
@@ -142,6 +144,13 @@ _INIT_TIMEOUT_S = 2.0
 # 1ms 退出，远小于一个 tick（33ms）。真机 USB 转串口的实际延迟必须在 timing
 # 阶段实测（标定指南 8.2 第 2 条"实际 SDK 超时行为必须测量"）。
 _SERIAL_READ_SLICE_S = 0.001
+
+# pyserial 写超时（秒）。上一版根本没设 write_timeout（pyserial 默认 None =
+# 无限阻塞），"整次预算"在慢写路径上形同虚设（审阅指引 3.3）。运行期每次写
+# 都带 timeout_s=剩余预算 下来，本常数只是"调用方没给预算"时的兜底上限。
+# 注意它限制的是把帧拷进操作系统发送缓冲的时间，不含 USB 实际排空；
+# 真实排空延迟无法由软件承诺，列为真机待测项（标定指南 8.2）。
+_SERIAL_WRITE_TIMEOUT_S = 0.1
 
 
 # ---------------------------------------------------------------------------
@@ -732,24 +741,55 @@ class MotorMapping:
 # ---------------------------------------------------------------------------
 
 
+def _feedback_block_layout(
+    pos_spec: tuple[int, int],
+    vel_spec: tuple[int, int],
+    cur_spec: tuple[int, int],
+) -> tuple[int, int, dict[str, int]]:
+    """从 vendor 寄存器定义推导"每台一次读全三个反馈量"的连续块。
+
+    STS3215 的 Present_Position / Present_Velocity / Present_Current 是
+    56/58/69（各 2 字节）：取最小地址为块起点、最大"地址+宽度-1"为块终点，
+    得到 56..70 共 15 字节。一台一次 READ 事务即可拿齐位置/速度/电流，
+    六台共 6 次（审阅指引 3.6：比旧的 12 次少一半事务，同一台各量的读取
+    间隔也更接近）。块中间的 Present_Load / 电压 / 温度 / 运动标志按原样
+    透传、一律不解码——尤其禁止把 Present_Load 当电流（标定指南 4.3）。
+    起止地址由表推导而不是抄云端的硬编码 56/15，换型号时自动跟随 vendor 表。
+
+    返回 (块起始地址, 块长度, {寄存器名: 块内偏移})。
+    """
+    specs = {
+        "Present_Position": tuple(pos_spec),
+        "Present_Velocity": tuple(vel_spec),
+        "Present_Current": tuple(cur_spec),
+    }
+    start = min(a for a, _ in specs.values())
+    end = max(a + s - 1 for a, s in specs.values())
+    offsets = {name: a - start for name, (a, _) in specs.items()}
+    return start, end - start + 1, offsets
+
+
 class ByteTransport(Protocol):
     """协议层需要的最小字节管道抽象。
 
     为什么用 Protocol 而不是继承：单元测试要能塞进一个假管道（标定指南 11 节
     要求故障试验覆盖"通信失败"），真机用 pyserial 适配器，两者没有也不需要
     共同基类。实现约定（协议层的时限语义建立在这几条之上）：
-      * write(data) 返回实际写出的字节数；短写由协议层判为通信错误。
-      * read(n) **至多**返回 n 字节；允许阻塞，但不得长于实现自身配置的阻塞
-        分片（协议层每轮循环重新检查绝对 deadline，所以总时限不会被拉长）。
+      * write(data, timeout_s) 返回实际写出的字节数；短写由协议层判为通信错误。
+        timeout_s 是**整次调用剩下的预算**，实现必须把阻塞时长限制在它以内
+        （pyserial 用 write_timeout；假总线推进注入的时钟），而不是收下不用。
+      * read(n, timeout_s) **至多**返回 n 字节；允许阻塞，但不得长于
+        min(实现自身的阻塞分片, timeout_s)。协议层每轮循环还会重新检查绝对
+        deadline，两层一起保证总时限不会被拉长。
       * read_available() 必须非阻塞，返回当前已到达的字节（可能为空）。
       * flush_input() 丢弃接收缓冲里的残留，避免上一次超时留下的迟到字节污染
         下一帧。
       * close() 释放底层资源，允许重复调用。
     """
 
-    def write(self, data: bytes) -> int: ...
+    def write(self, data: bytes, timeout_s: float | None = None) -> int: ...
 
-    def read(self, n: int) -> bytes: ...
+    def read(self, n: int, timeout_s: float | None = None) -> bytes: ...
 
     def read_available(self) -> bytes: ...
 
@@ -772,21 +812,35 @@ class StsProtocol:
 
     protocol 0 的参数字段里寄存器地址只占 1 字节；protocol 1（SCS 系列）才是
     2 字节地址 + CRC16。本类只支持 protocol 0（MODEL_PROTOCOL["sts3215"] == 0），
-    构造驱动的 mapping 时会核对型号，这里也拒绝超出 1 字节的地址。地址宽度、
-    校验和这些细节无法从 vendor 的 Python 表里推出来，必须在 motor 标定阶段
+    构造驱动的 mapping 时会核对型号，这里也拒绝超出 1 字节的地址。
+    指令码与报文格式已按手册示例报文（"读 ID 1 地址 56 长度 2 =
+    FF FF 01 04 02 38 02 BE"）由**独立于本类的**测试断言钉死
+    （tests/test_motor_control.py 第 3 节）；但地址宽度、应答延迟等
+    仍无法从 vendor 的 Python 表里推出来，必须在 motor 标定阶段
     用真机核对（标定指南 4.1 第 1 条、8.2 第 2 条）。
     """
 
     HEADER = (0xFF, 0xFF)
     BROADCAST_ID = 0xFE
 
-    # 指令码（Feetech protocol 0 指令表）。
-    INST_RESET = 0x00
+    # 指令码（Feetech 串行总线舵机通信协议手册，protocol_version=0）。
+    # 上一版把 READ 写成 0x04、WRITE 写成 0x05、REG_WRITE 写成 0x06，
+    # "读 ID 1 地址 56 长度 2"会生成 FF FF 01 04 04 38 02 BC 而不是厂商示例的
+    # FF FF 01 04 02 38 02 BE（审阅指引 3.1）。正确性以 tests/test_motor_control.py
+    # 里**独立于本类常量**构造的标准报文断言为准，不能拿本表当自查依据。
+    INST_RESET = 0x00       # 复位：型号/固件相关，本驱动不提供封装、不调用（见下）
     INST_PING = 0x01
-    INST_READ_DATA = 0x04
-    INST_WRITE_DATA = 0x05
-    INST_REG_WRITE = 0x06  # REG_WRITE / Action：触发已锁存的同步写
+    INST_READ_DATA = 0x02
+    INST_WRITE_DATA = 0x03
+    INST_REG_WRITE = 0x04   # 异步写入：锁存参数，等 INST_ACTION 触发
+    INST_ACTION = 0x05      # 执行此前 REG_WRITE 锁存的内容
     INST_SYNC_WRITE = 0x83
+
+    # 复位(0x00)与"REG_WRITE+ACTION 两段式提交"(0x04/0x05)在这里只登记常量、
+    # 不提供指令封装：复位按型号/固件差异大且不可逆，本任务没有需求（prompt
+    # §5.2），旧版 reg_write_action() 把 0x04 和 0x05 混成一条 0x06 的误导性
+    # 封装已随本表一并移除（审阅指引 3.1）。生产路径只有一条写运动目标的
+    # SYNC_WRITE（写完立即执行），不需要两段式提交。
 
     # 状态帧 ERROR 字节的位定义（STS3215 手册 RETURN_ERROR 位）。bit6/7 的含义
     # 随固件版本有差异，所以报错消息里永远附带原始掩码；"哪些位必须停机"要在
@@ -811,7 +865,7 @@ class StsProtocol:
     ) -> None:
         self._transport = transport
         # 接收帧的分段读取会一次多拿一些字节，未消费的部分暂存在这里（属于
-        # 接收分帧状态，不是应用层数据缓存）。
+        # 接收分帧状态，不是应用数据缓存）。
         self._pending = bytearray()
         # clock 与 sleep 可注入：单元测试需要一个"每调用一次就前进固定步长"的
         # 假时钟来验证超时，以及一个不真正睡觉的 sleep。
@@ -820,6 +874,20 @@ class StsProtocol:
         # 运行期 I/O 重试次数为 0（技术文档 4.2 末段）。把它做成可见的属性，
         # 是为了让"不重试"这件事写在代码里，而不是靠读者信任循环结构。
         self.num_retry = 0
+        # 每台舵机 WRITE 是否有应答：{servo_id: bool}。由控制器 initialize()
+        # 逐台读回 Response_Status_Level（vendor 表地址 8）后配置，见
+        # set_write_response()。未配置时默认 True（等应答）——那是单元测试
+        # 直连路径的保守值；真机运行前一定先过 initialize()，所以生产语义是
+        # "按设备实际应答配置"，不是按注释里的出厂默认猜（prompt §5.2）。
+        self._write_ack: dict[int, bool] = {}
+
+    def set_write_response(self, servo_id: int, expects_ack: bool) -> None:
+        """登记某台舵机 WRITE 指令的**实际**应答配置（来自寄存器读回）。"""
+        self._write_ack[int(servo_id)] = bool(expects_ack)
+
+    def write_expects_ack(self, servo_id: int) -> bool:
+        """查询当前 WRITE 应答策略（诊断与测试用）。"""
+        return self._write_ack.get(int(servo_id), True)
 
     # --- 纯函数：组包与解包（不需要 transport，便于单元测试）---
 
@@ -914,8 +982,23 @@ class StsProtocol:
             )
 
     def _send(self, packet: bytes, deadline_s: float, what: str) -> None:
+        remaining = deadline_s - self._clock()
+        if remaining <= 0.0:
+            raise MotorCommunicationError(
+                f"发送 {what} 超出整次调用总时限（deadline 已到；运行期 I/O 不重试）"
+            )
+        try:
+            # 剩余预算真正交给底层：SerialTransport 会先设 pyserial write_timeout
+            # 再写，慢设备/坏驱动不会把整次方法吊死（审阅指引 3.3）。
+            written = self._transport.write(packet, timeout_s=remaining)
+        except MotorError:
+            raise
+        except Exception as exc:
+            # 串口层的 OSError / 断开等一律归为通信错误，且保留原始原因，
+            # 不允许裸异常漏到上层（技术文档 4.2 的错误分类）。
+            raise MotorCommunicationError(f"发送 {what} 时底层写异常：{exc}") from exc
+        # 阻塞调用返回后再次检查时间：慢写即使最终写完了，也不能宣称满足预算。
         self._require_time(deadline_s, f"发送 {what}")
-        written = self._transport.write(packet)
         if written != len(packet):
             # 短写说明整帧没进 TX 缓冲，后面的应答一定会错配，只能当通信失败。
             raise MotorCommunicationError(
@@ -948,12 +1031,29 @@ class StsProtocol:
         polls = 0
         while len(buf) < n:
             self._require_time(deadline_s, f"接收 {what}")
-            chunk = self._transport.read_available()
+            try:
+                chunk = self._transport.read_available()
+            except MotorError:
+                raise
+            except Exception as exc:
+                raise MotorCommunicationError(f"接收 {what} 时底层读异常：{exc}") from exc
             if not chunk:
                 polls += 1
                 if polls > _POLLS_BEFORE_BLOCK:
                     polls = 0
-                    chunk = self._transport.read(max(1, n - len(buf)))
+                    # 阻塞分片也不得越过剩余预算：把 deadline 换算成 timeout
+                    # 交给 transport.read()，让底层调用自己有界。
+                    remaining = max(0.0, deadline_s - self._clock())
+                    try:
+                        chunk = self._transport.read(
+                            max(1, n - len(buf)), timeout_s=remaining
+                        )
+                    except MotorError:
+                        raise
+                    except Exception as exc:
+                        raise MotorCommunicationError(
+                            f"接收 {what} 时底层读异常：{exc}"
+                        ) from exc
             if chunk:
                 buf += chunk
                 continue
@@ -1019,7 +1119,7 @@ class StsProtocol:
         return rid
 
     def read_registers(self, servo_id: int, addr: int, length: int, deadline_s: float) -> bytes:
-        """READ_DATA（0x04）：params = [地址, 字节数]，返回原始参数字节。"""
+        """READ_DATA（0x02）：params = [地址, 字节数]，返回原始参数字节。"""
         if not 0 <= int(addr) <= 0xFF:
             raise ValueError(f"protocol 0 的参数地址只占 1 字节，{addr} 超出范围")
         _, params = self._request(
@@ -1036,22 +1136,42 @@ class StsProtocol:
         return params
 
     def write_registers(
-        self, servo_id: int, addr: int, data: Sequence[int], deadline_s: float
+        self,
+        servo_id: int,
+        addr: int,
+        data: Sequence[int],
+        deadline_s: float,
+        *,
+        expect_ack: bool | None = None,
     ) -> None:
-        """WRITE_DATA（0x05）：单舵机写若干**字节**，并等状态帧确认。
+        """WRITE_DATA（0x03）：单舵机写若干**字节**；是否等应答按设备实际配置。
 
         data 是字节序列而不是整数，因为寄存器宽度不统一（Torque_Enable 1 字节、
         Goal_Position 2 字节）；2 字节值请用 StsProtocol.split_u16 生成。
-        单舵机写有应答，所以能确认"这台收到了"；这正是与广播同步写的语义差别，
-        技术文档 4.2 要求区分"部分写入"与"提交完成"。
+
+        expect_ack=None 时用 set_write_response() 登记的策略（默认 True）。
+        该策略来自逐台读回的 Response_Status_Level：出厂"只回读指令"时 WRITE
+        本来就不应答，硬等应答会把整次预算耗光；反过来设备全应答时不读状态帧
+        就会让迟到应答污染下一次请求——所以必须按**实际配置**处理，而不是按
+        注释里的默认值假设（prompt §5.2）。应答配置未知的单元保持默认等待。
+
+        语义边界：等待并校验应答 → 能确认"这台收到了、且未报告故障"；不等
+        应答 → 只承诺"整帧已提交给串口"，不承诺设备已执行。两种情况都与
+        "设备已到位"无关（技术文档 4.2 要求区分这三层）。
         """
         if not 0 <= int(addr) <= 0xFF:
             raise ValueError(f"protocol 0 的参数地址只占 1 字节，{addr} 超出范围")
         params: list[int] = [int(addr)]
         params.extend(int(b) & 0xFF for b in data)
-        self._request(
-            servo_id, self.INST_WRITE_DATA, params, deadline_s, f"WRITE id={servo_id} addr={addr}"
-        )
+        what = f"WRITE id={servo_id} addr={addr}"
+        wait = self.write_expects_ack(servo_id) if expect_ack is None else bool(expect_ack)
+        if wait:
+            self._request(servo_id, self.INST_WRITE_DATA, params, deadline_s, what)
+        else:
+            self._drain_input()
+            self._send(
+                self.build_packet(servo_id, self.INST_WRITE_DATA, params), deadline_s, what
+            )
 
     def bulk_read(
         self, servo_ids: Sequence[int], addr: int, length: int, deadline_s: float
@@ -1120,26 +1240,11 @@ class StsProtocol:
             f"SYNC_WRITE addr={addr} ids={ids}",
         )
 
-    def reg_write_action(self, servo_id: int, deadline_s: float) -> None:
-        """REG_WRITE / Action（0x06）：触发已锁存的同步写。
-
-        本项目的 send_action 默认走单帧 0x83（写完立即执行），所以生产路径上不
-        会调用它。保留这个封装的原因："先把数据广播到 SRAM、再逐台 Action 触发"
-        是 Feetech 提供的另一种时序模式，timing 标定阶段需要能对比两者的实际
-        行为（标定指南 8.2 要求实测设备真实行为），届时不必改协议层。
-        """
-        self._request(servo_id, self.INST_REG_WRITE, [], deadline_s, f"REG_WRITE id={servo_id}")
-
-    def reset_servo(self, servo_id: int, deadline_s: float) -> None:
-        """RESET（0x00）：恢复出厂设置。只给标定工具显式调用，绝不进初始化。
-
-        技术文档 4.2/6.4 与标定指南 4.1 都禁止驱动在初始化里偷偷做回零/复位这类
-        不可逆动作，所以本文件没有任何路径调用它；把它写出来只是为了让"指令码
-        有实现、但生产路径不用"这件事在代码里一目了然。
-        """
-        self._send(
-            self.build_packet(servo_id, self.INST_RESET, []), deadline_s, f"RESET id={servo_id}"
-        )
+    # 旧版这里的 reg_write_action()/reset_servo() 已删除：前者把 REG_WRITE(0x04)
+    # 与 ACTION(0x05) 混成一条不存在的 0x06，后者是不可逆的恢复出厂指令，
+    # 型号/固件相关且本任务无需求（审阅指引 3.1、prompt §5.2）。本项目
+    # 的 send_action 只走单帧 0x83 立即执行模式，不需要两段式提交；
+    # 复位/EEPROM 操作属于官方标定工具的职责，不进入驱动。
 
 
 # ---------------------------------------------------------------------------
@@ -1153,10 +1258,24 @@ class SerialTransport:
     ``import serial`` 故意写在构造函数里（见模块 docstring 的依赖边界与
     libs/so_arm_core/SOURCE.md 第 2 节）：pyserial 只有真机驱动路径需要，
     开发机/CI/单元测试跑换算层时不应该因为没装 pyserial 而连模块都 import 不了。
+
+    时限落实（审阅指引 3.3）：上一版只设读 timeout、不设 write_timeout，
+    pyserial 默认写阻塞无上限，"整次预算"在慢写路径上不成立。现在打开时
+    就带一个有限的写超时，并且每次 write/read 都接受协议层传来的
+    timeout_s=剩余预算，在调用前落到 pyserial 的 write_timeout / timeout 上。
+    仍然不调用 ``flush()``：它要等发送缓冲真正排空，会把"提交完成"变成
+    "排空完成"并破坏预算；USB 排空延迟无法由软件承诺，列为真机待测项。
+    串口异常统一包成 MotorCommunicationError（保留原因）；只有"设备未就绪"
+    （未打开/已关闭）按 MotorStateError 分类。
     """
 
     def __init__(
-        self, port: str, baudrate: int, *, read_slice_s: float = _SERIAL_READ_SLICE_S
+        self,
+        port: str,
+        baudrate: int,
+        *,
+        read_slice_s: float = _SERIAL_READ_SLICE_S,
+        write_timeout_s: float = _SERIAL_WRITE_TIMEOUT_S,
     ) -> None:
         try:
             import serial  # 延迟导入：全项目只有这一处使用 pyserial
@@ -1165,10 +1284,15 @@ class SerialTransport:
                 "真机电机驱动需要 pyserial（本机未安装）。换算层（MotorMapping 与"
                 "第 2 节的共享函数）不需要它，可以照常做离线单元测试。"
             ) from exc
+        self._read_slice_s = float(read_slice_s)
         try:
-            # timeout 是"单次 read() 的阻塞分片"，不是整次调用的时限（见常量注释）。
+            # timeout 是"单次 read() 的阻塞分片"，不是整次调用的时限（见常量注释）；
+            # write_timeout 有限，运行期还会按剩余预算逐次收紧。
             self._serial = serial.Serial(
-                port=port, baudrate=int(baudrate), timeout=read_slice_s
+                port=port,
+                baudrate=int(baudrate),
+                timeout=read_slice_s,
+                write_timeout=write_timeout_s,
             )
         except Exception as exc:  # pyserial 的错误类型很多，统一归为"设备未就绪"
             raise MotorStateError(f"无法打开串口 {port}@{baudrate}：{exc}") from exc
@@ -1179,27 +1303,49 @@ class SerialTransport:
         """包装一个已经打开的 pyserial 对象（便于标定工具复用同一句柄）。"""
         obj = cls.__new__(cls)
         obj._serial = serial_like  # type: ignore[assignment]
+        obj._read_slice_s = _SERIAL_READ_SLICE_S
         obj._closed = False
         return obj
 
-    def write(self, data: bytes) -> int:
+    def write(self, data: bytes, timeout_s: float | None = None) -> int:
         self._check_open()
-        return int(self._serial.write(data))  # type: ignore[attr-defined]
+        try:
+            if timeout_s is not None:
+                # 剩余预算落实到本次写：pyserial 的 write_timeout 限制的是
+                # 把字节拷进操作系统发送缓冲的时间（非硬实时，见类注释）。
+                self._serial.write_timeout = max(float(timeout_s), 1e-4)  # type: ignore[attr-defined]
+            return int(self._serial.write(data))  # type: ignore[attr-defined]
+        except Exception as exc:
+            raise MotorCommunicationError(f"串口写失败：{exc}") from exc
 
-    def read(self, n: int) -> bytes:
+    def read(self, n: int, timeout_s: float | None = None) -> bytes:
         self._check_open()
-        return bytes(self._serial.read(int(n)))  # type: ignore[attr-defined]
+        try:
+            if timeout_s is not None:
+                # 阻塞分片不超过 min(常规分片, 剩余预算)，两者取小。
+                self._serial.timeout = min(  # type: ignore[attr-defined]
+                    self._read_slice_s, max(float(timeout_s), 0.0)
+                )
+            return bytes(self._serial.read(int(n)))  # type: ignore[attr-defined]
+        except Exception as exc:
+            raise MotorCommunicationError(f"串口读失败：{exc}") from exc
 
     def read_available(self) -> bytes:
         self._check_open()
-        waiting = int(getattr(self._serial, "in_waiting", 0) or 0)
-        if waiting <= 0:
-            return b""
-        return bytes(self._serial.read(waiting))  # type: ignore[attr-defined]
+        try:
+            waiting = int(getattr(self._serial, "in_waiting", 0) or 0)
+            if waiting <= 0:
+                return b""
+            return bytes(self._serial.read(waiting))  # type: ignore[attr-defined]
+        except Exception as exc:
+            raise MotorCommunicationError(f"串口读失败：{exc}") from exc
 
     def flush_input(self) -> None:
         self._check_open()
-        self._serial.reset_input_buffer()  # type: ignore[attr-defined]
+        try:
+            self._serial.reset_input_buffer()  # type: ignore[attr-defined]
+        except Exception as exc:
+            raise MotorCommunicationError(f"清接收缓冲失败：{exc}") from exc
 
     def close(self) -> None:
         if self._closed:
@@ -1287,9 +1433,14 @@ class Sts3215MotorController:
             # 悄悄按 2 字节读出错位的数据。
             if size != 2:
                 raise ValueError(f"寄存器 {reg} 在 vendor 表里的宽度是 {size} 字节，本驱动只实现 2")
-        # 一次 bulk_read 读 [Present_Position, Present_Velocity] 的前提是两者地址
-        # 连续（STS 表里是 56/58）。不连续就退回两次请求：宁可慢，也不猜地址。
-        self._pos_vel_contiguous = self._vel_addr == self._pos_addr + self._pos_len
+        # 一次事务读全每台的位置/速度/电流：块起止从 vendor 寄存器定义推导
+        # （STS3215 → 56..70，15 字节），不复制云端硬编码。中间的 Present_Load
+        # 等字节透传但不解码（标定指南 4.3）。
+        (self._fb_addr, self._fb_len, self._fb_off) = _feedback_block_layout(
+            (self._pos_addr, self._pos_len),
+            (self._vel_addr, self._vel_len),
+            (self._cur_addr, self._cur_len),
+        )
 
         if initialize:
             self.initialize()
@@ -1317,15 +1468,21 @@ class Sts3215MotorController:
         对不上就说明换算比例可能张冠李戴，宁可拒绝启动。
         单元测试与离线只读核对可以用 verify_identity=False 跳过。
 
-        timeout_s：初始化不是周期调用，内部约有 30 次事务（每台 PING + 型号 +
-        固件 + 力矩），所以不用面向每个 tick 的 write_timeout_s，而是用一个单独
-        的显式预算。原则不变——**一个绝对 deadline 覆盖本次调用里的全部事务**，
+        timeout_s：初始化不是周期调用，内部约有 36 次事务（每台应答配置读回 +
+        PING + 型号 + 固件×2 + 力矩），所以不用面向每个 tick 的 write_timeout_s，
+        而是用一个单独的
+        显式预算。原则不变——**一个绝对 deadline 覆盖本次调用里的全部事务**，
         不会退化成"每台一个超时"。真值需要 timing 阶段实测（标定指南 8.2）。
         """
         self._require_connected()
         # 一个绝对 deadline 覆盖本次初始化里的全部寄存器访问（不按台数倍增）。
         deadline_s = self._clock() + timeout_s
         self._protocol.reset_input()
+        # 先读回每台的**实际**应答配置，再做任何 WRITE（包括力矩）：
+        # WRITE 有没有状态帧由 Response_Status_Level 决定，等错方向要么耗光
+        # 预算、要么把迟到应答当成当前结果（prompt §5.2）。这是一次纯 READ
+        # 批量（6 事务），不做任何 EEPROM 写入。
+        self._configure_write_ack(deadline_s)
         if verify_identity:
             for ax in self.mapping.axes:
                 self._protocol.ping(ax.servo_id, deadline_s)
@@ -1333,11 +1490,34 @@ class Sts3215MotorController:
         if enable_torque:
             self.configure_torque(True, deadline_s=deadline_s)
 
+    def _configure_write_ack(self, deadline_s: float) -> None:
+        """逐台读 Response_Status_Level（vendor 表地址 8），配置 WRITE 应答策略。
+
+        STS 手册取值：0=所有指令应答；1=只回读指令（WRITE 不应答）；2=全静默。
+        等级 2 连 READ 都不应答，下面的读会在预算内以 MotorCommunicationError
+        失败——那正是"设备配置与驱动不匹配"该有的显式报错，不去猜它的含义。
+        只读不写：本页不改任何 EEPROM 配置（prompt §5.1：初始化不做隐藏的
+        回零/恢复出厂/写 EEPROM）。
+        """
+        addr, length = self.mapping.common_register("Response_Status_Level")
+        if length != 1:
+            raise ValueError(f"Response_Status_Level 应为 1 字节寄存器，vendor 表给出 {length}")
+        for ax in self.mapping.axes:
+            raw = int(self._protocol.read_registers(ax.servo_id, addr, 1, deadline_s)[0])
+            if raw not in (0, 1, 2):
+                raise MotorStateError(
+                    f"{ax.name}（id={ax.servo_id}）的 Response_Status_Level 读回 {raw}，"
+                    "不在协议表登记的 0/1/2 内，无法确定写应答语义"
+                )
+            self._protocol.set_write_response(ax.servo_id, expects_ack=(raw == 0))
+
     def configure_torque(self, enable: bool, *, deadline_s: float | None = None) -> None:
         """逐台写 Torque_Enable；初始化里调用一次，标定阶段卸力时也会用。
 
         为什么用单播 WRITE_DATA 而不是 sync_write：力矩开关不是同步运动命令，
-        逐台有应答才能确定"哪一台没配好"；卸力示教与急停时这个信息很重要。
+        逐台写才能定位"哪一台没配好"；卸力示教与急停时这个信息很重要。
+        能否真的"确认收到"取决于该台的实际应答配置（write_registers 按
+        Response_Status_Level 决定是否校验状态帧），设备全静默时只承诺提交。
         """
         self._require_ready()
         end = (
@@ -1403,6 +1583,10 @@ class Sts3215MotorController:
         """受总读时限约束地完整读回 6 台并换算单位。
 
         技术文档 4.2 与标定指南 8.2 第 3 条的要点：
+          * 每台一次 READ 事务读回 56..70 连续块（位置/速度/电流；块起止由
+            vendor 寄存器定义推导，见 _feedback_block_layout），六台共 6 次，
+            全部共用同一个绝对 deadline（read_timeout_s），总时限不随台数倍增；
+            块中间的 Present_Load 等字节透传但不解码（标定指南 4.3）；
           * 采样起止时间来自本机 monotonic_ns（可注入），sequence 只在整次
             完整成功读回后递增；
           * 跨度超过 timing.max_feedback_span_s 的采样无效 —— 6 台的读数不再
@@ -1413,28 +1597,24 @@ class Sts3215MotorController:
         """
         self._require_connected()
         sample_start_ns = self._monotonic_ns()
-        # 整次方法只有一个 deadline；两次 bulk_read（位置+速度块、电流块）共用
-        # 它，所以 12 次单播事务加起来也不能超过 read_timeout_s。
+        # 整次方法只有一个 deadline；六台块读共用它，所以 6 次单播事务加起来
+        # 也不能超过 read_timeout_s。
         deadline_s = self._clock() + self.timing.read_timeout_s
         ids = [ax.servo_id for ax in self.mapping.axes]
 
-        if self._pos_vel_contiguous:
-            # Present_Position(56) 与 Present_Velocity(58) 地址连续，一台一次
-            # 事务就读完两个寄存器，把总事务数从 18 降到 12，给 read_timeout_s
-            # 留余量。注意块里会顺带经过 Present_Load(60)——本实现不读它，
-            # 也绝不把它当 Present_Current（标定指南 4.3）。
-            block = self._protocol.bulk_read(
-                ids, self._pos_addr, self._pos_len + self._vel_len, deadline_s
-            )
-            pos_raw = {sid: StsProtocol.join_u16(b[: self._pos_len]) for sid, b in block.items()}
-            vel_raw = {sid: StsProtocol.join_u16(b[self._pos_len :]) for sid, b in block.items()}
-        else:  # pragma: no cover - 只在寄存器不连续的另一批型号上走到
-            pb = self._protocol.bulk_read(ids, self._pos_addr, self._pos_len, deadline_s)
-            vb = self._protocol.bulk_read(ids, self._vel_addr, self._vel_len, deadline_s)
-            pos_raw = {sid: StsProtocol.join_u16(b) for sid, b in pb.items()}
-            vel_raw = {sid: StsProtocol.join_u16(b) for sid, b in vb.items()}
-        cur_block = self._protocol.bulk_read(ids, self._cur_addr, self._cur_len, deadline_s)
-        cur_raw = {sid: StsProtocol.join_u16(b) for sid, b in cur_block.items()}
+        block = self._protocol.bulk_read(ids, self._fb_addr, self._fb_len, deadline_s)
+        op = self._fb_off["Present_Position"]
+        ov = self._fb_off["Present_Velocity"]
+        oc = self._fb_off["Present_Current"]
+        pos_raw = {
+            sid: StsProtocol.join_u16(b[op : op + self._pos_len]) for sid, b in block.items()
+        }
+        vel_raw = {
+            sid: StsProtocol.join_u16(b[ov : ov + self._vel_len]) for sid, b in block.items()
+        }
+        cur_raw = {
+            sid: StsProtocol.join_u16(b[oc : oc + self._cur_len]) for sid, b in block.items()
+        }
         # 结束时间戳贴着最后一次 I/O 取：后面的单位换算是纯 CPU 计算，不计入
         # 采样跨度；而 age 从 sample_start_ns 起算（8.2 第 3 条），所以这里不能
         # 把结束时间往前挪来"美化"跨度。
@@ -1485,6 +1665,13 @@ class Sts3215MotorController:
 
         一次读、一次写，不循环（技术文档 4.2）。写回的目标就是当前位置，所以
         正常情况下不产生运动，只是把"已提交的位置目标"重新固定住。
+
+        预算组合（标定指南 8.2；不新增配置字段）：读段受 timing.read_timeout_s
+        约束、写段受 timing.write_timeout_s 约束，各自是独立的整次方法预算，
+        本方法最坏合计两者之和；文档与实现以此为准。
+
+        失败语义：读失败直接抛出，**不会**发送一个猜出来的保持目标；写失败
+        同样抛出，不伪报"保持已提交"。返回后没有任何监控或续写循环。
 
         保持目标走的是与 send_action 完全相同的整条校验：如果实测位置已经在
         有效限位之外，那是机构/标定/外力造成的异常，本方法按"失败上报"处理，
@@ -1708,7 +1895,12 @@ class CalibrationReader:
         self._cur_addr, self._cur_len = self.mapping.common_register("Present_Current")
         if self._pos_len != 2 or self._vel_len != 2 or self._cur_len != 2:
             raise ValueError("CalibrationReader 按 2 字节小端寄存器编写，vendor 表宽度不符")
-        self._pos_vel_contiguous = self._vel_addr == self._pos_addr + self._pos_len
+        # 与 Sts3215MotorController 同一份块布局推导（vendor 表来源，不硬编码）。
+        (self._fb_addr, self._fb_len, self._fb_off) = _feedback_block_layout(
+            (self._pos_addr, self._pos_len),
+            (self._vel_addr, self._vel_len),
+            (self._cur_addr, self._cur_len),
+        )
         self._closed = False
 
     def close(self) -> None:
@@ -1719,7 +1911,9 @@ class CalibrationReader:
     def read_snapshot(self) -> dict:
         """一次有界事务读回 6 台的位置/速度/电流寄存器。
 
-        返回 dict（键名与指南 4.1/5 的 JSONL payload 对齐）：
+        每台一次 READ 连续块（六台共 6 次事务，共用同一个绝对 deadline），
+        原始寄存器值按 vendor 表偏移拆出；Present_Load 等中间字节透传不解码
+        （标定指南 4.3）。返回 dict（键名与指南 4.1/5 的 JSONL payload 对齐）：
           raw_position / raw_velocity / raw_current：按 MOTOR_NAMES 顺序的
             寄存器原始无符号值（未解码，供 fit 与离线复算）；
           sample_start_ns / sample_end_ns：本次采样的起止时间戳；
@@ -1733,19 +1927,19 @@ class CalibrationReader:
         deadline = self._clock() + self._read_timeout_s
         ids = [ax.servo_id for ax in self.mapping.axes]
         sample_start_ns = self._monotonic_ns()
-        if self._pos_vel_contiguous:
-            block = self._protocol.bulk_read(
-                ids, self._pos_addr, self._pos_len + self._vel_len, deadline
-            )
-            pos = {sid: StsProtocol.join_u16(b[: self._pos_len]) for sid, b in block.items()}
-            vel = {sid: StsProtocol.join_u16(b[self._pos_len:]) for sid, b in block.items()}
-        else:
-            pb = self._protocol.bulk_read(ids, self._pos_addr, self._pos_len, deadline)
-            vb = self._protocol.bulk_read(ids, self._vel_addr, self._vel_len, deadline)
-            pos = {sid: StsProtocol.join_u16(b) for sid, b in pb.items()}
-            vel = {sid: StsProtocol.join_u16(b) for sid, b in vb.items()}
-        cur_block = self._protocol.bulk_read(ids, self._cur_addr, self._cur_len, deadline)
-        cur = {sid: StsProtocol.join_u16(b) for sid, b in cur_block.items()}
+        block = self._protocol.bulk_read(ids, self._fb_addr, self._fb_len, deadline)
+        op = self._fb_off["Present_Position"]
+        ov = self._fb_off["Present_Velocity"]
+        oc = self._fb_off["Present_Current"]
+        pos = {
+            sid: StsProtocol.join_u16(b[op : op + self._pos_len]) for sid, b in block.items()
+        }
+        vel = {
+            sid: StsProtocol.join_u16(b[ov : ov + self._vel_len]) for sid, b in block.items()
+        }
+        cur = {
+            sid: StsProtocol.join_u16(b[oc : oc + self._cur_len]) for sid, b in block.items()
+        }
         sample_end_ns = self._monotonic_ns()
 
         m = self.mapping
