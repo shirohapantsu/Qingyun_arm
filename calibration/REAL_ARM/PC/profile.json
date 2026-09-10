@@ -1,0 +1,687 @@
+{
+  "schema_version": 1,
+  "profile_id": "real_pc_v0",
+  "robot_id": "REAL_ARM_PC",
+  "status": "draft",
+  "model": {
+    "urdf_path": "../../../libs/so_arm_core/so101_new_calib.urdf",
+    "urdf_sha256": "3a65d2d35e68a8d2f0c2cc176d19b884506543c93ba72980145b80abe276022c",
+    "motor_calibration_path": "motor_calibration.json",
+    "motor_calibration_sha256": "ad315322ad4d19cc322c8f21d86d9667d9df9eca2de325bebbd72fa62deefff5"
+  },
+  "motor": {
+    "port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+    "baudrate": 1000000,
+    "ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "models": [
+      "sts3215",
+      "sts3215",
+      "sts3215",
+      "sts3215",
+      "sts3215",
+      "sts3215"
+    ],
+    "firmware": [
+      "3.10",
+      "3.10",
+      "3.10",
+      "3.10",
+      "3.10",
+      "3.10"
+    ],
+    "position_resolution": [
+      4096,
+      4096,
+      4096,
+      4096,
+      4096,
+      4096
+    ],
+    "current_ma_per_raw": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "current_zero_raw": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "velocity_deg_s_per_raw": [
+      3.0,
+      3.0,
+      3.0,
+      3.0,
+      3.0,
+      3.0
+    ],
+    "gripper_closed_raw": 500,
+    "gripper_open_raw": 3600
+  },
+  "joints": {
+    "sign": null,
+    "zero_offset_deg": null,
+    "measured_limits_deg": [
+      [
+        -105.0,
+        105.0
+      ],
+      [
+        -95.0,
+        95.0
+      ],
+      [
+        -92.0,
+        92.0
+      ],
+      [
+        -90.0,
+        90.0
+      ],
+      [
+        -150.0,
+        155.0
+      ]
+    ],
+    "application_limits_deg": [
+      [
+        -110.0,
+        110.0
+      ],
+      [
+        -100.0,
+        60.0
+      ],
+      [
+        -96.0,
+        96.0
+      ],
+      [
+        -95.0,
+        95.0
+      ],
+      [
+        -90.0,
+        90.0
+      ]
+    ],
+    "margin_deg": [
+      2.0,
+      2.0,
+      2.0,
+      2.0,
+      2.0
+    ],
+    "hard_current_ma": [
+      900.0,
+      900.0,
+      900.0,
+      900.0,
+      900.0
+    ]
+  },
+  "tool": {
+    "rotation_e_tcp": [
+      [
+        0.0,
+        -0.0486886,
+        0.998814
+      ],
+      [
+        0.0,
+        -0.998814,
+        -0.0486886
+      ],
+      [
+        1.0,
+        0.0,
+        0.0
+      ]
+    ],
+    "translation_samples": [
+      {
+        "gripper_pct": 0.0,
+        "xyz_m": [
+          0.055,
+          -0.001,
+          0.0
+        ]
+      },
+      {
+        "gripper_pct": 50.0,
+        "xyz_m": [
+          0.055,
+          -0.0035,
+          0.0012
+        ]
+      },
+      {
+        "gripper_pct": 100.0,
+        "xyz_m": [
+          0.0548,
+          -0.006,
+          0.0025
+        ]
+      }
+    ],
+    "position_error_bound_m": 0.002,
+    "orientation_error_bound_deg": 1.2
+  },
+  "workspace": {
+    "target_bounds_m": [
+      [
+        0.325,
+        -0.07,
+        0.02
+      ],
+      [
+        0.4,
+        0.07,
+        0.028
+      ]
+    ],
+    "tcp_bounds_m": [
+      [
+        0.3,
+        -0.1,
+        0.015
+      ],
+      [
+        0.42,
+        0.1,
+        0.23
+      ]
+    ],
+    "table_z_m": 0.0,
+    "table_flatness_m": 0.001,
+    "home_joints_deg": [
+      0.0,
+      -60.0,
+      60.0,
+      0.0,
+      0.0
+    ],
+    "safe_waypoints_deg": [
+      [
+        0.0,
+        -75.0,
+        75.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        -45.0,
+        45.0,
+        0.0,
+        0.0
+      ]
+    ],
+    "obstacles": [
+      {
+        "id": "bracket_east",
+        "bounds_m": [
+          [
+            0.28,
+            0.13,
+            0.0
+          ],
+          [
+            0.36,
+            0.18,
+            0.1
+          ]
+        ]
+      },
+      {
+        "id": "camera_pole",
+        "bounds_m": [
+          [
+            0.2,
+            -0.2,
+            0.0
+          ],
+          [
+            0.23,
+            -0.15,
+            0.15
+          ]
+        ]
+      }
+    ]
+  },
+  "collision": {
+    "link_capsules": [
+      {
+        "id": "base_body",
+        "link": "base_link",
+        "p0_m": [
+          0,
+          0,
+          0
+        ],
+        "p1_m": [
+          0.03884,
+          -0.0,
+          0.0624
+        ],
+        "radius_m": 0.024
+      },
+      {
+        "id": "shoulder_body",
+        "link": "shoulder_link",
+        "p0_m": [
+          0,
+          0,
+          0
+        ],
+        "p1_m": [
+          -0.0304,
+          -0.01828,
+          -0.0542
+        ],
+        "radius_m": 0.017
+      },
+      {
+        "id": "upper_arm",
+        "link": "upper_arm_link",
+        "p0_m": [
+          0,
+          0,
+          0
+        ],
+        "p1_m": [
+          -0.11257,
+          -0.028,
+          0.0
+        ],
+        "radius_m": 0.015
+      },
+      {
+        "id": "lower_arm",
+        "link": "lower_arm_link",
+        "p0_m": [
+          0,
+          0,
+          0
+        ],
+        "p1_m": [
+          -0.1349,
+          0.0052,
+          0.0
+        ],
+        "radius_m": 0.014
+      },
+      {
+        "id": "wrist_body",
+        "link": "wrist_link",
+        "p0_m": [
+          0,
+          0,
+          0
+        ],
+        "p1_m": [
+          0.0,
+          -0.0611,
+          0.0181
+        ],
+        "radius_m": 0.013
+      },
+      {
+        "id": "gripper_body",
+        "link": "gripper_link",
+        "p0_m": [
+          0,
+          0,
+          0
+        ],
+        "p1_m": [
+          -0.0079,
+          -0.00022,
+          -0.09813
+        ],
+        "radius_m": 0.013
+      },
+      {
+        "id": "tool_head",
+        "link": "gripper_frame_link",
+        "p0_m": [
+          -0.02,
+          0.0,
+          0.0
+        ],
+        "p1_m": [
+          0.02,
+          0.0,
+          0.0
+        ],
+        "radius_m": 0.016
+      },
+      {
+        "id": "fixed_pad",
+        "link": "gripper_frame_link",
+        "p0_m": [
+          0.043,
+          0.0,
+          0.012
+        ],
+        "p1_m": [
+          0.054,
+          0.0,
+          0.012
+        ],
+        "radius_m": 0.005
+      },
+      {
+        "id": "moving_pad",
+        "link": "moving_jaw_so101_v1_link",
+        "p0_m": [
+          -0.09199,
+          -0.02297,
+          0.01902
+        ],
+        "p1_m": [
+          -0.10176,
+          -0.01791,
+          0.01902
+        ],
+        "radius_m": 0.005
+      }
+    ],
+    "ignore_self_pairs": [
+      [
+        "base_body",
+        "shoulder_body"
+      ],
+      [
+        "base_body",
+        "upper_arm"
+      ],
+      [
+        "shoulder_body",
+        "upper_arm"
+      ],
+      [
+        "upper_arm",
+        "lower_arm"
+      ],
+      [
+        "lower_arm",
+        "wrist_body"
+      ],
+      [
+        "wrist_body",
+        "gripper_body"
+      ],
+      [
+        "gripper_body",
+        "tool_head"
+      ],
+      [
+        "gripper_body",
+        "fixed_pad"
+      ],
+      [
+        "gripper_body",
+        "moving_pad"
+      ],
+      [
+        "tool_head",
+        "fixed_pad"
+      ],
+      [
+        "tool_head",
+        "moving_pad"
+      ],
+      [
+        "fixed_pad",
+        "moving_pad"
+      ]
+    ],
+    "clearance_m": 0.003,
+    "max_joint_substep_deg": 0.5
+  },
+  "places": {
+    "default": {
+      "position": [
+        0.32,
+        0.055,
+        0.024
+      ],
+      "yaw_deg": 10.0
+    },
+    "bin": {
+      "position": [
+        0.34,
+        -0.06,
+        0.024
+      ],
+      "yaw_deg": -10.0
+    }
+  },
+  "timing": {
+    "fps": 30,
+    "read_timeout_s": 0.02,
+    "write_timeout_s": 0.015,
+    "max_feedback_age_s": 0.05,
+    "max_feedback_span_s": 0.03,
+    "max_tick_lateness_s": 0.02,
+    "stop_poll_s": 0.01,
+    "planning_poll_s": 0.05
+  },
+  "motion": {
+    "max_velocity_deg_s": [
+      70.0,
+      70.0,
+      70.0,
+      70.0,
+      70.0
+    ],
+    "max_acceleration_deg_s2": [
+      260.0,
+      260.0,
+      260.0,
+      260.0,
+      260.0
+    ],
+    "max_command_step_deg": [
+      2.2,
+      2.2,
+      2.2,
+      2.2,
+      2.2
+    ],
+    "tcp_max_velocity_m_s": 0.22,
+    "tcp_max_acceleration_m_s2": 1.4,
+    "start_position_tol_deg": [
+      3.0,
+      3.0,
+      3.0,
+      3.0,
+      3.0
+    ],
+    "following_error_deg": [
+      12.0,
+      12.0,
+      12.0,
+      12.0,
+      12.0
+    ],
+    "following_error_hard_deg": [
+      25.0,
+      25.0,
+      25.0,
+      25.0,
+      25.0
+    ],
+    "following_error_dwell_s": 0.1,
+    "settle_position_tol_deg": [
+      2.5,
+      2.5,
+      2.5,
+      2.5,
+      2.5
+    ],
+    "settle_velocity_tol_deg_s": [
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0
+    ],
+    "settle_dwell_s": 0.15,
+    "settle_timeout_s": 3.0
+  },
+  "ik": {
+    "position_tol_m": 0.007,
+    "tilt_tol_deg": 1.5,
+    "yaw_tol_deg": 2.0,
+    "position_weight": 1.0,
+    "orientation_weight": 0.1,
+    "max_iterations": 250,
+    "stagnation_iterations": 12,
+    "max_solve_s": 1.5,
+    "min_progress": 0.001,
+    "seed_joints_deg": [
+      [
+        0.0,
+        -90.0,
+        90.0,
+        0.0,
+        0.0
+      ],
+      [
+        10.0,
+        -85.0,
+        85.0,
+        -5.0,
+        0.0
+      ],
+      [
+        -10.0,
+        -85.0,
+        85.0,
+        -5.0,
+        0.0
+      ],
+      [
+        0.0,
+        -30.0,
+        60.0,
+        -40.0,
+        0.0
+      ]
+    ]
+  },
+  "grasp": {
+    "center_offset_object_m": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "yaw_offset_deg": 0.0,
+    "object_envelope_m": [
+      0.05,
+      0.04,
+      0.04
+    ],
+    "target_position_error_bound_m": 0.004,
+    "target_yaw_error_bound_deg": 5.0,
+    "object_shift_bound_m": 0.003,
+    "approach_height_m": 0.08,
+    "lift_height_m": 0.09,
+    "retreat_height_m": 0.08
+  },
+  "gripper": {
+    "gap_table": [
+      {
+        "gripper_pct": 0.0,
+        "gap_m": 0.005
+      },
+      {
+        "gripper_pct": 25.0,
+        "gap_m": 0.0175
+      },
+      {
+        "gripper_pct": 50.0,
+        "gap_m": 0.03
+      },
+      {
+        "gripper_pct": 75.0,
+        "gap_m": 0.0425
+      },
+      {
+        "gripper_pct": 100.0,
+        "gap_m": 0.055
+      }
+    ],
+    "angle_table": [
+      {
+        "gripper_pct": 0.0,
+        "angle_deg": -10.0
+      },
+      {
+        "gripper_pct": 25.0,
+        "angle_deg": 17.5
+      },
+      {
+        "gripper_pct": 50.0,
+        "angle_deg": 45.0
+      },
+      {
+        "gripper_pct": 75.0,
+        "angle_deg": 72.5
+      },
+      {
+        "gripper_pct": 100.0,
+        "angle_deg": 100.0
+      }
+    ],
+    "preopen_pct": 70.0,
+    "release_pct": 55.0,
+    "open_speed_pct_s": 25.0,
+    "close_speed_pct_s": 15.0,
+    "contact_gap_range_m": [
+      0.02,
+      0.032
+    ],
+    "contact_current_ma": 220.0,
+    "hard_current_ma": 450.0,
+    "window_samples": 3,
+    "contact_dwell_s": 0.1,
+    "empty_closed_pct": 3.0,
+    "empty_tol_pct": 2.0,
+    "close_timeout_s": 6.0,
+    "open_timeout_s": 6.0,
+    "hold_dwell_s": 0.3,
+    "release_dwell_s": 0.5,
+    "slip_opening_change_pct": 6.0,
+    "settle_tol_pct": 2.0,
+    "settle_speed_pct_s": 3.0
+  },
+  "acceptance": {
+    "max_position_error_m": 0.01,
+    "max_tilt_error_deg": 3.0,
+    "max_yaw_error_deg": 4.0,
+    "max_stop_latency_s": 0.2,
+    "min_grasp_success_rate": 0.9,
+    "max_drop_rate": 0.05,
+    "max_damage_rate": 0.02,
+    "damage_observe_minutes": 30.0,
+    "min_grasp_trials": 30
+  },
+  "verification": null
+}

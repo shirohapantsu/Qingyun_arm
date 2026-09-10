@@ -509,15 +509,18 @@ def _capture_hardware(stage: str, profile_path: Path, args: argparse.Namespace) 
         elif stage == "joints":
             # 卸力手动/受限低速点动，参考角必须来自外部夹具（指南第 5 节）。
             # q_bus 由位置寄存器按 4.2 第一行公式换算，不依赖 joints 拟合结果。
+            # 参考样本必须整行合并：_fit_joints 还要读 sweep_joint_index、
+            # endpoint_urdf_deg、endpoint_repeat_deg、application_limit_urdf_deg、
+            # limit_reason、fk_check，逐个挑键会把它们丢掉（ISSUE-022）。
             refs = load_json(Path(args.reference)) if args.reference else {"samples": []}
             for row in refs.get("samples", []):
+                if "q_reference_deg" not in row:
+                    raise CalibError(
+                        f"joints 参考样本缺 q_reference_deg：{sorted(row)}")
                 snap = reader.read_snapshot()
-                emit({"record_type": "sample", "q_bus_deg": snap["q_bus_deg"],
-                      "q_reference_deg": row["q_reference_deg"],
-                      "measured_tcp_position_m": row.get("measured_tcp_position_m"),
-                      "measured_tool_axes": row.get("measured_tool_axes"),
-                      "fixture_id": row.get("fixture_id"), "load_label": row.get("load_label"),
-                      "approach_direction": row.get("approach_direction")})
+                payload = {"record_type": "sample", "q_bus_deg": snap["q_bus_deg"]}
+                payload.update(row)
+                emit(payload)
         elif stage in ("tool", "workcell"):
             refs = load_json(Path(args.reference)) if args.reference else {"samples": []}
             for row in refs.get("samples", []):
@@ -1055,9 +1058,15 @@ def _fit_motor(base: dict, records: list[Record]) -> tuple[dict[str, Any], dict[
     upd: dict[str, Any] = {}
     res: dict[str, Any] = {}
     meta = metadata_of(records)
-    if meta.get("models"):
+    # 身份与端口只能来自**真机**采集。指南 1.3 要求每一次实验的 metadata 都记录
+    # 型号与固件，模拟源因此也必须写它们——但那描述的是仿真工作台的设定，不是
+    # 这台臂的实测值。无条件回填会把操作者刚在真机上读回的 motor.firmware 静默
+    # 改回 "2.54"（ISSUE-019：实机为 3.10 时，initialize() 随后会以"配置登记 2.54
+    # 与读回不符"拒绝启动，而错误信息指不回是拟合环节引入的）。
+    from_hardware = meta.get("source") == "hardware"
+    if from_hardware and meta.get("models"):
         upd["motor.models"] = list(meta["models"])
-    if meta.get("firmware"):
+    if from_hardware and meta.get("firmware"):
         upd["motor.firmware"] = list(meta["firmware"])
 
     closed_samples = [r.payload for r in samples_of(records)
@@ -1107,10 +1116,10 @@ def _fit_motor(base: dict, records: list[Record]) -> tuple[dict[str, Any], dict[
     res["velocity_direction_check"] = _velocity_direction_check(records)
     if "motor.velocity_deg_s_per_raw" not in upd:
         upd["motor.velocity_deg_s_per_raw"] = list(base["motor"]["velocity_deg_s_per_raw"])
-    # 串口路径来自实际采集环境的 metadata（hardware 采集已写入真实端口）。
+    # 串口路径同样只认真机采集的 metadata（_capture_hardware 会写入真实端口）。
     # 操作者没有提供时保持 null：技术文档第八节要求"实机未测参数保持未完成
     # 状态，不用猜测值自动填补"（P2-3 修掉的正是这个猜测值）。
-    if meta.get("port"):
+    if from_hardware and meta.get("port"):
         upd["motor.port"] = str(meta["port"])
 
     # 资源哈希（指南 1.1 要求 real 模式复核）

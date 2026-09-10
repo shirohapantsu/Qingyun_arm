@@ -245,6 +245,52 @@ def test_fit不修改输入配置(pipeline):
     assert c0.read_text(encoding="utf-8") == before, "fit 必须输出独立候选文件"
 
 
+def test_模拟源拟合不得覆盖实机身份字段(tmp_path):
+    """ISSUE-019：模拟源 metadata 里的型号/固件是仿真工作台的设定。
+
+    指南 1.3 要求 metadata 必须记录它们，所以不能靠"模拟源不写"来修；真正的
+    规则是**只有真机采集才允许回填身份字段**。这里两个方向都要钉住：模拟源不能
+    覆盖实测值，真机采集仍然要把读回值取进来——只测前一个方向的话，"永远不回
+    填"这种更错的实现也能让测试通过。
+    """
+    prof = tmp_path / "profile.json"
+    run("init", "--output", str(tmp_path), "--robot-id", "HW", "--profile-id", "v0")
+    data = json.loads(prof.read_text(encoding="utf-8"))
+    # 操作者在真机上逐台读回的固件（实机案例：STS3215 3.10）
+    data["motor"]["firmware"] = ["3.10"] * 6
+    data["motor"]["port"] = "/dev/serial/by-id/usb-OPERATOR-CONFIRMED"
+    prof.write_text(json.dumps(data), encoding="utf-8")
+
+    sim = tmp_path / "fit_sim.jsonl"
+    run("capture", "--stage", "motor", "--profile", str(prof), "--output", str(sim))
+    # 前提：模拟源确实自带一个不同的固件号，否则这个测试没有任何判别力
+    sim_meta = json.loads(sim.read_text(encoding="utf-8").splitlines()[0])
+    assert sim_meta["payload"]["source"] == "simulated"
+    assert sim_meta["payload"]["firmware"] != ["3.10"] * 6
+
+    cand = tmp_path / "cand_sim.json"
+    run("fit", "--stage", "motor", "--profile", str(prof), "--input", str(sim),
+        "--output", str(cand))
+    after = json.loads(cand.read_text(encoding="utf-8"))["motor"]
+    assert after["firmware"] == ["3.10"] * 6, "模拟源把实测固件改回去了（ISSUE-019）"
+    assert after["port"] == "/dev/serial/by-id/usb-OPERATOR-CONFIRMED"
+
+    # 反方向：同一份样本改成真机来源，并带上读回值，fit 必须把它取进来
+    rows = [json.loads(l) for l in sim.read_text(encoding="utf-8").splitlines()]
+    rows[0]["payload"]["source"] = "hardware"
+    rows[0]["payload"]["firmware"] = ["3.77"] * 6
+    rows[0]["payload"]["port"] = "/dev/serial/by-id/usb-REAL-ARM"
+    hw = tmp_path / "fit_hw.jsonl"
+    hw.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows),
+                  encoding="utf-8")
+    cand_hw = tmp_path / "cand_hw.json"
+    run("fit", "--stage", "motor", "--profile", str(prof), "--input", str(hw),
+        "--output", str(cand_hw))
+    got = json.loads(cand_hw.read_text(encoding="utf-8"))["motor"]
+    assert got["firmware"] == ["3.77"] * 6, "真机采集的读回值没有被采纳"
+    assert got["port"] == "/dev/serial/by-id/usb-REAL-ARM"
+
+
 def test_joints拟合能定出方向与零位(pipeline):
     data = json.loads(pipeline["candidate"].read_text(encoding="utf-8"))
     assert data["joints"]["sign"] in ([1, 1, 1, 1, 1], [-1] * 5) or \
@@ -507,7 +553,7 @@ import numpy as np
 
 import qingyun.grabbing.motor_control as MC
 from configs.motion_params import load_calibration_profile
-from tests.test_motor_control import FakeBus
+from tests.test_motor_control import VENDOR_INST_READ, FakeBus
 
 
 def _load_mod():
@@ -610,6 +656,132 @@ def test_capture_hardware_joints_stage给出q_bus(tmp_path, monkeypatch):
     expect = [rd.mapping.raw_to_bus_deg(ax, 2100 + 5 * i)
               for i, ax in enumerate(rd.mapping.axes[:5])]
     assert payload["q_bus_deg"] == pytest.approx(expect, abs=1e-12)
+
+
+def test_capture_hardware_joints的外部测量键能进记录并被fit消费(tmp_path, monkeypatch):
+    """ISSUE-022：joints 采集分支曾逐个挑键，把 _fit_joints 必需的键全丢掉。
+
+    端到端跑 capture --hardware --stage joints → fit --stage joints。旧写法在 fit
+    里抛 KeyError: 'sweep_joint_index'，joints 整阶段无法拟合。
+    """
+    mod, prof = _draft_package(tmp_path)
+    (tmp_path / "reports").mkdir(exist_ok=True)
+    (tmp_path / "reports" / "motor.json").write_text(
+        json.dumps({"stages": {"motor": {"passed": True}}}), encoding="utf-8")
+
+    # 真值定义在被标定模型自己的坐标里：用生产换算层把期望总线角折回寄存器计数。
+    probe = MC.CalibrationReader(load_calibration_profile(prof), transport=FakeBus())
+    mapping = probe.mapping
+    probe.close()
+    sign_true = [1, -1, 1, -1, 1]
+    offset_true = [0.0, 5.0, -3.0, 12.0, 0.5]
+    neutral = [int(mapping.bus_deg_to_raw(j, 0.0)) for j in range(5)]
+
+    def q_ref(j: int, deg: float) -> list[float]:
+        return [sign_true[k] * (deg if k == j else 0.0) + offset_true[k]
+                for k in range(5)]
+
+    samples: list[dict] = []
+    positions: list[list[int]] = []
+
+    def add(row: dict, pos: list[int]) -> None:
+        samples.append(row)
+        positions.append(pos)
+
+    # 1) 每关节 3 个角度、覆盖正反方向 → sign / zero_offset_deg
+    for j in range(5):
+        for deg in (-20.0, 15.0, 40.0):
+            pos = list(neutral)
+            pos[j] = int(mapping.bus_deg_to_raw(j, deg))
+            add({"approach_direction": "joint_sweep", "sweep_joint_index": j,
+                 "sweep_direction": "forward" if deg >= 0 else "backward",
+                 "q_reference_deg": q_ref(j, deg),
+                 "fixture_id": "G1", "load_label": "unloaded"}, pos)
+    # 2) 端点重复测量 → measured_limits_deg / margin_deg。关节 0 故意给 1.8° 的
+    #    重复散布，用来验证指南 5.5 的 margin = max(draft, 散布 + 0.5) 真会变大。
+    for j in range(5):
+        spread = 1.8 if j == 0 else 0.4
+        for side, base in (("lower", -95.0), ("upper", 88.0)):
+            dirn = -1.0 if side == "lower" else 1.0
+            for rep in (0.0, spread):
+                v = base + dirn * rep
+                add({"approach_direction": "endpoints", "sweep_joint_index": j,
+                     "endpoint_side": side, "endpoint_urdf_deg": v,
+                     "endpoint_repeat_deg": v, "q_reference_deg": q_ref(j, 0.0)},
+                    list(neutral))
+    # 3) 线缆/支架限制，每关节一条 → application_limits_deg
+    for j in range(5):
+        add({"approach_direction": "application_limit", "sweep_joint_index": j,
+             "application_limit_urdf_deg": [-90.0 - j, 90.0 + j],
+             "limit_reason": "harness", "q_reference_deg": q_ref(j, 0.0)},
+            list(neutral))
+    # 4) 至少 10 个未参与拟合的 FK 验证构型（指南 5.6）
+    for k in range(10):
+        add({"approach_direction": "fk_validation", "fk_check": True,
+             "q_reference_deg": q_ref(k % 5, float(k)),
+             "measured_tcp_position_m": [0.3, 0.01 * k, 0.05]},
+            list(neutral))
+
+    ref = tmp_path / "ref.json"
+    ref.write_text(json.dumps({"samples": samples}), encoding="utf-8")
+    bus = _RowSteppingBus(positions)
+    monkeypatch.setattr(MC, "SerialTransport", lambda port, baud: bus)
+    out = tmp_path / "hw_joints.jsonl"
+    assert mod.main(["capture", "--stage", "joints", "--profile", str(prof),
+                     "--output", str(out), "--hardware", "--reference", str(ref)]) == 0
+
+    records = [json.loads(line) for line in out.read_text(encoding="utf-8").splitlines()]
+    sweep = records[1]["payload"]
+    for key in ("q_bus_deg", "sweep_joint_index", "sweep_direction", "fixture_id"):
+        assert key in sweep, f"采集记录丢了 fit 必需的键 {key}（ISSUE-022）"
+    assert not any(f[4] in (MC.StsProtocol.INST_SYNC_WRITE,
+                            MC.StsProtocol.INST_WRITE_DATA) for f in bus.tx_log), \
+        "joints 采集只允许读总线，不许提交运动"
+
+    cand = tmp_path / "cand.json"
+    assert mod.main(["fit", "--stage", "joints", "--profile", str(prof),
+                     "--input", str(out), "--output", str(cand)]) == 0
+    fitted = json.loads(cand.read_text(encoding="utf-8"))
+    assert fitted["status"] == "draft"
+    assert fitted["joints"]["sign"] == sign_true, "方向真值未被恢复"
+    assert fitted["joints"]["zero_offset_deg"] == pytest.approx(
+        offset_true, abs=0.06), "零位偏置未被恢复（编码步长 0.0879°/计数）"
+    for j in range(5):
+        lo, hi = fitted["joints"]["measured_limits_deg"][j]
+        assert (lo, hi) == (-95.0 - (1.8 if j == 0 else 0.4), 88.0 + (1.8 if j == 0 else 0.4))
+    assert fitted["joints"]["margin_deg"] == pytest.approx([2.3, 2.0, 2.0, 2.0, 2.0])
+    assert fitted["joints"]["application_limits_deg"][2] == [-92.0, 92.0]
+    audit = json.loads((tmp_path / "cand.audit.json").read_text(encoding="utf-8"))
+    assert audit["joints"]["residuals"]["fk_validation_configs"] == 10
+    assert audit["joints"]["updated_fields"] == sorted([
+        "joints.sign", "joints.zero_offset_deg", "joints.measured_limits_deg",
+        "joints.margin_deg", "joints.application_limits_deg"])
+
+
+class _RowSteppingBus(FakeBus):
+    """每完成一次 read_snapshot（6 台各一次块读）换一组 Present_Position。
+
+    模拟操作者按 --reference 逐行把臂重新摆好——没有它就只能测"键是否进记录"，
+    测不到"fit 能否从这些记录解出真值"。
+
+    挂钩必须放在 write()：FakeBus 在 write() 里处理 READ 请求并自增
+    read_request_count，而 read() 只是从应答缓冲取字节、一次应答会被分多次调用。
+    挂在 read() 上会让行号在同一个 snapshot 内部错位。
+    """
+
+    def __init__(self, position_rows: list[list[int]]) -> None:
+        super().__init__()
+        self._rows = position_rows
+
+    def write(self, data: bytes, timeout_s: float | None = None) -> int:
+        frame = bytes(data)
+        if len(frame) > 4 and frame[4] == VENDOR_INST_READ:
+            row = self._rows[(self.read_request_count // 6) % len(self._rows)]
+            for i, pos in enumerate(row):
+                self.set_u16(i + 1, 56, pos)       # Present_Position
+                self.set_u16(i + 1, 58, 0)         # Present_Velocity
+                self.set_u16(i + 1, 69, 10)        # Present_Current
+        return super().write(data, timeout_s)
 
 
 def test_capture_hardware_tool阶段在joints未拟合时明确拒绝(tmp_path, monkeypatch, capsys):
