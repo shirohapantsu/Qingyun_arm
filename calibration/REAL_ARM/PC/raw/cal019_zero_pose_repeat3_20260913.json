@@ -1,0 +1,251 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-019",
+  "status": "CALIBRATING",
+  "captured_at": "2026-09-13T17:37:04.966636+08:00",
+  "source": "official_urdf_zero_pose_hardware_read_only",
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256": "2781d0d174b11af06763dfdd2c2d4e11251aa34eb1b396c8d90ddd6f2a456822",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_to_workspace"
+  },
+  "fixture_id": "official_so101_urdf_zero_pose",
+  "repeat_index": 3,
+  "official_zero_pose_url": "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot/follower_zero.webp",
+  "urdf_zero_pose_geometry_mm": {
+    "servo_2_to_3": {
+      "forward": 28.0,
+      "vertical_up": 112.57
+    },
+    "servo_3_to_4": {
+      "forward": 134.9,
+      "vertical_up": 5.2
+    },
+    "servo_4_to_5": {
+      "forward": 61.1,
+      "lateral": 18.1,
+      "vertical_up": 0.0,
+      "horizontal_distance": 63.724
+    }
+  },
+  "motor_names": [
+    "shoulder_pan",
+    "shoulder_lift",
+    "elbow_flex",
+    "wrist_flex",
+    "wrist_roll",
+    "gripper"
+  ],
+  "ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "model_numbers": [
+    777,
+    777,
+    777,
+    777,
+    777,
+    777
+  ],
+  "torque_enabled_by_motor": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "samples_per_pose": 10,
+  "pose": {
+    "captured_at": "2026-09-13T17:37:04.487813+08:00",
+    "raw_position_by_sample": [
+      [
+        2084,
+        3119,
+        1003,
+        1982,
+        2055,
+        1493
+      ],
+      [
+        2084,
+        3119,
+        1003,
+        1982,
+        2055,
+        1493
+      ],
+      [
+        2084,
+        3119,
+        1003,
+        1982,
+        2055,
+        1493
+      ],
+      [
+        2084,
+        3119,
+        1003,
+        1982,
+        2055,
+        1493
+      ],
+      [
+        2084,
+        3119,
+        1003,
+        1982,
+        2055,
+        1493
+      ],
+      [
+        2084,
+        3119,
+        1003,
+        1982,
+        2055,
+        1493
+      ],
+      [
+        2084,
+        3119,
+        1003,
+        1982,
+        2055,
+        1493
+      ],
+      [
+        2084,
+        3119,
+        1003,
+        1982,
+        2055,
+        1493
+      ],
+      [
+        2084,
+        3119,
+        1003,
+        1982,
+        2055,
+        1493
+      ],
+      [
+        2084,
+        3119,
+        1003,
+        1982,
+        2055,
+        1493
+      ]
+    ],
+    "raw_position_representative": [
+      2084,
+      3119,
+      1003,
+      1982,
+      2055,
+      1493
+    ],
+    "raw_position_static_span": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_before": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_after": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "joint_raw_representative": [
+    2084,
+    3119,
+    1003,
+    1982,
+    2055
+  ],
+  "official_raw_ranges": [
+    [
+      718,
+      3424
+    ],
+    [
+      865,
+      3333
+    ],
+    [
+      796,
+      3095
+    ],
+    [
+      729,
+      3192
+    ],
+    [
+      0,
+      4095
+    ]
+  ],
+  "q_bus_deg": [
+    1.142857142857143,
+    89.67032967032968,
+    -82.85714285714286,
+    1.8901098901098903,
+    0.6593406593406594
+  ],
+  "q_reference_deg": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "joint_sign": [
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "zero_offset_deg_candidate": [
+    -1.142857142857143,
+    -89.67032967032968,
+    82.85714285714286,
+    -1.8901098901098903,
+    -0.6593406593406594
+  ],
+  "formula": "zero_offset_deg = q_reference_deg - joint_sign * q_bus_deg",
+  "write_instructions_sent": 0,
+  "motion_instructions_sent": 0,
+  "eeprom_written": false
+}

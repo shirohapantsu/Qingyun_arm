@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-068",
+  "status": "CONFIRMED_FOR_CURRENT_DEMO",
+  "completed_at": "2026-09-16T12:20:09+08:00",
+  "parameter": "motion.settle_velocity_tol_deg_s",
+  "method": "Reuse the CAL-067 shortest final-target windows that each cover 0.15 s. Multiply historically stored speed_deg_s by 0.02, then add three current velocity raw-count units to each observed maximum and round upward to 0.1 deg/s.",
+  "inputs": {
+    "CAL-067_report": "CAL-067_settle_position_tolerance_derived_20260916.json",
+    "CAL-067_report_sha256": "fd6b48b85b49c2b3e74f1c519507c5bd5b9b7f41e10ee560ebc49d7abb80d5be",
+    "terminal_windows": 90,
+    "terminal_window_rows": 1080,
+    "settle_dwell_s": 0.15,
+    "historical_stored_velocity_correction_factor": 0.02,
+    "current_velocity_deg_s_per_raw": [0.087890625, 0.087890625, 0.087890625, 0.087890625, 0.087890625],
+    "three_velocity_count_margin_deg_s": [0.263671875, 0.263671875, 0.263671875, 0.263671875, 0.263671875]
+  },
+  "observed": {
+    "corrected_velocity_unique_values_deg_s": [0.0, 0.087890625],
+    "corrected_velocity_p99_deg_s": [0.087890625, 0.087890625, 0.087890625, 0.087890625, 0.087890625],
+    "corrected_velocity_max_deg_s": [0.087890625, 0.087890625, 0.087890625, 0.087890625, 0.087890625]
+  },
+  "derivation": {
+    "rule": "ceil((terminal_window_velocity_max + 3 velocity raw counts) * 10) / 10",
+    "unrounded_deg_s": [0.3515625, 0.3515625, 0.3515625, 0.3515625, 0.3515625],
+    "before_deg_s": [8.0, 8.0, 8.0, 8.0, 8.0],
+    "after_deg_s": [0.4, 0.4, 0.4, 0.4, 0.4]
+  },
+  "joint_replay": {
+    "rows_within_CAL-067_position_tolerance": 1080,
+    "rows_within_CAL-068_velocity_tolerance": 1080,
+    "windows_covering_0p15_s": 90,
+    "result": "PASS"
+  },
+  "fit_correction": {
+    "obsolete_rule": "hard-coded [8.0] * 5 deg/s",
+    "function": "scripts.calibrate._derive_settle_velocity_tolerance",
+    "regression_test": "test_motion到位速度容差使用末端dwell窗口与三个计数余量",
+    "calibration_module_tests_passed": 56,
+    "calibration_module_tests_failed": 0
+  },
+  "profile_sha256_before": "c16e4f86a071983a01661fc4ed00539780df7ddd49ae6e8cd5afe813b310fb65",
+  "profile_sha256_after": "dff211979a4005b6cef9e1a697987f08b6acb6aae46720d0d15b348e93927aeb",
+  "profile_written": true,
+  "hardware_accessed_for_this_derivation": false,
+  "eeprom_written": false,
+  "limitations": [
+    "The result reuses existing real-arm trajectories and corrects their known obsolete velocity scale rather than repeating physical motion.",
+    "The evidence covers the current demo environment and maximum 92.4 g demo payload, not the full mechanical workspace."
+  ],
+  "post_write_verification": {
+    "profile_json_valid": true,
+    "CAL-067_position_replay_after_CAL-068": "PASS",
+    "full_motion_group_regression": "deferred until CAL-063 through CAL-070 form a complete group, per operator instruction",
+    "result": "PASS"
+  },
+  "downstream": {
+    "CAL-069": "calibrate continuous settling dwell",
+    "CAL-070": "calibrate total settling timeout"
+  }
+}

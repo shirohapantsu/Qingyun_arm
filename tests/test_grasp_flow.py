@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import math
+from dataclasses import replace
 
 import numpy as np
 import pytest
@@ -21,6 +22,7 @@ import pytest
 from configs.common_interface import (
     GraspStatus,
     HoldingState,
+    JointFeedback,
     MotorCommunicationError,
     MotorLimitError,
     VisionInterface,
@@ -610,6 +612,76 @@ def test_滞后过大导致跟踪误差停止(params):
     r = arm.grasp_and_place(graspable(params, 0.34, 0.04))
     assert r.status is GraspStatus.TRACKING_ERROR, r
     assert "跟踪误差" in r.reason
+
+
+def test_硬跟踪误差首帧立即停止不等dwell(params):
+    """CAL-065：硬阈值的语义是单次反馈立即停止。"""
+    arm, st, _motor = make_arm(params)
+    target = np.asarray(params.workspace.home_joints_deg, float)
+    arm.executor.state.last_submitted_deg = target.copy()
+    angles = target.copy()
+    angles[0] += float(params.motion.following_error_hard_deg[0]) + 0.1
+    feedback = JointFeedback(
+        angles_deg=angles,
+        speeds_deg_s=np.zeros(5),
+        currents_ma=np.zeros(5),
+        gripper_pct=50.0,
+        gripper_speed_pct_s=0.0,
+        gripper_current_ma=0.0,
+        sample_start_ns=st.monotonic_ns(),
+        sample_end_ns=st.monotonic_ns(),
+        sequence=1,
+    )
+    before = st.monotonic()
+    with pytest.raises(ExecutionError, match="立即超限"):
+        arm.executor.monitor(feedback)
+    assert st.monotonic() == before, "硬阈值不应等待 following_error_dwell_s"
+
+
+def test_普通跟踪误差孤立尖峰恢复而持续两周期停止(params):
+    """CAL-066：孤立一帧不停，连续超阈跨两个tick后停止。"""
+    dwell = 1.5 / params.timing.fps
+    tuned = replace(
+        params,
+        motion=replace(params.motion, following_error_dwell_s=dwell),
+    )
+
+    def feedback(st, target, error, sequence):
+        angles = target.copy()
+        angles[0] += error
+        return JointFeedback(
+            angles_deg=angles,
+            speeds_deg_s=np.zeros(5),
+            currents_ma=np.zeros(5),
+            gripper_pct=50.0,
+            gripper_speed_pct_s=0.0,
+            gripper_current_ma=0.0,
+            sample_start_ns=st.monotonic_ns(),
+            sample_end_ns=st.monotonic_ns(),
+            sequence=sequence,
+        )
+
+    target = np.asarray(tuned.workspace.home_joints_deg, float)
+    over = float(tuned.motion.following_error_deg[0]) + 0.1
+    assert over < float(tuned.motion.following_error_hard_deg[0])
+
+    # 一帧超软阈后恢复，计时必须清零。
+    arm, st, _motor = make_arm(tuned)
+    arm.executor.state.last_submitted_deg = target.copy()
+    arm.executor.monitor(feedback(st, target, over, 1))
+    st.sleep(1.0 / tuned.timing.fps)
+    arm.executor.monitor(feedback(st, target, 0.0, 2))
+    assert arm.executor._follow_violation_since is None  # noqa: SLF001
+
+    # 持续超阈：第一帧建立计时，跨过两个tick的第三帧停止。
+    arm2, st2, _motor2 = make_arm(tuned)
+    arm2.executor.state.last_submitted_deg = target.copy()
+    arm2.executor.monitor(feedback(st2, target, over, 1))
+    st2.sleep(1.0 / tuned.timing.fps)
+    arm2.executor.monitor(feedback(st2, target, over, 2))
+    st2.sleep(1.0 / tuned.timing.fps)
+    with pytest.raises(ExecutionError, match="持续超限"):
+        arm2.executor.monitor(feedback(st2, target, over, 3))
 
 
 # ---------------------------------------------------------------------------

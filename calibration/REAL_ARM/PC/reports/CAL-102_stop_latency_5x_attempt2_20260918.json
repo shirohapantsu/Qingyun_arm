@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "parameter_id": "CAL-102",
+  "test": "gripper_stop_latency_5x",
+  "status": "FAIL",
+  "started_at": "2026-09-18T18:12:04.792663+08:00",
+  "operator_confirmation": "批准，CAL-102 需求 0.20s 确认并同意空爪停测方案",
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256": "f48f2791825c340131d6b1960cf048128c5244d59b6c356dac6f13bba6b62136",
+  "motor_calibration_sha256": "ad315322ad4d19cc322c8f21d86d9667d9df9eca2de325bebbd72fa62deefff5",
+  "environment": {
+    "power": "12V, operator-confirmed unchanged",
+    "base_mount": "fixed_to_wooden_work_surface_no_gap",
+    "load": "empty_gripper",
+    "seed": null
+  },
+  "config": {
+    "iterations": 5,
+    "trigger_range_s": [
+      1.2,
+      1.8
+    ],
+    "trigger_delays_s": [
+      1.4301,
+      1.3087,
+      1.2115,
+      1.5398,
+      1.4981
+    ],
+    "preopen_pct": 37.65,
+    "close_speed_pct_s": 15.0,
+    "open_speed_pct_s": 20.0,
+    "empty_gate_pct": 1.21,
+    "abort_current_ma_from_profile_hard": 150.0,
+    "evidence_s": 0.5,
+    "fps": 30.0,
+    "tick_s": 0.03333333333333333,
+    "latency_definition": "command_halt=置位→主循环tick前检查观测（此后零新目标）；velocity_settle=置位→|速度|<1deg/s首次"
+  },
+  "eeprom_written": false,
+  "profile_written": false,
+  "joint_servo_motion_commands_sent": 0,
+  "gripper_motion_commands_sent": 0,
+  "iterations": [],
+  "readonly_preflight": {
+    "ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "models": [
+      777,
+      777,
+      777,
+      777,
+      777,
+      777
+    ],
+    "torques": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "failure": "RuntimeError: 起点2292不在[preopen−15, release+15]",
+  "torque_enabled_after": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "sram_settings_after": {},
+  "gripper_position_after_torque_off_raw": 2292,
+  "finished_at": "2026-09-18T18:12:05.579993+08:00"
+}

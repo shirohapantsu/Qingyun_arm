@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-018",
+  "status": "VERIFIED_FOR_DEMO",
+  "scope": "joint_element_0_shoulder_pan_remeasurement",
+  "captured_at": "2026-09-14",
+  "parameter": "joints.sign[0]",
+  "joint": {
+    "index": 0,
+    "name": "shoulder_pan",
+    "servo_id": 1,
+    "parent_link": "base_link",
+    "child_link": "shoulder_link",
+    "urdf_axis_joint_frame": [0, 0, 1],
+    "urdf_axis_parent_frame_at_zero": [0, 0, -1],
+    "positive_physical_reference": "Viewed vertically from above the base, rotate the shoulder and arm clockwise."
+  },
+  "direction_reference_pose": {
+    "name": "urdf_orthogonal_joint_center_reference",
+    "q_reference_deg": [0.0, -13.968, 16.175, -2.207, 0.0],
+    "warning": "Known nonzero URDF reference pose; not q=[0]*5 and not follower_zero.webp."
+  },
+  "hardware": {
+    "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+    "resolved_port": "/dev/ttyACM0",
+    "usb_identity": {
+      "vid": "1a86",
+      "pid": "55d3",
+      "serial": "5B14114904"
+    },
+    "power": "12 V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_to_workspace",
+    "model_number": 777,
+    "official_raw_range": [718, 3424],
+    "torque_enabled_by_motor": [0, 0, 0, 0, 0, 0]
+  },
+  "observations": {
+    "baseline_raw": 2113,
+    "urdf_positive_raw": 2239,
+    "urdf_negative_raw": 1718,
+    "positive_delta_counts": 126,
+    "negative_delta_counts": -395,
+    "positive_delta_bus_deg": 11.076923076923,
+    "negative_delta_bus_deg": -34.725274725275,
+    "static_span_counts": {
+      "baseline": 0,
+      "urdf_positive": 0,
+      "urdf_negative": 0
+    },
+    "samples_per_pose": 10
+  },
+  "result": {
+    "joint_sign": 1,
+    "formula": "q_urdf_deg = joint_sign * q_bus_deg + zero_offset_deg",
+    "reason": "The operator-confirmed URDF-positive move increased raw position, while the URDF-negative move decreased it and landed on the opposite side of baseline."
+  },
+  "checks": {
+    "stable_port_identity_checked_before_each_pose": true,
+    "all_six_torque_disabled_before_and_after_each_pose": true,
+    "positive_and_negative_on_opposite_sides_of_baseline": true,
+    "both_motion_magnitudes_exceed_30_counts": true,
+    "all_observations_inside_official_range": true,
+    "write_instructions_sent": 0,
+    "motion_instructions_sent": 0,
+    "eeprom_written": false
+  },
+  "evidence": {
+    "baseline_pose": "../raw/cal018_urdf_orthogonal_shoulder_pan_baseline_20260914.json",
+    "baseline_pose_sha256": "f91cb4bd617df2cdc8e131e6d0f19c19b82989da806489fd3cb2f1660a59d8ea",
+    "positive_pose": "../raw/cal018_urdf_orthogonal_shoulder_pan_positive_20260914.json",
+    "positive_pose_sha256": "71bf88d1c2f1a5f392f4d9180ed823982cdab0923b92431ca195cb5214460701",
+    "negative_pose": "../raw/cal018_urdf_orthogonal_shoulder_pan_negative_20260914.json",
+    "negative_pose_sha256": "eb6149a63ef755bf682b6e6dbef8d18a361641a547ea42e81da82c3b4bbba9c5",
+    "one_shot_reader_sha256": "b3a3143fe4106e3e588aebae3635e79dd497c54aa7559acc8ff8e74a2f21e2b3",
+    "direction_definition_sha256": "49062fe38b526c814e0e85a51f791ea7747dfe019a0e760a930d10672c60a51d"
+  },
+  "implementation": {
+    "profile_sha256": "fa4594ebed194446e3900e62219f6ce4caa0c0e751f1a71a34eb2e829589f90c",
+    "profile_write_deferred_until_all_five_sign_elements_are_measured": true
+  }
+}

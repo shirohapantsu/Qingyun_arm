@@ -1,0 +1,448 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-085",
+  "source": "offline_causal_replay_of_hardware_capture_no_new_motion",
+  "fixture_report": "CAL-085_fixture_sustained_current_relaxed_attempt1_20260917.json",
+  "empty_paired_report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+  "runtime_criteria": {
+    "window_samples": 3,
+    "contact_dwell_s": 0.1,
+    "current_comparison": "strict > on3-frame mean of absolute current",
+    "contact_gap_range_m": [
+      0.022,
+      0.042
+    ],
+    "empty_closed_pct": 3,
+    "empty_tol_pct": 2
+  },
+  "high_threshold_replays": {
+    "7": {
+      "fixture": {
+        "peak_filtered_current_ma": 8.666666666666666,
+        "longest_above_run_s": 0.06659594000666402,
+        "hits": []
+      },
+      "empty": {
+        "peak_filtered_current_ma": 6.5,
+        "longest_above_run_s": 0,
+        "hits": []
+      }
+    },
+    "8": {
+      "fixture": {
+        "peak_filtered_current_ma": 8.666666666666666,
+        "longest_above_run_s": 0.06659594000666402,
+        "hits": []
+      },
+      "empty": {
+        "peak_filtered_current_ma": 6.5,
+        "longest_above_run_s": 0,
+        "hits": []
+      }
+    },
+    "13": {
+      "fixture": {
+        "peak_filtered_current_ma": 8.666666666666666,
+        "longest_above_run_s": 0,
+        "hits": []
+      },
+      "empty": {
+        "peak_filtered_current_ma": 6.5,
+        "longest_above_run_s": 0,
+        "hits": []
+      }
+    },
+    "6.5": {
+      "fixture": {
+        "peak_filtered_current_ma": 8.666666666666666,
+        "longest_above_run_s": 0.06659594000666402,
+        "hits": []
+      },
+      "empty": {
+        "peak_filtered_current_ma": 6.5,
+        "longest_above_run_s": 0,
+        "hits": []
+      }
+    },
+    "8.5": {
+      "fixture": {
+        "peak_filtered_current_ma": 8.666666666666666,
+        "longest_above_run_s": 0.06659594000666402,
+        "hits": []
+      },
+      "empty": {
+        "peak_filtered_current_ma": 6.5,
+        "longest_above_run_s": 0,
+        "hits": []
+      }
+    },
+    "9.1": {
+      "fixture": {
+        "peak_filtered_current_ma": 8.666666666666666,
+        "longest_above_run_s": 0,
+        "hits": []
+      },
+      "empty": {
+        "peak_filtered_current_ma": 6.5,
+        "longest_above_run_s": 0,
+        "hits": []
+      }
+    },
+    "19.5": {
+      "fixture": {
+        "peak_filtered_current_ma": 8.666666666666666,
+        "longest_above_run_s": 0,
+        "hits": []
+      },
+      "empty": {
+        "peak_filtered_current_ma": 6.5,
+        "longest_above_run_s": 0,
+        "hits": []
+      }
+    }
+  },
+  "lower_threshold_replays": {
+    "empty_trials": [
+      {
+        "role": "empty_baseline",
+        "report": "CAL-085_empty_current_repeat1_20260916.json",
+        "operator_observation": "无异常",
+        "replays": {
+          "5": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "6": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "4.5": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "5.5": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "6.4": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        }
+      },
+      {
+        "role": "expanded_empty_range_control",
+        "report": "CAL-085_empty_expanded_control_repeat1_20260916.json",
+        "operator_observation": "无异常",
+        "replays": {
+          "5": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.03340298499097116,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "6": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.03340298499097116,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "4.5": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.03340298499097116,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "5.5": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.03340298499097116,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "6.4": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.03340298499097116,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        }
+      },
+      {
+        "role": "updated_baseline_empty_range_control",
+        "report": "CAL-085_empty_updated_baseline_control_repeat1_20260916.json",
+        "operator_observation": null,
+        "replays": {
+          "5": {
+            "max_filtered_ma": 8.666666666666666,
+            "longest_qualifying_run_s": 0.06627872200624552,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "6": {
+            "max_filtered_ma": 8.666666666666666,
+            "longest_qualifying_run_s": 0.06627872200624552,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "4.5": {
+            "max_filtered_ma": 8.666666666666666,
+            "longest_qualifying_run_s": 0.06627872200624552,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "5.5": {
+            "max_filtered_ma": 8.666666666666666,
+            "longest_qualifying_run_s": 0.06627872200624552,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "6.4": {
+            "max_filtered_ma": 8.666666666666666,
+            "longest_qualifying_run_s": 0.06627872200624552,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        }
+      },
+      {
+        "role": "updated_baseline_empty_range_control",
+        "report": "CAL-085_empty_updated_baseline_control_repeat2_reposition_attempt1_20260916.json",
+        "operator_observation": "无异常",
+        "replays": {
+          "5": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.033488110988400877,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "6": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.033488110988400877,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "4.5": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.033488110988400877,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "5.5": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.033488110988400877,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "6.4": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.033488110988400877,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        }
+      },
+      {
+        "role": "complete_contact_domain_empty_control",
+        "report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+        "operator_observation": "无异常",
+        "replays": {
+          "5": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.13302046500029974,
+            "hit_count": 3,
+            "first_hit": {
+              "phase": "empty_closing",
+              "raw": 1774,
+              "command_raw": 1768,
+              "mean_ma": 6.5,
+              "duration_s": 0.10072675600531511
+            }
+          },
+          "6": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.13302046500029974,
+            "hit_count": 3,
+            "first_hit": {
+              "phase": "empty_closing",
+              "raw": 1774,
+              "command_raw": 1768,
+              "mean_ma": 6.5,
+              "duration_s": 0.10072675600531511
+            }
+          },
+          "4.5": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.13302046500029974,
+            "hit_count": 3,
+            "first_hit": {
+              "phase": "empty_closing",
+              "raw": 1774,
+              "command_raw": 1768,
+              "mean_ma": 6.5,
+              "duration_s": 0.10072675600531511
+            }
+          },
+          "5.5": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.13302046500029974,
+            "hit_count": 3,
+            "first_hit": {
+              "phase": "empty_closing",
+              "raw": 1774,
+              "command_raw": 1768,
+              "mean_ma": 6.5,
+              "duration_s": 0.10072675600531511
+            }
+          },
+          "6.4": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.13302046500029974,
+            "hit_count": 3,
+            "first_hit": {
+              "phase": "empty_closing",
+              "raw": 1774,
+              "command_raw": 1768,
+              "mean_ma": 6.5,
+              "duration_s": 0.10072675600531511
+            }
+          }
+        }
+      },
+      {
+        "role": "sustained_empty_current_control",
+        "report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+        "operator_observation": "无异常",
+        "replays": {
+          "5": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.03353963801055215,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "6": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.03353963801055215,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "4.5": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.03353963801055215,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "5.5": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.03353963801055215,
+            "hit_count": 0,
+            "first_hit": null
+          },
+          "6.4": {
+            "max_filtered_ma": 6.5,
+            "longest_qualifying_run_s": 0.03353963801055215,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        }
+      }
+    ],
+    "fixture_replays": {
+      "5": {
+        "max_filtered_ma": 8.666666666666666,
+        "longest_qualifying_run_s": 0.3687094610068016,
+        "hit_count": 10,
+        "first_hit": {
+          "phase": "fixture_closing",
+          "raw": 1825,
+          "command_raw": 1815,
+          "mean_ma": 6.5,
+          "duration_s": 0.10010654100915417
+        }
+      },
+      "6": {
+        "max_filtered_ma": 8.666666666666666,
+        "longest_qualifying_run_s": 0.3687094610068016,
+        "hit_count": 10,
+        "first_hit": {
+          "phase": "fixture_closing",
+          "raw": 1825,
+          "command_raw": 1815,
+          "mean_ma": 6.5,
+          "duration_s": 0.10010654100915417
+        }
+      },
+      "4.5": {
+        "max_filtered_ma": 8.666666666666666,
+        "longest_qualifying_run_s": 0.3687094610068016,
+        "hit_count": 10,
+        "first_hit": {
+          "phase": "fixture_closing",
+          "raw": 1825,
+          "command_raw": 1815,
+          "mean_ma": 6.5,
+          "duration_s": 0.10010654100915417
+        }
+      },
+      "5.5": {
+        "max_filtered_ma": 8.666666666666666,
+        "longest_qualifying_run_s": 0.3687094610068016,
+        "hit_count": 10,
+        "first_hit": {
+          "phase": "fixture_closing",
+          "raw": 1825,
+          "command_raw": 1815,
+          "mean_ma": 6.5,
+          "duration_s": 0.10010654100915417
+        }
+      },
+      "6.4": {
+        "max_filtered_ma": 8.666666666666666,
+        "longest_qualifying_run_s": 0.3687094610068016,
+        "hit_count": 10,
+        "first_hit": {
+          "phase": "fixture_closing",
+          "raw": 1825,
+          "command_raw": 1815,
+          "mean_ma": 6.5,
+          "duration_s": 0.10010654100915417
+        }
+      }
+    },
+    "uses_current_gap_and_empty_exclusion_gates": true,
+    "window_samples": 3,
+    "dwell_s": 0.1
+  },
+  "fixture_hold_raw_currents_ma": [
+    6.5,
+    6.5,
+    6.5,
+    6.5,
+    6.5,
+    13,
+    6.5,
+    6.5,
+    6.5
+  ],
+  "fixture_hold_current_histogram_ma": {
+    "6.5": 8,
+    "13.0": 1
+  },
+  "conclusion": {
+    "status": "NO_VALID_CURRENT_ONLY_THRESHOLD_WITH_EXISTING_WINDOW_DWELL_AND_DEMO_GAP_RANGE",
+    "threshold_below_6_5_ma": "Accepts fixture but existing confirmed full-domain empty data falsely passes at current gap/empty gates for0.133020465s",
+    "threshold_at_or_above_6_5_ma": "Fixture longest strictly-above run0.06659594s below0.1s, never confirms contact",
+    "profile_numeric_threshold_written": false,
+    "production_verification_promoted": false,
+    "limitations": "Single plastic fixture latest operator observation pending; historical empty records retained, broader actual-fruit/15%/force/compression safety untested. This conclusion is scoped to observed data and existing3-frame0.1s algorithm, not impossible for all future sensors/algorithms."
+  }
+}

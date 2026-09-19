@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-051",
+  "parameter": "timing.read_timeout_s",
+  "date": "2026-09-15",
+  "status": "VERIFIED_FOR_UNLOADED_STATIC_DEMO",
+  "profile_changed": false,
+  "profile_sha256": "6a971b5c19b5316a56702980968103f9de0f998c8520758b0ccb47835b188bd1",
+  "source_evidence": "../raw/cal051_feedback_read_timing_1000ticks_20260915.jsonl",
+  "source_sha256": "91f2d95bbe8729021deb3ed3f1b2c4af99a134682a96fba08191938232c36f5d",
+  "test": {
+    "ticks": 1000,
+    "fps": 30.0,
+    "successful_reads": 1000,
+    "failed_reads": 0,
+    "transaction": "six servos, one contiguous 15-byte feedback block per servo, one shared deadline per whole-arm read",
+    "measurement_timeout_s": 1.0,
+    "torque_enabled_before": [0, 0, 0, 0, 0, 0],
+    "torque_enabled_after": [0, 0, 0, 0, 0, 0],
+    "raw_position_stable": true,
+    "motion_instructions_sent": 0,
+    "write_instructions_sent": 0,
+    "eeprom_written": false
+  },
+  "read_latency_ms": {
+    "p50": 4.397647,
+    "p95": 4.8719945,
+    "p99": 5.69207893,
+    "max": 7.754172
+  },
+  "feedback_span_ms": {
+    "p999": 7.192189545,
+    "max": 7.754172
+  },
+  "tick_lateness_ms": {
+    "p99": 0.9344652,
+    "max": 1.206721
+  },
+  "fitter_formula": "round(max(P99 * 1.5, max), 4)",
+  "formula_candidate_s": 0.0085,
+  "retained_value_s": 0.02,
+  "decision": "Keep the existing 20 ms value. It is more conservative than the isolated static formula candidate, and mixed read/write preflight operations previously produced read timeouts at 20 ms; reducing the configured budget would be unsupported.",
+  "scope_limit": "This verifies unloaded torque-off static feedback reads only. Post-write register reads, command writes, active-motion feedback and cleanup semantics remain for CAL-052/053 and CAL-ISSUE-039."
+}

@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-055",
+  "parameter": "timing.max_tick_lateness_s",
+  "date": "2026-09-15",
+  "status": "DERIVED_AND_VERIFIED_FOR_UNLOADED_STATIC_DEMO",
+  "profile_changed": false,
+  "profile_sha256": "52e2b621a303368f0774cf9ee439da852f2992480b0dfec1c21c55dad4106ba9",
+  "source_reports": [
+    "CAL-051_read_timeout_static_1000ticks_20260915.json",
+    "CAL-052_write_timeout_static_1000ticks_20260915.json"
+  ],
+  "inputs": {
+    "fps": 30,
+    "fixed_cap_s": 0.02,
+    "fraction_of_tick": 0.6,
+    "fractional_tick_s": 0.02
+  },
+  "formula": "min(0.020, 0.6 / FPS)",
+  "derived_value_s": 0.02,
+  "old_value_s": 0.02,
+  "observed_tick_lateness_ms": {
+    "cal_051_read_path": {
+      "p99": 0.9344652,
+      "max": 1.206721
+    },
+    "cal_052_equal_length_write_path": {
+      "p99": 0.72786417,
+      "max": 0.935811
+    },
+    "combined_observed_max": 1.206721
+  },
+  "margin_over_combined_observed_max_ms": 18.793279,
+  "verification": {
+    "less_than_one_tick": true,
+    "observed_static_ticks_within_limit": 2000,
+    "observed_static_ticks_over_limit": 0,
+    "profile_value_matches_derivation": true
+  },
+  "decision": "Retain 20 ms. At 30 Hz it is exactly 60 percent of one tick and remains below the 33.333 ms period; all 2000 static read/write schedule observations were below the threshold.",
+  "hardware_accessed": false,
+  "eeprom_written": false,
+  "scope_limit": "The threshold is verified against unloaded static serial workloads. Final CPU-load and active-motion timing remain part of the integrated timing/motion test."
+}

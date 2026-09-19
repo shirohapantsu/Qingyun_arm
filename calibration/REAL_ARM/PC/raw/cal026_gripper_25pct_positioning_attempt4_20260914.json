@@ -1,0 +1,2128 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-026",
+  "operation": "position_gripper_for_manual_gap_measurement",
+  "started_at": "2026-09-14T18:30:47.478451+08:00",
+  "success": false,
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256": "cfd4830f99fabd90a9b2f889b22cbf39f5bdb90ae6fca78d49c0c6d527247bbd",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_to_workspace"
+  },
+  "target_raw": 1849,
+  "calibrated_safe_endpoints_raw": [
+    1499,
+    2897
+  ],
+  "official_gripper_range_raw": [
+    1458,
+    2980
+  ],
+  "temporary_sram_settings": {
+    "Acceleration": 5,
+    "Goal_Time": 0,
+    "Goal_Velocity": 10,
+    "Torque_Limit": 600
+  },
+  "eeprom_written": false,
+  "joint_servo_motion_commands_sent": 0,
+  "gripper_motion_commands_sent": 1,
+  "samples": [
+    {
+      "time": "2026-09-14T18:30:47.543501+08:00",
+      "position_raw": 1509,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:47.595008+08:00",
+      "position_raw": 1509,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:47.646378+08:00",
+      "position_raw": 1509,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:47.698055+08:00",
+      "position_raw": 1513,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:47.749800+08:00",
+      "position_raw": 1519,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:47.801338+08:00",
+      "position_raw": 1525,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:47.853416+08:00",
+      "position_raw": 1534,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:47.905317+08:00",
+      "position_raw": 1543,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:47.956636+08:00",
+      "position_raw": 1554,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.008005+08:00",
+      "position_raw": 1567,
+      "current_register_raw": 2,
+      "current_ma": 13.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.059256+08:00",
+      "position_raw": 1580,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.110617+08:00",
+      "position_raw": 1595,
+      "current_register_raw": 2,
+      "current_ma": 13.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.162110+08:00",
+      "position_raw": 1610,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.213640+08:00",
+      "position_raw": 1628,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.265193+08:00",
+      "position_raw": 1647,
+      "current_register_raw": 2,
+      "current_ma": 13.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.316761+08:00",
+      "position_raw": 1667,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.368250+08:00",
+      "position_raw": 1687,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.419817+08:00",
+      "position_raw": 1706,
+      "current_register_raw": 2,
+      "current_ma": 13.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.471709+08:00",
+      "position_raw": 1724,
+      "current_register_raw": 2,
+      "current_ma": 13.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.523066+08:00",
+      "position_raw": 1741,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.574753+08:00",
+      "position_raw": 1757,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.626350+08:00",
+      "position_raw": 1772,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.677725+08:00",
+      "position_raw": 1785,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.729129+08:00",
+      "position_raw": 1797,
+      "current_register_raw": 2,
+      "current_ma": 13.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.780938+08:00",
+      "position_raw": 1808,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.832645+08:00",
+      "position_raw": 1818,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.884103+08:00",
+      "position_raw": 1826,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.935658+08:00",
+      "position_raw": 1832,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:48.987144+08:00",
+      "position_raw": 1837,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:49.038550+08:00",
+      "position_raw": 1841,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:49.090051+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:30:49.141451+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:49.193227+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:49.244462+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:49.296181+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:49.347593+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:49.398935+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:49.450321+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:49.501690+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:49.553231+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:49.604655+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:49.655989+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:49.707467+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:49.759002+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:49.810534+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:49.861863+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:49.913257+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:49.964627+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.015985+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.067604+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.119205+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.171131+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.222790+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.274048+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.325664+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.376955+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.428598+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.480221+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.531634+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.583204+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.634645+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.686304+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.737588+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.789053+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.840250+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.891633+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.943181+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:50.994561+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:51.046163+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:51.097686+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:51.149285+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:51.200817+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:51.252209+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:51.303719+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:51.355055+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:51.406547+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:51.457915+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:51.509640+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:51.561197+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:51.612847+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:51.664760+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:51.716406+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:51.768000+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:51.819427+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:51.870876+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:51.922223+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:51.973687+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:52.025281+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:52.076762+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:52.128136+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:52.179502+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:52.230857+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:52.282232+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:52.333878+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:52.385375+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:52.436768+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:52.488276+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:52.539593+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:52.591102+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:52.642524+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:52.693918+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:52.745459+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:52.796736+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:52.848151+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:52.899441+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:52.951409+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.003116+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.054925+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.106270+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.157891+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.209161+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.260551+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.311920+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.363299+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.414692+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.466064+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.517381+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.569262+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.620597+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.672241+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.723700+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.775475+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.827135+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.878606+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.930629+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:53.981997+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:54.033530+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:54.085266+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:54.136638+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:54.188140+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:54.239443+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:54.290917+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:54.342320+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:54.394206+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:54.445596+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:54.497077+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:54.548541+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:54.600054+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:54.651682+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:54.703164+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:54.755053+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:54.806464+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:54.857896+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:54.909388+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:54.960880+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.012826+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.064683+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.116277+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.167953+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.219341+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.270726+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.322505+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.373850+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.425222+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.476490+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.528003+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.579473+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.630909+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.682400+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.734279+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.785819+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.837442+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.888860+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.940245+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:55.991945+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:56.043721+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:56.095382+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:56.146919+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:56.198370+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:56.249749+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:56.301150+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:56.352536+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:56.404079+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:56.455604+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:56.506986+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:56.558365+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:56.609752+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:56.661216+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:56.712736+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:56.764332+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:56.815883+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:56.867227+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:56.919017+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:56.971113+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:57.022699+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:57.074059+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:57.125759+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:57.177228+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:57.228875+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:57.280781+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:57.332777+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:57.384134+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:57.435865+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:57.487515+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:57.539262+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:57.590871+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:57.642429+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:57.693775+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:57.745492+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:57.796774+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:57.848511+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:57.899926+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:57.952073+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.003563+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.054842+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.106361+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.157956+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.209298+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.260688+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.312156+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.364157+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.415866+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.467288+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.518869+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.570955+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.622474+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.674685+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.726592+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.778430+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.829887+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.881610+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.933067+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:58.984800+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:59.036786+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:59.088047+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:59.139419+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:59.190825+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:59.242547+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:59.294158+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:59.345856+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:59.397263+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:59.448913+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:59.500446+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:59.552418+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:59.603877+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:59.655289+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:59.706806+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:59.758232+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:59.810171+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:59.861559+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:59.912921+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:30:59.964239+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.015727+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.067149+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.118698+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.170297+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.221732+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.273192+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.324659+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.376325+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.428263+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.480008+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.531854+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.583341+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.635602+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.687062+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.738456+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.789937+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.841359+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.892732+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.944432+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:00.995655+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:01.047252+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:01.099086+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:01.150929+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:01.202340+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:01.253997+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:01.305279+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:01.356919+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:01.408300+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:01.459653+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:01.510963+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:01.562262+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:01.613688+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:01.665507+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:01.716997+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:01.768990+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:01.820280+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:01.872057+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:01.923529+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:01.975030+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:02.026509+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:02.077864+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:02.129247+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:02.180698+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:02.232222+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:02.283624+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:02.334894+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:02.386585+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:02.437971+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:02.489610+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:31:02.541340+08:00",
+      "position_raw": 1845,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    }
+  ],
+  "response_status_level_by_motor": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "model_numbers": [
+    777,
+    777,
+    777,
+    777,
+    777,
+    777
+  ],
+  "torque_enabled_before": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "start_raw": 1509,
+  "original_sram_settings": {
+    "Acceleration": 5,
+    "Goal_Time": 0,
+    "Goal_Velocity": 0,
+    "Torque_Limit": 500
+  },
+  "gripper_torque_enable_readback": 1,
+  "error": "RuntimeError: gripper did not settle at raw 1849 in time",
+  "final_torque_check_error": "MotorCommunicationError: READ id=1 addr=40 n=1 帧头不完整：FF 83",
+  "finished_at": "2026-09-14T18:31:02.593819+08:00"
+}

@@ -1,0 +1,1388 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-058",
+  "test": "current_to_waypoint_then_joint_velocity_sweep_then_torque_off",
+  "started_at": "2026-09-15T19:14:00.334125+08:00",
+  "status": "MOTION_PASS_VELOCITY_SCALE_SUPERSEDED",
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256": "ff27c260f69dbc1a9a440af88a2e757f3adcd438474c5123c8b9e9a97f24f539",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_to_wooden_work_surface_no_gap",
+    "load_label": "unloaded"
+  },
+  "readonly_preflight": {
+    "torque_enabled": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "model_numbers": [
+      777,
+      777,
+      777,
+      777,
+      777,
+      777
+    ],
+    "snapshot": {
+      "raw_position": [
+        2135,
+        1519,
+        2692,
+        2672,
+        2045,
+        1564
+      ],
+      "raw_velocity": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "raw_current": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "sample_start_ns": 23550441102104,
+      "sample_end_ns": 23550444701110,
+      "q_bus_deg": [
+        5.626373626373627,
+        -50.98901098901099,
+        65.62637362637363,
+        62.549450549450555,
+        -0.2197802197802198
+      ],
+      "q_urdf_deg": [
+        7.120879120879121,
+        -63.90206593406594,
+        73.75741758241759,
+        58.1886043956044,
+        1.142857142857143
+      ],
+      "gripper_pct": 4.649499284692418
+    }
+  },
+  "recovery": {
+    "start_deg": [
+      7.120879120879121,
+      -63.90206593406594,
+      73.75741758241759,
+      58.1886043956044,
+      1.142857142857143
+    ],
+    "target_deg": [
+      6.681318681318682,
+      -50.451516483516485,
+      10.900274725274727,
+      62.05673626373627,
+      1.054945054945055
+    ],
+    "duration_s": 20.0,
+    "operator_collision_override": true,
+    "operator_confirmation": "从这个姿态开始，完成当前姿态→中转位→测试→卸力的测试，并标定cal-58",
+    "normal_collision_result": "CollisionViolation: [cal058_current_to_waypoint] 自碰撞 shoulder_02 × gripper_02：穿透 1.3mm",
+    "limit_and_motion_check": "PASS",
+    "peak_joint_velocity_deg_s": [
+      0.041208485959511876,
+      1.2609796703608822,
+      5.892813492209186,
+      0.36263467644374714,
+      0.00824169719189971
+    ]
+  },
+  "temporary_settle_position_tolerance_deg": [
+    2.6,
+    2.6,
+    2.6,
+    2.6,
+    2.6
+  ],
+  "settle_tolerance_profile_changed": false,
+  "test_preflight": [
+    {
+      "trajectory_id": "cal058_L1_J1_leg1",
+      "active_axis": "shoulder_pan",
+      "direction": 1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        36.68131868131868,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 2.8333333333333335,
+      "requested_peak_speed_deg_s": 20.0,
+      "planned_peak_joint_velocity_deg_s": [
+        19.85110937791621,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        21.56669918167715,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.06418386392196362,
+      "planned_peak_tcp_acceleration_m_s2": 0.06987070171105901,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L1_J1_leg2",
+      "active_axis": "shoulder_pan",
+      "direction": -1,
+      "start_deg": [
+        36.68131868131868,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 2.8333333333333335,
+      "requested_peak_speed_deg_s": 20.0,
+      "planned_peak_joint_velocity_deg_s": [
+        19.851109377916103,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        21.56669918168035,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.06418386392196324,
+      "planned_peak_tcp_acceleration_m_s2": 0.06987070171107501,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L1_J2_leg1",
+      "active_axis": "shoulder_lift",
+      "direction": 1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -20.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 2.8333333333333335,
+      "requested_peak_speed_deg_s": 20.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        19.851109377916316,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        21.56669918168035,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.05806144788506975,
+      "planned_peak_tcp_acceleration_m_s2": 0.06320582554867836,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L1_J2_leg2",
+      "active_axis": "shoulder_lift",
+      "direction": -1,
+      "start_deg": [
+        6.681318681318682,
+        -20.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 2.8333333333333335,
+      "requested_peak_speed_deg_s": 20.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        19.851109377916316,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        21.56669918168035,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.05806144788506975,
+      "planned_peak_tcp_acceleration_m_s2": 0.06320582554869973,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L1_J3_leg1",
+      "active_axis": "elbow_flex",
+      "direction": 1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        40.90027472527473,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 2.8333333333333335,
+      "requested_peak_speed_deg_s": 20.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        0.0,
+        19.85110937791621,
+        0.0,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        0.0,
+        21.56669918168035,
+        0.0,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.07820561639817435,
+      "planned_peak_tcp_acceleration_m_s2": 0.08513481366794366,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L1_J3_leg2",
+      "active_axis": "elbow_flex",
+      "direction": -1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        40.90027472527473,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 2.8333333333333335,
+      "requested_peak_speed_deg_s": 20.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        0.0,
+        19.85110937791621,
+        0.0,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        0.0,
+        21.56669918168035,
+        0.0,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.07820561639817318,
+      "planned_peak_tcp_acceleration_m_s2": 0.0851348136680292,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L1_J4_leg1",
+      "active_axis": "wrist_flex",
+      "direction": 1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        82.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 1.9,
+      "requested_peak_speed_deg_s": 20.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        0.0,
+        0.0,
+        19.73279265011172,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        0.0,
+        0.0,
+        31.95618053505882,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.05899939139676921,
+      "planned_peak_tcp_acceleration_m_s2": 0.09562869383385933,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L1_J4_leg2",
+      "active_axis": "wrist_flex",
+      "direction": -1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        82.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 1.9,
+      "requested_peak_speed_deg_s": 20.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        0.0,
+        0.0,
+        19.73279265011172,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        0.0,
+        0.0,
+        31.95618053505882,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.05899939139676921,
+      "planned_peak_tcp_acceleration_m_s2": 0.09562869383389323,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L1_J5_leg1",
+      "active_axis": "wrist_roll",
+      "direction": 1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        31.054945054945055
+      ],
+      "duration_s": 2.8333333333333335,
+      "requested_peak_speed_deg_s": 20.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        19.85110937791621
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        21.566699181678352
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.021798461327940742,
+      "planned_peak_tcp_acceleration_m_s2": 0.023729855077835593,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L1_J5_leg2",
+      "active_axis": "wrist_roll",
+      "direction": -1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        31.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 2.8333333333333335,
+      "requested_peak_speed_deg_s": 20.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        19.85110937791621
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        21.56669918168035
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.02179846132794073,
+      "planned_peak_tcp_acceleration_m_s2": 0.023729855077852583,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L2_J1_leg1",
+      "active_axis": "shoulder_pan",
+      "direction": -1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        -23.318681318681318,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 1.4333333333333333,
+      "requested_peak_speed_deg_s": 40.0,
+      "planned_peak_joint_velocity_deg_s": [
+        39.23003864478722,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        84.16353338290766,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.12683899716820354,
+      "planned_peak_tcp_acceleration_m_s2": 0.2726289842694708,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L2_J1_leg2",
+      "active_axis": "shoulder_pan",
+      "direction": 1,
+      "start_deg": [
+        -23.318681318681318,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 1.4333333333333333,
+      "requested_peak_speed_deg_s": 40.0,
+      "planned_peak_joint_velocity_deg_s": [
+        39.23003864478719,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        84.16353338290925,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.12683899716820407,
+      "planned_peak_tcp_acceleration_m_s2": 0.2726289842694891,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L2_J2_leg1",
+      "active_axis": "shoulder_lift",
+      "direction": -1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -80.45151648351649,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 1.4333333333333333,
+      "requested_peak_speed_deg_s": 40.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        39.2300386447873,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        84.16353338291245,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.11473998874281133,
+      "planned_peak_tcp_acceleration_m_s2": 0.24662325691964665,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L2_J2_leg2",
+      "active_axis": "shoulder_lift",
+      "direction": 1,
+      "start_deg": [
+        6.681318681318682,
+        -80.45151648351649,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 1.4333333333333333,
+      "requested_peak_speed_deg_s": 40.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        39.2300386447873,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        84.16353338290605,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.11473998874281381,
+      "planned_peak_tcp_acceleration_m_s2": 0.2466232569196666,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L2_J3_leg1",
+      "active_axis": "elbow_flex",
+      "direction": -1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        -19.099725274725273,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 1.4333333333333333,
+      "requested_peak_speed_deg_s": 40.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        0.0,
+        39.23003864478719,
+        0.0,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        0.0,
+        84.16353338290766,
+        0.0,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.1545485321501682,
+      "planned_peak_tcp_acceleration_m_s2": 0.3321881304734875,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L2_J3_leg2",
+      "active_axis": "elbow_flex",
+      "direction": 1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        -19.099725274725273,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 1.4333333333333333,
+      "requested_peak_speed_deg_s": 40.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        0.0,
+        39.23003864478719,
+        0.0,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        0.0,
+        84.16353338290925,
+        0.0,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.1545485321501682,
+      "planned_peak_tcp_acceleration_m_s2": 0.33218813047349455,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L2_J4_leg1",
+      "active_axis": "wrist_flex",
+      "direction": -1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        42.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 0.9666666666666667,
+      "requested_peak_speed_deg_s": 40.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        0.0,
+        0.0,
+        38.762362849589636,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        0.0,
+        0.0,
+        123.07940427910395,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.11589438741776961,
+      "planned_peak_tcp_acceleration_m_s2": 0.36827917953299744,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L2_J4_leg2",
+      "active_axis": "wrist_flex",
+      "direction": 1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        42.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 0.9666666666666667,
+      "requested_peak_speed_deg_s": 40.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        0.0,
+        0.0,
+        38.762362849589636,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        0.0,
+        0.0,
+        123.07940427910395,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.11589438741776961,
+      "planned_peak_tcp_acceleration_m_s2": 0.368279179533045,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L2_J5_leg1",
+      "active_axis": "wrist_roll",
+      "direction": -1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        -28.945054945054945
+      ],
+      "duration_s": 1.4333333333333333,
+      "requested_peak_speed_deg_s": 40.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        39.23003864478719
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        84.16353338290826
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.04307772710610719,
+      "planned_peak_tcp_acceleration_m_s2": 0.09259168905286684,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L2_J5_leg2",
+      "active_axis": "wrist_roll",
+      "direction": 1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        -28.945054945054945
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 1.4333333333333333,
+      "requested_peak_speed_deg_s": 40.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        39.23003864478719
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        84.16353338290925
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.04307772710610719,
+      "planned_peak_tcp_acceleration_m_s2": 0.09259168905287522,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L3_J1_leg1",
+      "active_axis": "shoulder_pan",
+      "direction": 1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        36.68131868131868,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 0.9666666666666667,
+      "requested_peak_speed_deg_s": 60.0,
+      "planned_peak_joint_velocity_deg_s": [
+        58.143544274384666,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        184.61910641866072,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.1879854712917647,
+      "planned_peak_tcp_acceleration_m_s2": 0.597947221774517,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L3_J1_leg2",
+      "active_axis": "shoulder_pan",
+      "direction": -1,
+      "start_deg": [
+        36.68131868131868,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 0.9666666666666667,
+      "requested_peak_speed_deg_s": 60.0,
+      "planned_peak_joint_velocity_deg_s": [
+        58.143544274384666,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        184.61910641865913,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.18798547129176513,
+      "planned_peak_tcp_acceleration_m_s2": 0.5979472217745764,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L3_J2_leg1",
+      "active_axis": "shoulder_lift",
+      "direction": 1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -20.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 0.9666666666666667,
+      "requested_peak_speed_deg_s": 60.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        58.143544274384666,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        184.61910641865913,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.1700537795266987,
+      "planned_peak_tcp_acceleration_m_s2": 0.5409098071330017,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L3_J2_leg2",
+      "active_axis": "shoulder_lift",
+      "direction": -1,
+      "start_deg": [
+        6.681318681318682,
+        -20.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 0.9666666666666667,
+      "requested_peak_speed_deg_s": 60.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        58.143544274384666,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        184.61910641866234,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.17005377952669642,
+      "planned_peak_tcp_acceleration_m_s2": 0.5409098071331035,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L3_J3_leg1",
+      "active_axis": "elbow_flex",
+      "direction": 1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        40.90027472527473,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 1.0333333333333332,
+      "requested_peak_speed_deg_s": 55.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        0.0,
+        54.39773257684109,
+        0.0,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        0.0,
+        161.1277260719346,
+        0.0,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.21429806443264732,
+      "planned_peak_tcp_acceleration_m_s2": 0.6366083708456537,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L3_J3_leg2",
+      "active_axis": "elbow_flex",
+      "direction": -1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        40.90027472527473,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 1.0333333333333332,
+      "requested_peak_speed_deg_s": 55.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        0.0,
+        54.39773257684109,
+        0.0,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        0.0,
+        161.1277260719298,
+        0.0,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.214298064432647,
+      "planned_peak_tcp_acceleration_m_s2": 0.6366083708456862,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L3_J4_leg1",
+      "active_axis": "wrist_flex",
+      "direction": 1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        82.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 0.6666666666666666,
+      "requested_peak_speed_deg_s": 60.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        0.0,
+        0.0,
+        55.87612500000006,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        0.0,
+        0.0,
+        257.17500000000655,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.16705847863806256,
+      "planned_peak_tcp_acceleration_m_s2": 0.7694025547694948,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L3_J4_leg2",
+      "active_axis": "wrist_flex",
+      "direction": -1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        82.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 0.6666666666666666,
+      "requested_peak_speed_deg_s": 60.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        0.0,
+        0.0,
+        55.87612500000006,
+        0.0
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        0.0,
+        0.0,
+        257.175000000013,
+        0.0
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.16705847863806256,
+      "planned_peak_tcp_acceleration_m_s2": 0.769402554769495,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L3_J5_leg1",
+      "active_axis": "wrist_roll",
+      "direction": 1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        31.054945054945055
+      ],
+      "duration_s": 0.9666666666666667,
+      "requested_peak_speed_deg_s": 60.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        58.14354427438472
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        184.61910641866072
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.06384461414087583,
+      "planned_peak_tcp_acceleration_m_s2": 0.20307797931655316,
+      "full_limit_motion_collision_check": "PASS"
+    },
+    {
+      "trajectory_id": "cal058_L3_J5_leg2",
+      "active_axis": "wrist_roll",
+      "direction": -1,
+      "start_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        31.054945054945055
+      ],
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "duration_s": 0.9666666666666667,
+      "requested_peak_speed_deg_s": 60.0,
+      "planned_peak_joint_velocity_deg_s": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        58.14354427438472
+      ],
+      "planned_peak_joint_acceleration_deg_s2": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        184.61910641866552
+      ],
+      "planned_peak_tcp_velocity_m_s": 0.06384461414087583,
+      "planned_peak_tcp_acceleration_m_s2": 0.2030779793165584,
+      "full_limit_motion_collision_check": "PASS"
+    }
+  ],
+  "eeprom_written": false,
+  "profile_written": false,
+  "torque_enabled_after": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "feedback_before_goal_seed": {
+    "angles_deg": [
+      7.120879120879121,
+      -63.90206593406594,
+      73.75741758241759,
+      58.1886043956044,
+      1.142857142857143
+    ],
+    "speeds_deg_s": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.0
+    ],
+    "currents_ma": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gripper_pct": 4.649499284692418,
+    "gripper_speed_pct_s": 0.0,
+    "gripper_current_ma": 0.0,
+    "sample_start_ns": 23570138805209,
+    "sample_end_ns": 23570142464686,
+    "sequence": 1
+  },
+  "torque_enable_source": "goal_seed_implicit_verified",
+  "torque_enabled_during": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "recovery_feedback": {
+    "angles_deg": [
+      7.032967032967034,
+      -50.62734065934066,
+      13.449725274725276,
+      61.880912087912094,
+      1.142857142857143
+    ],
+    "speeds_deg_s": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.0
+    ],
+    "currents_ma": [
+      6.5,
+      0.0,
+      45.5,
+      0.0,
+      0.0
+    ],
+    "gripper_pct": 4.506437768240343,
+    "gripper_speed_pct_s": 0.0,
+    "gripper_current_ma": 0.0,
+    "sample_start_ns": 23590573609403,
+    "sample_end_ns": 23590577276952,
+    "sequence": 615
+  },
+  "recovery_endpoint_abs_error_deg": [
+    0.3516483516483522,
+    0.1758241758241752,
+    2.5494505494505493,
+    0.1758241758241752,
+    0.08791208791208804
+  ],
+  "sample_rows": 1983,
+  "measured_peak_velocity_deg_s": [
+    2856.4453125,
+    3076.171875,
+    2636.71875,
+    2636.71875,
+    2856.4453125
+  ],
+  "proposed_max_velocity_deg_s": [
+    2427.98,
+    2614.75,
+    2241.21,
+    2241.21,
+    2427.98
+  ],
+  "peak_joint_current_ma": [
+    32.5,
+    156.0,
+    110.5,
+    39.0,
+    26.0
+  ],
+  "software_hard_current_ma": [
+    900.0,
+    900.0,
+    900.0,
+    900.0,
+    900.0
+  ],
+  "current_threshold_result": "PASS",
+  "motion_execution_status": "PASS",
+  "velocity_conversion_status": "SUPERSEDED_BY_CAL-016_DYNAMIC_CROSSCHECK",
+  "velocity_conversion_note": "Stored speed_deg_s and the automatic proposal used the obsolete 4.39453125 scale and are exactly 50x too large. Preserve this report as execution evidence; use CAL-058_joint_velocity_unloaded_corrected_20260915.json for engineering-unit results.",
+  "corrected_report": "CAL-058_joint_velocity_unloaded_corrected_20260915.json",
+  "finished_at": "2026-09-15T19:15:16.973566+08:00"
+}

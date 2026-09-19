@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-018",
+  "status": "RETRACTED_DIRECTION_REFERENCE_ERROR",
+  "scope": "joint_element_2_elbow_flex",
+  "captured_at": "2026-09-13",
+  "parameter": "joints.sign[2]",
+  "joint": {
+    "index": 2,
+    "name": "elbow_flex",
+    "servo_id": 3,
+    "parent_link": "upper_arm_link",
+    "child_link": "lower_arm_link",
+    "urdf_axis_joint_frame": [0.0, 0.0, 1.0],
+    "urdf_axis_parent_frame_at_zero": [0.0, 0.0, 1.0],
+    "positive_physical_reference": "Keep the upper arm fixed and flex the elbow so the wrist and forearm move toward the upper arm/shoulder."
+  },
+  "hardware": {
+    "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+    "resolved_port": "/dev/ttyACM0",
+    "usb_identity": {
+      "vid": "1a86",
+      "pid": "55d3",
+      "serial": "5B14114904"
+    },
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_in_workspace",
+    "model_number": 777,
+    "official_raw_range": [796, 3095],
+    "torque_enabled_by_motor": [0, 0, 0, 0, 0, 0]
+  },
+  "observations": {
+    "baseline_raw": 2826,
+    "urdf_positive_raw": 3004,
+    "urdf_negative_raw": 2774,
+    "positive_delta_counts": 178,
+    "negative_delta_counts": -52,
+    "positive_delta_bus_deg": 15.648351648352,
+    "negative_delta_bus_deg": -4.571428571429,
+    "static_span_counts_by_pose": [0, 0, 0],
+    "samples_per_pose": 10
+  },
+  "result": {
+    "joint_sign": 1,
+    "formula": "q_urdf_deg = joint_sign * q_bus_deg + zero_offset_deg",
+    "reason": "The operator-confirmed URDF-positive flexion increased q_bus/raw, while extension past the baseline decreased it."
+  },
+  "checks": {
+    "stable_port_identity_checked_before_each_pose": true,
+    "all_six_torque_disabled_before_and_after_each_pose": true,
+    "positive_and_negative_on_opposite_sides_of_baseline": true,
+    "both_motion_magnitudes_exceed_30_counts": true,
+    "all_observations_inside_official_range": true,
+    "write_instructions_sent": 0,
+    "motion_instructions_sent": 0,
+    "eeprom_written": false
+  },
+  "evidence": {
+    "baseline_pose": "../raw/cal018_elbow_flex_baseline_20260913.json",
+    "baseline_pose_sha256": "a5560797c2a97aec058983a8e218371d567250b91a3ce647778b9090f3ab21ec",
+    "positive_pose": "../raw/cal018_elbow_flex_positive_20260913.json",
+    "positive_pose_sha256": "777dc83445383bf5edab9fbae9975a6b7db942eb0f01632f99131e45ded446ef",
+    "negative_pose": "../raw/cal018_elbow_flex_negative_20260913.json",
+    "negative_pose_sha256": "29b881cce811ee401aa23b4025142a6ad281caeaf480886a8af464e8aff609fd",
+    "direction_reader_sha256": "28549491e552a737ec0afe137b2db3575467c8c76bb199162ee43dfa13af601b",
+    "one_shot_reader_sha256": "e46edf2df5dd04a245efc6f5324216d276037b495a94186032e445da9abc0fc8"
+  },
+  "implementation": {
+    "profile_write_deferred_until_all_five_sign_elements_are_measured": true
+  },
+  "retraction": {
+    "reason": "The former toward/away-from-shoulder label is pose-dependent; local URDF FK at true q=0 must be used to label wrist-down as positive.",
+    "raw_evidence_preserved": true
+  }
+}

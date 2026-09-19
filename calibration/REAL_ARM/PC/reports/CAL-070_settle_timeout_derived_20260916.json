@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-070",
+  "status": "CONFIRMED_FOR_CURRENT_DEMO",
+  "completed_at": "2026-09-16T12:26:43+08:00",
+  "parameter": "motion.settle_timeout_s",
+  "method": "For each passed trajectory, measure from the first feedback frame associated with the final command through the final frame that completes settling. Add a 0.5 s current-demo scheduling and communication margin to the observed maximum, then round upward to 0.1 s.",
+  "inputs": {
+    "deduplicated_passed_trajectories": 90,
+    "CAL-069_dwell_s": 0.15,
+    "CAL-069_report": "CAL-069_settle_dwell_validated_20260916.json",
+    "CAL-069_report_sha256": "09aad690fb2ef017357e288e9632f430f66b42c032bead1fa834d8962cb121a6",
+    "demo_margin_s": 0.5
+  },
+  "observed": {
+    "terminal_completion_time_min_s": 0.156488746,
+    "terminal_completion_time_median_s": 0.19729804950000002,
+    "terminal_completion_time_max_s": 0.346771464,
+    "slowest_trajectory": "unloaded/cal058_L3_J4_leg1"
+  },
+  "derivation": {
+    "rule": "ceil((terminal_completion_time_max + 0.5 s) * 10) / 10",
+    "unrounded_s": 0.846771464,
+    "before_s": 3.0,
+    "after_s": 0.9
+  },
+  "fit_correction": {
+    "obsolete_behavior": "unconditionally write hard-coded 3.0 s",
+    "function": "scripts.calibrate._derive_settle_timeout",
+    "regression_test": "test_motion到位超时由末端完成耗时加固定余量派生"
+  },
+  "profile_sha256_before": "dff211979a4005b6cef9e1a697987f08b6acb6aae46720d0d15b348e93927aeb",
+  "profile_sha256_after": "4781d6bac5b4d8ee7f381b35a07c469d85fd85258c7c0095ef6e4cee2727143d",
+  "profile_written": true,
+  "hardware_accessed_for_this_derivation": false,
+  "eeprom_written": false,
+  "limitations": [
+    "The 0.5 s margin is a conservative current-demo engineering allowance, not a mechanical constant.",
+    "The timing evidence covers the recorded 12 V, 26.8 C, fixed-base, unloaded and maximum 92.4 g demo conditions; environment, load, EEPROM, USB, or CPU changes require revalidation.",
+    "The first feedback timestamp follows final-command submission, so the unobserved submit-to-first-feedback interval is covered by the margin rather than directly measured."
+  ],
+  "group_regression": {
+    "scope": "full repository offline test suite after CAL-063 through CAL-070 closure",
+    "tests_passed": 328,
+    "tests_failed": 0,
+    "warnings": 1,
+    "warning_summary": "Third-party hppfcl import deprecation warning",
+    "elapsed_s": 642.34,
+    "status": "PASS"
+  },
+  "downstream": {
+    "current_motion_group": "CAL-063 through CAL-070 complete after group regression",
+    "next_non_deferred_parameter": "CAL-080 because CAL-071 through CAL-079 are deferred with TCP/vision-dependent work"
+  }
+}

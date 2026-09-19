@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-020",
+  "status": "VERIFIED_FOR_DEMO",
+  "captured_at": "2026-09-14",
+  "parameter": "joints.measured_limits_deg",
+  "source": "deterministic_conversion_of_authoritative_motor_calibration_ranges",
+  "formula": [
+    "mid_raw = (range_min + range_max) / 2",
+    "q_bus_deg = (raw - mid_raw) * 360 / (4096 - 1)",
+    "q_urdf_deg = joint_sign * q_bus_deg + zero_offset_deg",
+    "measured_limits_deg = sorted(q_urdf_at_range_min, q_urdf_at_range_max)"
+  ],
+  "joint_names": [
+    "shoulder_pan",
+    "shoulder_lift",
+    "elbow_flex",
+    "wrist_flex",
+    "wrist_roll"
+  ],
+  "joint_sign": [1, 1, 1, 1, -1],
+  "zero_offset_deg": [1.4945054945054945, -12.913054945054945, 8.131043956043957, -4.360846153846154, 0.9230769230769231],
+  "rows": [
+    {
+      "joint": "shoulder_pan",
+      "raw_limits": [718, 3424],
+      "mid_raw": 2071.0,
+      "q_bus_limits_deg": [-118.94505494505495, 118.94505494505495],
+      "q_urdf_measured_limits_deg": [-117.45054945054946, 120.43956043956044]
+    },
+    {
+      "joint": "shoulder_lift",
+      "raw_limits": [865, 3333],
+      "mid_raw": 2099.0,
+      "q_bus_limits_deg": [-108.4835164835165, 108.4835164835165],
+      "q_urdf_measured_limits_deg": [-121.39657142857143, 95.57046153846156]
+    },
+    {
+      "joint": "elbow_flex",
+      "raw_limits": [796, 3095],
+      "mid_raw": 1945.5,
+      "q_bus_limits_deg": [-101.05494505494507, 101.05494505494507],
+      "q_urdf_measured_limits_deg": [-92.92390109890111, 109.18598901098902]
+    },
+    {
+      "joint": "wrist_flex",
+      "raw_limits": [729, 3192],
+      "mid_raw": 1960.5,
+      "q_bus_limits_deg": [-108.26373626373628, 108.26373626373628],
+      "q_urdf_measured_limits_deg": [-112.62458241758243, 103.90289010989012]
+    },
+    {
+      "joint": "wrist_roll",
+      "raw_limits": [0, 4095],
+      "mid_raw": 2047.5,
+      "q_bus_limits_deg": [-180.0, 180.0],
+      "q_urdf_measured_limits_deg": [-179.07692307692307, 180.92307692307693]
+    }
+  ],
+  "result": {
+    "measured_limits_deg": [
+      [-117.45054945054946, 120.43956043956044],
+      [-121.39657142857143, 95.57046153846156],
+      [-92.92390109890111, 109.18598901098902],
+      [-112.62458241758243, 103.90289010989012],
+      [-179.07692307692307, 180.92307692307693]
+    ]
+  },
+  "scope_and_uncertainty": {
+    "accepted_scope": "demo_only",
+    "raw_range_source_is_authoritative": true,
+    "urdf_coordinate_values_inherit_CAL_019_manual_alignment_uncertainty": true,
+    "application_limits_are_separate": true
+  },
+  "evidence": {
+    "motor_calibration_path": "../motor_calibration.json",
+    "motor_calibration_sha256": "ad315322ad4d19cc322c8f21d86d9667d9df9eca2de325bebbd72fa62deefff5",
+    "CAL_018_report": "CAL-018_joint_signs_orthogonal_reference_20260914.json",
+    "CAL_018_report_sha256": "3d3db6b3fa1f0c9df9de4a96a357ad081fcd504718f330a0977fecc6e35340fe",
+    "CAL_019_report": "CAL-019_joint_zero_offsets_orthogonal_reference_20260914.json",
+    "CAL_019_report_sha256": "18dad1f5d801bf28e473f06e1219698c55dfeea28522024cb481094b123724c7",
+    "conversion_implementation_sha256": "0601c86846ad86af0d9baa64a6e0b736b98831e6f42fe49e209b399b3fb9b782"
+  },
+  "integration": {
+    "profile_sha256": "301bde3178fd213de9a4b5883ef22a4c1f87bbc5e373601dbda5bf4816fc4cfa",
+    "profile_field_written": "joints.measured_limits_deg",
+    "eeprom_written": false
+  }
+}

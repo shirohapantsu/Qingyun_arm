@@ -207,6 +207,10 @@ MODEL_BAUDRATE_TABLE = {
 STS_SMS_SERIES_ENCODINGS_TABLE = {
     "Present_Load": 10,
     "Homing_Offset": 11,
+    # CAL-013 本地审计补丁：LeRobot 0.5.1 的表漏了该项。飞特官方
+    # FTServo_Linux `SMS_STS::ReadCurrent()` 明确用 bit 15 按符号-幅值解码
+    # 地址69~70的 Present_Current；来源与偏离说明见 libs/so_arm_core/SOURCE.md。
+    "Present_Current": 15,
     "Goal_Position": 15,
     "Goal_Velocity": 15,
     "Goal_Speed": 15,

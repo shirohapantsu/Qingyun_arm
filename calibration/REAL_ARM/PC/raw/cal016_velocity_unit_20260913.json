@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-016",
+  "captured_at": "2026-09-13T12:23:56.308299+08:00",
+  "source": "hardware_read_only",
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256": "7fb7864737353252a6e7178c09561d531b4c10d35430e5c30198b67ee4de2067",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_in_workspace"
+  },
+  "motor_names": [
+    "shoulder_pan",
+    "shoulder_lift",
+    "elbow_flex",
+    "wrist_flex",
+    "wrist_roll",
+    "gripper"
+  ],
+  "ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "model_numbers": [
+    777,
+    777,
+    777,
+    777,
+    777,
+    777
+  ],
+  "firmware": [
+    "3.10",
+    "3.10",
+    "3.10",
+    "3.10",
+    "3.10",
+    "3.10"
+  ],
+  "torque_enabled_by_motor": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "angular_resolution_raw": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "velocity_unit_factor_raw": [
+    50,
+    50,
+    50,
+    50,
+    50,
+    50
+  ],
+  "checks": {
+    "ids_match": true,
+    "models_match_sts3215": true,
+    "firmware_matches_profile": true,
+    "torque_disabled": true
+  },
+  "write_instructions_sent": 0,
+  "motion_instructions_sent": 0
+}

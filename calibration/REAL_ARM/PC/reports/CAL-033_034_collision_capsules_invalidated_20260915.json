@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "parameter_ids": ["CAL-033", "CAL-034", "CAL-035", "CAL-036"],
+  "date": "2026-09-15",
+  "status": "INVALIDATED_BY_PHYSICAL_FALSE_POSITIVE",
+  "profile_changed": false,
+  "profile_sha256": "52e2b621a303368f0774cf9ee439da852f2992480b0dfec1c21c55dad4106ba9",
+  "source_evidence": "CAL-047_serial_recovery_to_waypoint_20260915.json",
+  "physical_pose_deg": [8.175824175824175, -85.44052747252749, 70.15302197802198, 68.82596703296704, 1.142857142857143],
+  "gripper_pct": 2.0028612303290414,
+  "operator_observation": "目前来看实际运动路径根本不可能出现按安全问题",
+  "model_false_positive_pairs": [
+    {"pair": ["shoulder_01", "gripper_02"], "reported_penetration_mm": 11.371381622976497},
+    {"pair": ["shoulder_03", "gripper_02"], "reported_penetration_mm": 2.1004188624553985},
+    {"pair": ["upper_arm_02", "wrist_01"], "reported_penetration_mm": 6.570076728073575},
+    {"pair": ["upper_arm_02", "gripper_01"], "reported_penetration_mm": 19.15184020744348},
+    {"pair": ["upper_arm_02", "gripper_02"], "reported_penetration_mm": 29.930774761948435}
+  ],
+  "finding": "The physical arm occupies the measured pose without the contacts reported by the capsule union. The discrepancy is too large to explain as the configured 3 mm clearance alone; capsule decomposition, frame placement, sweep inflation and ignore-pair generation must be re-audited against physical poses.",
+  "decision": "Withdraw the prior demo confirmation for CAL-033 and CAL-034. CAL-035 and CAL-036 remain numeric policies but no longer provide a valid path-safety conclusion with the current capsules. Keep the profile geometry unchanged until a replacement model is fitted; do not silently broaden global ignore pairs.",
+  "temporary_operation_policy": "A collision override may be used only for a named recovery route explicitly confirmed clear by the on-site operator. Joint limits, command step, joint/TCP speed and acceleration, feedback, current and communication checks remain enabled. This is not a general collision bypass.",
+  "eeprom_written": false
+}

@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="755" viewBox="0 0 980 755">
+  <rect width="980" height="755" fill="#fbfbf8"/>
+  <style>
+    text { font-family: sans-serif; fill: #202124; }
+    .title { font-size: 25px; font-weight: 700; }
+    .sub { font-size: 16px; }
+    .label { font-size: 15px; font-weight: 600; }
+    .dim { font-size: 14px; fill: #315b7d; }
+    .link { stroke: #343a40; stroke-width: 8; stroke-linecap: round; fill: none; }
+    .joint { fill: #ffbd2e; stroke: #252525; stroke-width: 2; }
+    .axis { stroke: #c83232; stroke-width: 2; marker-end: url(#arrow); }
+    .guide { stroke: #8ca3b5; stroke-width: 1.5; stroke-dasharray: 6 5; }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#c83232"/>
+    </marker>
+  </defs>
+
+  <text x="36" y="42" class="title">SO-101：本仓库 URDF 的 q=[0,0,0,0,0] 参考</text>
+  <text x="36" y="70" class="sub">由 so101_new_calib.urdf 的 origin/axis 直接计算；不是 follower_zero.webp 手工校准照片姿态</text>
+
+  <text x="36" y="112" class="label">侧视图（base_link X–Z）</text>
+  <line x1="80" y1="370" x2="720" y2="370" class="axis"/>
+  <line x1="80" y1="370" x2="80" y2="120" class="axis"/>
+  <text x="725" y="375" class="label">+X 前方（远离控制板）</text>
+  <text x="58" y="116" class="label">+Z</text>
+  <rect x="32" y="332" width="70" height="28" rx="5" fill="#c8ccd0"/>
+  <text x="35" y="325" class="sub">控制板侧 −X</text>
+
+  <polyline points="138,295 184,230 226,95 428,89 520,89 667,99" class="link"/>
+  <circle cx="138" cy="295" r="10" class="joint"/><text x="116" y="321" class="label">ID1</text>
+  <circle cx="184" cy="230" r="10" class="joint"/><text x="162" y="218" class="label">ID2</text>
+  <circle cx="226" cy="95" r="10" class="joint"/><text x="207" y="82" class="label">ID3</text>
+  <circle cx="428" cy="89" r="10" class="joint"/><text x="409" y="76" class="label">ID4</text>
+  <circle cx="520" cy="89" r="10" class="joint"/><text x="501" y="76" class="label">ID5</text>
+  <circle cx="667" cy="99" r="7" fill="#4a90c2"/><text x="678" y="104" class="label">gripper frame</text>
+
+  <line x1="184" y1="230" x2="226" y2="230" class="guide"/>
+  <line x1="226" y1="230" x2="226" y2="95" class="guide"/>
+  <text x="186" y="250" class="dim">2→3：前 28.00 mm</text>
+  <text x="232" y="169" class="dim">上 112.57 mm</text>
+  <line x1="226" y1="95" x2="428" y2="95" class="guide"/>
+  <text x="282" y="117" class="dim">3→4：前 134.90 mm，上 5.20 mm</text>
+  <text x="442" y="111" class="dim">4、5 轴心同高</text>
+
+  <text x="36" y="423" class="label">俯视图（base_link X–Y）</text>
+  <line x1="80" y1="552" x2="720" y2="552" class="axis"/>
+  <line x1="80" y1="552" x2="80" y2="455" class="axis"/>
+  <text x="725" y="557" class="label">+X 前方</text>
+  <text x="55" y="452" class="label">+Y</text>
+  <rect x="32" y="565" width="70" height="28" rx="5" fill="#c8ccd0"/>
+  <text x="33" y="617" class="sub">控制板/安装板位于 −X</text>
+
+  <polyline points="138,552 184,589 226,589 428,589 520,552 667,552" class="link"/>
+  <circle cx="138" cy="552" r="10" class="joint"/><text x="116" y="542" class="label">ID1</text>
+  <circle cx="184" cy="589" r="10" class="joint"/><text x="162" y="582" class="label">ID2</text>
+  <circle cx="226" cy="589" r="10" class="joint"/><text x="207" y="582" class="label">ID3</text>
+  <circle cx="428" cy="589" r="10" class="joint"/><text x="409" y="582" class="label">ID4</text>
+  <circle cx="520" cy="552" r="10" class="joint"/><text x="501" y="542" class="label">ID5</text>
+  <circle cx="667" cy="552" r="7" fill="#4a90c2"/>
+  <text x="405" y="625" class="dim">4→5：前 61.10 mm，横向 18.10 mm，水平距离 63.72 mm</text>
+
+  <text x="36" y="663" class="sub">重要：q2=0° 时 2→3 仅是近竖直（向前偏 13.97°）；完全竖直向上对应 q2≈−13.97°。</text>
+  <text x="36" y="689" class="sub">q5=0° 还要求夹爪张合平面近似竖直；轴心位置本身不能唯一确定腕部滚转角。</text>
+  <text x="36" y="730" class="label">推荐实测姿态 q=[0,−13.968,+16.175,−2.207,0]°：2→3 竖直，3→4 水平，4→5 同高。</text>
+</svg>

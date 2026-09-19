@@ -1,0 +1,1064 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-026",
+  "operation": "position_gripper_for_manual_gap_measurement",
+  "started_at": "2026-09-14T18:40:08.446592+08:00",
+  "success": false,
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256": "cfd4830f99fabd90a9b2f889b22cbf39f5bdb90ae6fca78d49c0c6d527247bbd",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_to_workspace"
+  },
+  "target_raw": 2548,
+  "calibrated_safe_endpoints_raw": [
+    1499,
+    2897
+  ],
+  "official_gripper_range_raw": [
+    1458,
+    2980
+  ],
+  "temporary_sram_settings": {
+    "Acceleration": 5,
+    "Goal_Time": 0,
+    "Goal_Velocity": 10,
+    "Torque_Limit": 600
+  },
+  "eeprom_written": false,
+  "joint_servo_motion_commands_sent": 0,
+  "gripper_motion_commands_sent": 1,
+  "samples": [
+    {
+      "time": "2026-09-14T18:40:08.511902+08:00",
+      "position_raw": 2196,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:40:08.563810+08:00",
+      "position_raw": 2196,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:08.615316+08:00",
+      "position_raw": 2196,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:08.666797+08:00",
+      "position_raw": 2196,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:08.718132+08:00",
+      "position_raw": 2198,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:08.770019+08:00",
+      "position_raw": 2201,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:08.821537+08:00",
+      "position_raw": 2204,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:08.873130+08:00",
+      "position_raw": 2206,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:08.924509+08:00",
+      "position_raw": 2209,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:08.976059+08:00",
+      "position_raw": 2212,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:09.027690+08:00",
+      "position_raw": 2215,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:09.079115+08:00",
+      "position_raw": 2218,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:09.130662+08:00",
+      "position_raw": 2221,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:09.182287+08:00",
+      "position_raw": 2222,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:09.233981+08:00",
+      "position_raw": 2225,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:09.285542+08:00",
+      "position_raw": 2228,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:09.336886+08:00",
+      "position_raw": 2230,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:09.388307+08:00",
+      "position_raw": 2234,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:09.439801+08:00",
+      "position_raw": 2236,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:09.491055+08:00",
+      "position_raw": 2239,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:09.542421+08:00",
+      "position_raw": 2240,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:09.593900+08:00",
+      "position_raw": 2244,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:09.645322+08:00",
+      "position_raw": 2246,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:09.696972+08:00",
+      "position_raw": 2249,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:09.748497+08:00",
+      "position_raw": 2252,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:09.800065+08:00",
+      "position_raw": 2253,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:09.851445+08:00",
+      "position_raw": 2256,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:09.902940+08:00",
+      "position_raw": 2259,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:09.954484+08:00",
+      "position_raw": 2262,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.005861+08:00",
+      "position_raw": 2264,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.057474+08:00",
+      "position_raw": 2266,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.109094+08:00",
+      "position_raw": 2270,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.160436+08:00",
+      "position_raw": 2270,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.212011+08:00",
+      "position_raw": 2274,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.263625+08:00",
+      "position_raw": 2277,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.315365+08:00",
+      "position_raw": 2280,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.366993+08:00",
+      "position_raw": 2282,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.418650+08:00",
+      "position_raw": 2285,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.470240+08:00",
+      "position_raw": 2287,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.521610+08:00",
+      "position_raw": 2290,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.573148+08:00",
+      "position_raw": 2293,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.624660+08:00",
+      "position_raw": 2294,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.676188+08:00",
+      "position_raw": 2298,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.727725+08:00",
+      "position_raw": 2300,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.779219+08:00",
+      "position_raw": 2303,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.830576+08:00",
+      "position_raw": 2305,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.881845+08:00",
+      "position_raw": 2307,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.933348+08:00",
+      "position_raw": 2311,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:10.985251+08:00",
+      "position_raw": 2313,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:11.036843+08:00",
+      "position_raw": 2317,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:11.088313+08:00",
+      "position_raw": 2318,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:11.139667+08:00",
+      "position_raw": 2321,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:11.191270+08:00",
+      "position_raw": 2323,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:11.243215+08:00",
+      "position_raw": 2327,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:11.295200+08:00",
+      "position_raw": 2329,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:11.346698+08:00",
+      "position_raw": 2332,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:11.398114+08:00",
+      "position_raw": 2335,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:11.449567+08:00",
+      "position_raw": 2337,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:11.501125+08:00",
+      "position_raw": 2340,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:11.552772+08:00",
+      "position_raw": 2341,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:11.604321+08:00",
+      "position_raw": 2345,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:11.655696+08:00",
+      "position_raw": 2347,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:11.707177+08:00",
+      "position_raw": 2349,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:11.758552+08:00",
+      "position_raw": 2353,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:11.810256+08:00",
+      "position_raw": 2356,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:11.861596+08:00",
+      "position_raw": 2358,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:11.913486+08:00",
+      "position_raw": 2360,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:11.965098+08:00",
+      "position_raw": 2363,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.016789+08:00",
+      "position_raw": 2365,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.068132+08:00",
+      "position_raw": 2368,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.119669+08:00",
+      "position_raw": 2371,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.171107+08:00",
+      "position_raw": 2373,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.222853+08:00",
+      "position_raw": 2377,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.274356+08:00",
+      "position_raw": 2377,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.325869+08:00",
+      "position_raw": 2381,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.377504+08:00",
+      "position_raw": 2383,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.429309+08:00",
+      "position_raw": 2386,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.481238+08:00",
+      "position_raw": 2389,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.532685+08:00",
+      "position_raw": 2391,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.584094+08:00",
+      "position_raw": 2394,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.635700+08:00",
+      "position_raw": 2395,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.687385+08:00",
+      "position_raw": 2399,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.738862+08:00",
+      "position_raw": 2401,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.790430+08:00",
+      "position_raw": 2405,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.842625+08:00",
+      "position_raw": 2406,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.894427+08:00",
+      "position_raw": 2410,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.946352+08:00",
+      "position_raw": 2412,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:12.997863+08:00",
+      "position_raw": 2415,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:13.049406+08:00",
+      "position_raw": 2418,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:13.100806+08:00",
+      "position_raw": 2420,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:13.152078+08:00",
+      "position_raw": 2423,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:13.203971+08:00",
+      "position_raw": 2424,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:13.255228+08:00",
+      "position_raw": 2428,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:13.306851+08:00",
+      "position_raw": 2430,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:13.358477+08:00",
+      "position_raw": 2432,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:13.410308+08:00",
+      "position_raw": 2436,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:13.461634+08:00",
+      "position_raw": 2436,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:13.513160+08:00",
+      "position_raw": 2441,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:13.564722+08:00",
+      "position_raw": 2443,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:13.616341+08:00",
+      "position_raw": 2447,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:13.667935+08:00",
+      "position_raw": 2448,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:13.719460+08:00",
+      "position_raw": 2451,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:13.771073+08:00",
+      "position_raw": 2454,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:13.822547+08:00",
+      "position_raw": 2455,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:13.873931+08:00",
+      "position_raw": 2459,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:13.925624+08:00",
+      "position_raw": 2460,
+      "current_register_raw": 2,
+      "current_ma": 13.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:13.977350+08:00",
+      "position_raw": 2464,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:14.029175+08:00",
+      "position_raw": 2467,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:14.080673+08:00",
+      "position_raw": 2469,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:14.133212+08:00",
+      "position_raw": 2472,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:14.185414+08:00",
+      "position_raw": 2475,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:14.236757+08:00",
+      "position_raw": 2478,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:14.288751+08:00",
+      "position_raw": 2480,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:14.340238+08:00",
+      "position_raw": 2483,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:14.392205+08:00",
+      "position_raw": 2484,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:14.443884+08:00",
+      "position_raw": 2487,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:14.495335+08:00",
+      "position_raw": 2490,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:14.546839+08:00",
+      "position_raw": 2492,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:14.598129+08:00",
+      "position_raw": 2496,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:14.649640+08:00",
+      "position_raw": 2497,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:14.700859+08:00",
+      "position_raw": 2500,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:14.752498+08:00",
+      "position_raw": 2502,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:14.803999+08:00",
+      "position_raw": 2506,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:14.855330+08:00",
+      "position_raw": 2508,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:14.907043+08:00",
+      "position_raw": 2509,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:14.958782+08:00",
+      "position_raw": 2513,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:15.010342+08:00",
+      "position_raw": 2516,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:15.061741+08:00",
+      "position_raw": 2519,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:15.113133+08:00",
+      "position_raw": 2521,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:15.164672+08:00",
+      "position_raw": 2524,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:15.216427+08:00",
+      "position_raw": 2526,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:15.267950+08:00",
+      "position_raw": 2530,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:15.319534+08:00",
+      "position_raw": 2532,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:15.371004+08:00",
+      "position_raw": 2532,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:15.422516+08:00",
+      "position_raw": 2537,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:15.474067+08:00",
+      "position_raw": 2538,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:15.525278+08:00",
+      "position_raw": 2542,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "time": "2026-09-14T18:40:15.576895+08:00",
+      "position_raw": 2544,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:40:15.628406+08:00",
+      "position_raw": 2544,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T18:40:15.680017+08:00",
+      "position_raw": 2544,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    }
+  ],
+  "response_status_level_by_motor": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "model_numbers": [
+    777,
+    777,
+    777,
+    777,
+    777,
+    777
+  ],
+  "torque_enabled_before": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "start_raw": 2196,
+  "original_sram_settings": {
+    "Acceleration": 5,
+    "Goal_Time": 0,
+    "Goal_Velocity": 0,
+    "Torque_Limit": 500
+  },
+  "gripper_torque_enable_readback": 1,
+  "final_raw_before_torque_off": 2544,
+  "final_torque_check_error": "MotorCommunicationError: READ id=1 addr=40 n=1 帧头不完整：FF C3",
+  "finished_at": "2026-09-14T18:40:15.682827+08:00"
+}

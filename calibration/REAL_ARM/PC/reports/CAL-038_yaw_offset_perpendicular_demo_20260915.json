@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-038",
+  "date": "2026-09-15",
+  "scope": "REAL_ARM/PC demo grasp direction",
+  "status": "confirmed_demo",
+  "operator_selection": "gripper closing direction perpendicular to the object long axis",
+  "yaw_offset_deg": 90.0,
+  "profile_sha256_before": "62da9cf9057c5bdc301467f990e4a5e9217f8f05193744364d28fa50eea7665a",
+  "profile_sha256_after": "04c7e28def4f2d5a87beeaf63132faf9477ddee3f053136f908c91d7623a20ec",
+  "object_envelope_m": [0.07, 0.045, 0.045],
+  "derived": {
+    "nominal_close_axis_width_m": 0.045,
+    "close_axis_width_at_5_deg_yaw_error_m": 0.05092966340646462,
+    "current_preopen_pct": 70.0,
+    "interpolated_gap_at_preopen_m": 0.09304,
+    "nominal_preopen_gap_margin_m": 0.04804,
+    "preopen_gap_margin_at_5_deg_yaw_error_m": 0.04211033659353538
+  },
+  "directed_test": {
+    "command": "pytest -q tests/test_kinematics_math.py -k '闭合方向宽度'",
+    "result": "1 passed, 44 deselected"
+  },
+  "limitations": [
+    "Direction is operator-selected for the demo and has not yet been validated by grasp trials.",
+    "The +90 degree orientation is directional on this single-moving-finger gripper; it must not be silently replaced by -90 degrees or +270 degrees without revalidation.",
+    "CAL-037 remains deferred until real TCP translation is calibrated, and CAL-080 preopen still requires its own grasp-stage confirmation."
+  ]
+}

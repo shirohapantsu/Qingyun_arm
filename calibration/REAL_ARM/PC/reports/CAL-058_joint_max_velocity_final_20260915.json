@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-058",
+  "status": "CONFIRMED",
+  "completed_at": "2026-09-15T19:45:00+08:00",
+  "parameter": "motion.max_velocity_deg_s",
+  "method": "Three increasing commanded velocity levels, one positive and one negative leg per joint and level, with the final limit equal to the per-axis minimum of unloaded and 92.4 g loaded peak feedback velocity times 0.85.",
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_to_wooden_work_surface_no_gap",
+    "demo_max_load_g": 92.4
+  },
+  "velocity_feedback_scale": {
+    "value_deg_s_per_raw": [0.087890625, 0.087890625, 0.087890625, 0.087890625, 0.087890625, 0.087890625],
+    "correction_report": "CAL-016_velocity_scale_dynamic_correction_20260915.json"
+  },
+  "unloaded": {
+    "source_report": "CAL-058_joint_velocity_unloaded_corrected_20260915.json",
+    "source_report_sha256": "0d3270b3eb24b21679197e0c18ab809a796b1047d544190f02c93bcba3e54378",
+    "sample_rows": 1983,
+    "measured_peak_velocity_deg_s": [57.12890625, 61.5234375, 52.734375, 52.734375, 57.12890625],
+    "candidate_deg_s": [48.56, 52.29, 44.82, 44.82, 48.56],
+    "peak_joint_current_ma": [32.5, 156.0, 110.5, 39.0, 26.0],
+    "operator_observation": "无异常"
+  },
+  "loaded_92p4g": {
+    "attempt1": {
+      "source_report": "CAL-058_joint_velocity_92p4g_20260915.json",
+      "result": "recovery settle timeout before velocity samples"
+    },
+    "attempt2": {
+      "source_report": "CAL-058_joint_velocity_92p4g_attempt2_20260915.json",
+      "source_report_sha256": "3c71f01e42dee301ec0e7b5c78f08ba1a6e153b98abd8812cb0d86bf18afda3f",
+      "passed_segments": 5,
+      "result": "2.6 deg loaded static settle threshold exceeded by 0.037 deg on joint 3; all torque disabled"
+    },
+    "attempt3": {
+      "source_report": "CAL-058_joint_velocity_92p4g_attempt3_20260915.json",
+      "source_report_sha256": "81cd57ab970f7507dc18ada3416b92bd6c21a2d791e15399f761bd1b6b6a7c18",
+      "start_segment_index": 5,
+      "passed_segments": 26,
+      "temporary_settle_position_tolerance_deg": 2.8,
+      "temporary_settle_timeout_s": 8.0,
+      "torque_enabled_after": [0, 0, 0, 0, 0, 0]
+    },
+    "combined_unique_trajectory_count": 30,
+    "combined_passed_sample_rows": 2002,
+    "measured_peak_velocity_deg_s": [57.12890625, 57.12890625, 52.734375, 57.12890625, 57.12890625],
+    "candidate_deg_s": [48.56, 48.56, 44.82, 48.56, 48.56],
+    "following_error_p99_deg": [3.5121169299917514, 3.7980536130230127, 4.573158725489899, 3.214242865807121, 3.4022268201016437],
+    "following_error_max_deg": [4.720929250463993, 6.804223906404584, 6.43010327572668, 4.552298901098908, 4.592088793881192],
+    "peak_joint_current_ma": [26.0, 156.0, 123.5, 32.5, 26.0],
+    "gripper_pct_min": 25.321888412017167,
+    "gripper_pct_max": 25.321888412017167,
+    "gripper_opening_drift_pct": 0.0,
+    "operator_observation": "无异常"
+  },
+  "fit": {
+    "rule": "min(unloaded_candidate, loaded_candidate) per axis",
+    "before_deg_s": [70.0, 70.0, 70.0, 70.0, 70.0],
+    "after_deg_s": [48.56, 48.56, 44.82, 44.82, 48.56]
+  },
+  "current_revalidation": {
+    "peak_across_unloaded_and_loaded_ma": [32.5, 156.0, 123.5, 39.0, 26.0],
+    "software_hard_limit_ma": [900.0, 900.0, 900.0, 900.0, 900.0],
+    "eeprom_protection_current_ma": [2015.0, 2015.0, 2015.0, 2015.0, 2015.0],
+    "result": "PASS_WITH_LARGE_MARGIN"
+  },
+  "profile_sha256_before": "1d50e9bcbe68b5fd2431d7b602538c980ef695c872c79340088bfe3fd56223e0",
+  "profile_sha256_after": "87d46d7600a2204af1445b9eb557813c4c5d25ef6f0a578ed6c44e82f3b1d27e",
+  "profile_written": true,
+  "eeprom_written": false,
+  "post_write_verification": {
+    "targeted_tests_passed": 214,
+    "targeted_tests_failed": 0,
+    "profile_routes_checked": 20,
+    "profile_route_nodes_checked": 668,
+    "home_waypoint_gripper_percentages": [0, 25, 50, 75, 100],
+    "five_axis_local_round_trips_checked": true,
+    "result": "PASS"
+  },
+  "downstream": {
+    "CAL-059": "must fit acceleration from the same motion records",
+    "CAL-060_candidate_not_written_deg_per_tick": [1.619, 1.619, 1.494, 1.494, 1.619],
+    "CAL-063_to_CAL-070": "must use loaded endpoint and tracking records; temporary 2.8 deg settle tolerance is not promoted"
+  }
+}

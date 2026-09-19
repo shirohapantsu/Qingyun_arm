@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-026",
+  "completed_date": "2026-09-14",
+  "source": "operator_manual_measurements_with_serial_positioning",
+  "status": "verified_for_demo",
+  "measurement_protocol": {
+    "measurement_plane_mm_behind_hard_fingertip": 20.0,
+    "surfaces": "uncompressed_inner_pad_surfaces",
+    "repeats_per_point": 1,
+    "formal_protocol_deviation": "Reverse-direction repeats and quantified measurement uncertainty were omitted for the demo."
+  },
+  "calibrated_endpoints_raw": {
+    "closed": 1499,
+    "open": 2897
+  },
+  "gap_table": [
+    {
+      "gripper_pct": 0.0,
+      "gap_m": 0.0096,
+      "gap_mm": 9.6,
+      "goal_raw": 1499,
+      "present_raw": null,
+      "evidence": "calibration/REAL_ARM/PC/reports/CAL-026_gap_0pct_operator_correction_20260914.json"
+    },
+    {
+      "gripper_pct": 25.0,
+      "gap_m": 0.0405,
+      "gap_mm": 40.5,
+      "goal_raw": 1849,
+      "present_raw": 1845,
+      "evidence": "calibration/REAL_ARM/PC/reports/CAL-026_gap_25pct_operator_measurement_20260914.json"
+    },
+    {
+      "gripper_pct": 50.0,
+      "gap_m": 0.0712,
+      "gap_mm": 71.2,
+      "goal_raw": 2198,
+      "present_raw": 2194,
+      "evidence": "calibration/REAL_ARM/PC/reports/CAL-026_gap_50pct_operator_measurement_20260914.json"
+    },
+    {
+      "gripper_pct": 75.0,
+      "gap_m": 0.0985,
+      "gap_mm": 98.5,
+      "goal_raw": 2548,
+      "present_raw": 2544,
+      "evidence": "calibration/REAL_ARM/PC/reports/CAL-026_gap_75pct_operator_measurement_20260914.json"
+    },
+    {
+      "gripper_pct": 100.0,
+      "gap_m": 0.1207,
+      "gap_mm": 120.7,
+      "goal_raw": 2897,
+      "present_raw": 2894,
+      "evidence": "calibration/REAL_ARM/PC/reports/CAL-026_gap_100pct_operator_measurement_20260914.json"
+    }
+  ],
+  "validation": {
+    "gripper_pct_strictly_increasing": true,
+    "gap_strictly_increasing": true,
+    "adjacent_gap_increments_mm": [
+      30.9,
+      30.7,
+      27.3,
+      22.2
+    ],
+    "interpolation": "piecewise_linear",
+    "extrapolation_allowed": false
+  },
+  "profile_write": {
+    "path": "calibration/REAL_ARM/PC/profile.json",
+    "previous_sha256": "cfd4830f99fabd90a9b2f889b22cbf39f5bdb90ae6fca78d49c0c6d527247bbd",
+    "new_sha256": "251b5a03d6a4282d225642b3deff8112edbc3af641909f5f28b64bd9777a4150",
+    "field": "gripper.gap_table",
+    "written": true
+  },
+  "motor_calibration_sha256": "ad315322ad4d19cc322c8f21d86d9667d9df9eca2de325bebbd72fa62deefff5"
+}

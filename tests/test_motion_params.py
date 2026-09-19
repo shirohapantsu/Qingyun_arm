@@ -291,6 +291,16 @@ def test_拒绝为零的电流比例(tmp_path):
         _load(tmp_path, **{"motor.current_ma_per_raw": [0.0] * 6})
 
 
+def test_拒绝负数电流比例(tmp_path):
+    with pytest.raises(ParamsError):
+        _load(tmp_path, **{"motor.current_ma_per_raw": [6.5, 6.5, -6.5, 6.5, 6.5, 6.5]})
+
+
+def test_拒绝非正速度比例(tmp_path):
+    with pytest.raises(ParamsError):
+        _load(tmp_path, **{"motor.velocity_deg_s_per_raw": [4.39453125] * 5 + [0.0]})
+
+
 def test_拒绝ignore_pairs引用不存在的capsule(tmp_path):
     with pytest.raises(ParamsError):
         _load(tmp_path, **{"collision.ignore_self_pairs": [["ghost", "base_body"]]})

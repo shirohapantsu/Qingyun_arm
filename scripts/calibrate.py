@@ -48,6 +48,8 @@ from qingyun.grabbing.kinematics_ext import (  # noqa: E402
     gap_to_gripper_pct,
     gripper_pct_to_gap,
 )
+from libs.so_arm_core.motors.encoding_utils import decode_sign_magnitude  # noqa: E402
+from libs.so_arm_core.motors.feetech.tables import MODEL_ENCODING_TABLE  # noqa: E402
 
 # 八个固定阶段（指南 1.2），顺序就是第 3 节规定的测量顺序。
 STAGES: tuple[str, ...] = (
@@ -136,8 +138,11 @@ DRAFT_OPERATOR_VALUES: dict[str, Any] = {
     "joints.margin_deg": [2.0] * 5,
     "collision.max_joint_substep_deg": 0.5,
     "motor.baudrate": 1000000,
-    "motor.current_ma_per_raw": [1.0] * 6,
-    "motor.velocity_deg_s_per_raw": [3.0] * 6,
+    # STS3215 厂商定义：Present_Current 每 raw count = 6.5 mA（CAL-015）。
+    "motor.current_ma_per_raw": [6.5] * 6,
+    # Present_Velocity直接回报编码步/秒；每raw为360°/4096步（CAL-016复核）。
+    # EEPROM地址82的Velocity_Unit_factor=50是固件内部参数，不是反馈寄存器倍率。
+    "motor.velocity_deg_s_per_raw": [0.087890625] * 6,
     # 型号与固件是"实际读回"的身份信息（指南 2.1）；模拟源会原样写回。
     "motor.models": ["sts3215"] * 6,
     "motor.firmware": ["2.54"] * 6,
@@ -418,6 +423,8 @@ def cmd_capture(args: argparse.Namespace) -> int:
     raw = load_json(profile_path)
     if stage not in STAGES:
         raise CalibError(f"未知阶段 {stage!r}，可用：{'、'.join(STAGES)}")
+    if args.require_torque_disabled and (not args.hardware or stage != "motor"):
+        raise CalibError("--require-torque-disabled 只能用于 capture --hardware --stage motor")
 
     if args.hardware:
         _check_hardware_prerequisites(raw, stage, profile_path)
@@ -486,6 +493,8 @@ def _capture_hardware(stage: str, profile_path: Path, args: argparse.Namespace) 
         "port": profile.motor.port,
         "power": args.power or "unspecified", "pad_id": args.pad or "unspecified",
         "load_label": args.load or "unloaded", "operator": args.operator or "unspecified",
+        "ambient_temperature_c": args.ambient_temperature_c,
+        "base_mount": args.base_mount or "unspecified",
     })
     out = [meta]
 
@@ -498,6 +507,12 @@ def _capture_hardware(stage: str, profile_path: Path, args: argparse.Namespace) 
             # 静止读回原始六通道量 + 参考角由外部量角器人工录入（--reference 文件）。
             refs = load_json(Path(args.reference)) if args.reference else None
             for _ in range(args.repeats or 5):
+                torque_by_motor = reader.read_torque_enabled()
+                if args.require_torque_disabled and any(torque_by_motor):
+                    state = dict(zip(MOTOR_NAMES, torque_by_motor))
+                    raise CalibError(
+                        "零偏采集要求六台舵机 Torque_Enable 全为 0，"
+                        f"实际读回 {state}。请先用已知安全的方式卸力；本命令不会写寄存器。")
                 snap = reader.read_snapshot()
                 emit({"record_type": "sample", "raw_position": snap["raw_position"],
                       "raw_velocity": snap["raw_velocity"], "raw_current": snap["raw_current"],
@@ -505,7 +520,10 @@ def _capture_hardware(stage: str, profile_path: Path, args: argparse.Namespace) 
                       "reference_current_ma": (refs or {}).get("reference_current_ma"),
                       "sample_start_ns": snap["sample_start_ns"],
                       "sample_end_ns": snap["sample_end_ns"],
-                      "torque_enabled": 1, "motion_label": "static"})
+                      "torque_enabled": (torque_by_motor[0]
+                                           if len(set(torque_by_motor)) == 1 else None),
+                      "torque_enabled_by_motor": torque_by_motor,
+                      "motion_label": "static"})
         elif stage == "joints":
             # 卸力手动/受限低速点动，参考角必须来自外部夹具（指南第 5 节）。
             # q_bus 由位置寄存器按 4.2 第一行公式换算，不依赖 joints 拟合结果。
@@ -596,6 +614,20 @@ def _sim_motor() -> list[Record]:
     run = new_run_id()
     out = [_sim_meta("motor", run)]
     closed, opened = 500, 3600
+    # 模拟流水线也显式给出“卸力空载零偏”mock 样本，不能再由参考电流分支
+    # 偷偷把 current_zero_raw 写死为 0。source=simulated 会保证它永远不是物理证据。
+    for _ in range(5):
+        out.append(Record("motor", run, new_sample_id(), time_ns(), {
+            "record_type": "sample",
+            "raw_position": [2048] * 6,
+            "raw_velocity": [0] * 6,
+            "raw_current": [0] * 6,
+            "reference_angle_deg": None,
+            "reference_current_ma": None,
+            "sample_start_ns": time_ns(), "sample_end_ns": time_ns() + 800_000,
+            "torque_enabled": 0, "torque_enabled_by_motor": [0] * 6,
+            "motion_label": "zero_current_mock",
+        }))
     for k in range(6):
         # 每通道取几个覆盖正反方向的读数；参考角/参考电流由外部量具给出。
         raw = [int(np.linspace(600, 3500, 7)[k % 7])]
@@ -666,7 +698,8 @@ def _sim_joints() -> list[Record]:
             "limit_reason": "cable" if j == 4 else "bracket",
             "q_bus_deg": [0.0] * 5, "q_reference_deg": [0.0] * 5,
         }))
-    # 端点重复测量（指南 5.4/5.5 用来定 measured_limits 与 margin）。
+    # 可选端点重复测量（指南 5.4/5.5）：核对官方校准端点并定 margin；
+    # measured_limits 由 motor_calibration.json 的 raw 行程另行派生。
     for j in range(5):
         for side, sign in (("lower", -1.0), ("upper", 1.0)):
             for _ in range(5):
@@ -877,6 +910,23 @@ def _sim_motion() -> list[Record]:
                     "stop_reason": None if ok else "acceleration_limit",
                     "passed": ok, "direction": direction,
                 }))
+            # 通过轨迹必须包含段末连续低速窗口，才能像实机采集一样独立拟合
+            # CAL-067~070；重复终点不会影响压缩后的速度/加速度命令统计。
+            if ok:
+                settle_lag = direction * np.array([0.2, 0.4, 0.3, 0.25, 0.15])
+                terminal_base_ns = time_ns()
+                for settle_index in range(16):
+                    terminal_time_ns = terminal_base_ns + settle_index * 10_000_000
+                    out.append(Record("motion", run, new_sample_id(), terminal_time_ns, {
+                        "record_type": "sample", "trajectory_id": f"traj_{trial}",
+                        "segment": f"seg{trial}", "command_deg": [float(v) for v in cmd],
+                        "feedback_deg": [float(v) for v in (cmd - settle_lag)],
+                        "speed_deg_s": [0.0] * 5,
+                        "current_ma": [float(v) for v in (200.0 + 250.0 * vel_scale) * np.ones(5)],
+                        "tcp_reference_B_m": None, "time_ns": terminal_time_ns,
+                        "gripper_pct": 70.0, "load_label": "unloaded",
+                        "stop_reason": None, "passed": True, "direction": direction,
+                    }))
     return out
 
 
@@ -908,7 +958,9 @@ def _sim_grasp() -> list[Record]:
     # 量块/假果/真果的接触试验（指南 10.2 第 4 条）
     for idx, (dim, gap) in enumerate((([0.040, 0.030, 0.038], 0.0300),
                                       ([0.045, 0.034, 0.040], 0.0320),
-                                      ([0.050, 0.038, 0.042], 0.0340),
+                                      # 模拟gap表上限为55mm；46mm长轴在±5°偏航与10%净余量后
+                                      # 仍落在覆盖内，避免用越界假数据测试合法流水线。
+                                      ([0.046, 0.038, 0.042], 0.0340),
                                       ([0.038, 0.028, 0.036], 0.0270),
                                       ([0.042, 0.031, 0.039], 0.0290))):
         trial = f"contact_{idx}"
@@ -1053,6 +1105,15 @@ def _fmt(v: Any) -> str:
 # --- 各阶段拟合 -------------------------------------------------------------
 
 
+def _decode_current_count(model: str, raw: int) -> int:
+    """按型号把 Present_Current 的总线字解成有符号原始计数。"""
+    value = int(raw)
+    if value != raw or not 0 <= value <= 0xFFFF:
+        raise CalibError(f"Present_Current 原始值必须是 16 位无符号整数，实际 {raw!r}")
+    sign_bit = MODEL_ENCODING_TABLE.get(str(model), {}).get("Present_Current")
+    return value if sign_bit is None else int(decode_sign_magnitude(value, int(sign_bit)))
+
+
 def _fit_motor(base: dict, records: list[Record]) -> tuple[dict[str, Any], dict[str, Any]]:
     """指南 4.1~4.4：身份、单位比例、夹爪两端，以及资源哈希。"""
     upd: dict[str, Any] = {}
@@ -1073,36 +1134,92 @@ def _fit_motor(base: dict, records: list[Record]) -> tuple[dict[str, Any], dict[
                       if r.payload.get("motion_label") == "gripper_closed_end"]
     open_samples = [r.payload for r in samples_of(records)
                     if r.payload.get("motion_label") == "gripper_open_end"]
+    endpoint_counts = [len(closed_samples), len(open_samples)]
+    res["gripper_endpoint_repeat_count"] = endpoint_counts
     if closed_samples and open_samples:
-        # 指南 4.4：重复至少 5 次，检查迟滞与方向；取各次读数的一致性。
-        closed_vals = {int(s["raw_position"][5]) for s in closed_samples}
-        open_vals = {int(s["raw_position"][5]) for s in open_samples}
-        if len(closed_vals) > 1 or len(open_vals) > 1:
-            res["gripper_end_hysteresis_counts"] = [
-                int(max(closed_vals) - min(closed_vals)), int(max(open_vals) - min(open_vals))]
-        upd["motor.gripper_closed_raw"] = int(round(statistics.mean(closed_vals)))
-        upd["motor.gripper_open_raw"] = int(round(statistics.mean(open_vals)))
+        # 指南 4.4：正式拟合要求两端分别重复至少 5 次。样本不足时只登记进度，
+        # 不把 demo 读数伪装成 fitter 已完成的标定结果。
+        closed_vals = [int(s["raw_position"][5]) for s in closed_samples]
+        open_vals = [int(s["raw_position"][5]) for s in open_samples]
+        res["gripper_end_hysteresis_counts"] = [
+            int(max(closed_vals) - min(closed_vals)),
+            int(max(open_vals) - min(open_vals)),
+        ]
+        if min(endpoint_counts) >= 5:
+            upd["motor.gripper_closed_raw"] = int(round(statistics.median(closed_vals)))
+            upd["motor.gripper_open_raw"] = int(round(statistics.median(open_vals)))
+        else:
+            res["gripper_endpoint_status"] = "insufficient_repeats_no_update"
 
     # 位置编码分辨率按型号从 vendor 表取，而不是从读数猜（指南 2.1）。
     from libs.so_arm_core.motors.feetech.tables import MODEL_RESOLUTION
 
-    upd["motor.position_resolution"] = [
-        int(MODEL_RESOLUTION[str(m)]) for m in upd.get("motor.models", base["motor"]["models"])
-    ]
+    models = list(upd.get("motor.models", base["motor"]["models"]))
+    upd["motor.position_resolution"] = [int(MODEL_RESOLUTION[str(m)]) for m in models]
+    # CAL-014：只用真机、空载、六轴 Torque_Enable 实际读回全为 0 的静止样本
+    # 拟合零偏。不能让“有参考电流”旁路把它写死为 0；零偏与比例是两份独立证据。
+    zero_rows = []
+    for record in samples_of(records):
+        row = record.payload
+        hardware_zero = (
+            from_hardware
+            and meta.get("load_label") == "unloaded"
+            and row.get("motion_label") == "static"
+            and row.get("torque_enabled") == 0
+            and row.get("torque_enabled_by_motor") == [0] * len(MOTOR_NAMES)
+        )
+        mock_zero = (
+            not from_hardware
+            and row.get("motion_label") == "zero_current_mock"
+            and row.get("torque_enabled") == 0
+            and row.get("torque_enabled_by_motor") == [0] * len(MOTOR_NAMES)
+        )
+        if hardware_zero or mock_zero:
+            zero_rows.append(row)
+    if zero_rows:
+        zero_raw = np.asarray([
+            [_decode_current_count(models[i], raw) for i, raw in enumerate(row["raw_current"])]
+            for row in zero_rows
+        ], dtype=np.float64)
+        if zero_raw.ndim != 2 or zero_raw.shape[1] != len(MOTOR_NAMES):
+            raise CalibError(
+                f"CAL-014 raw_current 必须为 N×{len(MOTOR_NAMES)}，实际 {zero_raw.shape}")
+        if not np.all(np.isfinite(zero_raw)):
+            raise CalibError("CAL-014 解码后的 raw_current 含非有限值")
+        med = np.median(zero_raw, axis=0)
+        upd["motor.current_zero_raw"] = [float(v) for v in med]
+        res["current_zero_sample_count"] = int(zero_raw.shape[0])
+        res["current_zero_min_raw"] = [float(v) for v in np.min(zero_raw, axis=0)]
+        res["current_zero_max_raw"] = [float(v) for v in np.max(zero_raw, axis=0)]
+        res["current_zero_mad_raw"] = [
+            float(v) for v in np.median(np.abs(zero_raw - med), axis=0)
+        ]
     # 参考电流用于验证 mA/raw 的合理性（4.3）：decoded 读数与参考值的线性比例。
     # 逐通道求中位数（字段是 float[6]，各通道比例可以不同，P3-6）；某通道没有
     # 参考数据时保留操作者给定的基值，不用别的通道的中位数冒充。
     ref_rows = [r.payload for r in samples_of(records)
                 if r.payload.get("reference_current_ma")]
     if ref_rows:
+        current_zeros = upd.get("motor.current_zero_raw", base["motor"]["current_zero_raw"])
+        if current_zeros is None or any(v is None for v in current_zeros):
+            # CAL-015 明确依赖 CAL-014。参考样本不能在零偏未知时用 raw 直接相除，
+            # 但 motor 阶段还可能同时承担身份/资源哈希更新，不能因此整阶段失败。
+            res["current_scale_fit_skipped"] = "current_zero_raw_missing"
+            ref_rows = []
+    if ref_rows:
         base_scales = base["motor"]["current_ma_per_raw"]
+        current_zeros = upd.get("motor.current_zero_raw", base["motor"]["current_zero_raw"])
         fitted: list[float] = []
         all_ratios: list[float] = []
         for i in range(6):
-            ch_ratios = [row["reference_current_ma"][i] / float(row["raw_current"][i])
-                         for row in ref_rows
-                         if row.get("reference_current_ma")
-                         and row["reference_current_ma"][i] and row["raw_current"][i]]
+            ch_ratios: list[float] = []
+            for row in ref_rows:
+                reference_ma = float(row["reference_current_ma"][i])
+                decoded = float(_decode_current_count(models[i], row["raw_current"][i]))
+                delta = decoded - float(current_zeros[i])
+                if reference_ma and delta:
+                    # 外接参考表通常只给电流幅值；比例本身按 schema 必须为正。
+                    ch_ratios.append(abs(reference_ma) / abs(delta))
             if ch_ratios:
                 fitted.append(float(np.median(ch_ratios)))
                 all_ratios.extend(ch_ratios)
@@ -1111,11 +1228,10 @@ def _fit_motor(base: dict, records: list[Record]) -> tuple[dict[str, Any], dict[
         upd["motor.current_ma_per_raw"] = fitted
         if all_ratios:
             res["current_scale_spread"] = float(np.std(all_ratios))
-        upd["motor.current_zero_raw"] = [0.0] * 6
-    # 速度比例：厂商资料给定的每计数 deg/s（4.3），随后用差分中位数核对方向。
+    # 速度比例由实机 Velocity_Unit_factor 与编码分辨率派生
+    # （CAL-016）。fit 只用差分中位数核对方向，不把原值回抄
+    # 冒充“updated field”；候选配置本就会从 base 完整继承该字段。
     res["velocity_direction_check"] = _velocity_direction_check(records)
-    if "motor.velocity_deg_s_per_raw" not in upd:
-        upd["motor.velocity_deg_s_per_raw"] = list(base["motor"]["velocity_deg_s_per_raw"])
     # 串口路径同样只认真机采集的 metadata（_capture_hardware 会写入真实端口）。
     # 操作者没有提供时保持 null：技术文档第八节要求"实机未测参数保持未完成
     # 状态，不用猜测值自动填补"（P2-3 修掉的正是这个猜测值）。
@@ -1185,7 +1301,7 @@ def _velocity_direction_check(records: list[Record]) -> Any:
 
 
 def _fit_joints(base: dict, records: list[Record]) -> tuple[dict[str, Any], dict[str, Any]]:
-    """指南 5.2：对每关节试 sign=±1 拟合 q_reference = sign*q_bus + offset，取残差小的一侧。"""
+    """指南 5.2：拟合坐标映射，再由官方校准 raw 端点派生实际行程。"""
     upd: dict[str, Any] = {}
     res: dict[str, Any] = {}
     # 只要单关节扫描样本：端点重复测量与 FK 验证构型里的 q_bus/q_reference 是占位值，
@@ -1216,26 +1332,70 @@ def _fit_joints(base: dict, records: list[Record]) -> tuple[dict[str, Any], dict
     upd["joints.zero_offset_deg"] = offset
     res["sign_fit_rms_deg"] = [round(v, 6) for v in rms]
 
-    # 端点重复测量 → measured_limits_deg 与 margin_deg（指南 5.4/5.5）
+    # motor_calibration.json 的 range_min/range_max 就是官方标定已采集的本机
+    # raw 行程端点。将其先换成 q_bus，再用本阶段拟合出的 sign/offset
+    # 转成 URDF 坐标；不得从 URDF limit 反推真机行程。
+    from qingyun.grabbing.motor_control import (
+        calibrated_range_to_bus_limits_deg,
+        calibrated_range_to_urdf_limits_deg,
+        load_motor_calibration,
+    )
+
+    profile_dir = Path(args_profile_dir.get("current", ".")).resolve()
+    calib_rel = base["model"]["motor_calibration_path"]
+    calib_path = _resolve_from(profile_dir, calib_rel) if calib_rel else None
+    if calib_path is None or not calib_path.is_file():
+        raise CalibError(f"joints 阶段找不到官方电机校准文件：{calib_path}")
+    expected_hash = base["model"].get("motor_calibration_sha256")
+    actual_hash = sha256_file(calib_path)
+    if expected_hash is not None and actual_hash != expected_hash:
+        raise CalibError(
+            "joints 阶段的官方电机校准文件与 profile 绑定哈希不一致："
+            f"{actual_hash} != {expected_hash}。请先重做 motor 阶段资源绑定"
+        )
+    try:
+        calibration = load_motor_calibration(calib_path)
+    except ValueError as exc:
+        raise CalibError(f"官方电机校准文件无效：{exc}") from exc
+    resolutions = base["motor"]["position_resolution"]
+    limits: list[list[float]] = []
+    bus_limits: list[list[float]] = []
+    raw_limits: list[list[int]] = []
+    for j, name in enumerate(JOINT_NAMES):
+        entry = calibration[name]
+        raw_limits.append([int(entry["range_min"]), int(entry["range_max"])])
+        bus_pair = calibrated_range_to_bus_limits_deg(
+            entry["range_min"], entry["range_max"], resolutions[j]
+        )
+        urdf_pair = calibrated_range_to_urdf_limits_deg(
+            entry["range_min"], entry["range_max"], resolutions[j], sign[j], offset[j]
+        )
+        bus_limits.append([float(bus_pair[0]), float(bus_pair[1])])
+        limits.append([float(urdf_pair[0]), float(urdf_pair[1])])
+    upd["joints.measured_limits_deg"] = limits
+    res["calibration_raw_limits"] = raw_limits
+    res["calibration_bus_limits_deg"] = [
+        [round(value, 6) for value in pair] for pair in bus_limits
+    ]
+
+    # 端点重复观测不再作为 measured_limits_deg 的第二份真值；若有采集，
+    # 只用来发现官方校准文件与当前 EEPROM/机构不一致，并估计 margin。
     ends: dict[tuple[int, str], list[float]] = {}
     for rp in (r.payload for r in samples_of(records)):
         if rp.get("endpoint_urdf_deg") is not None:
             key = (int(rp["sweep_joint_index"]), str(rp["endpoint_side"]))
             ends.setdefault(key, []).append(
                 [rp["endpoint_urdf_deg"], rp["endpoint_repeat_deg"]])
-    limits = [[None, None] for _ in range(5)]
     margins = [float(v) for v in (base["joints"]["margin_deg"] or [2.0] * 5)]
+    endpoint_delta: dict[str, float] = {}
     for (j, side), vals in ends.items():
         arr = np.array(vals, dtype=np.float64)
-        # 端点重复误差：同一侧两次读数的最大半差，加上统计散布，作为余量来源。
+        # 端点重复误差：同一侧重复读数的散布作为余量来源。
         spread = float(np.max(arr[:, 1]) - np.min(arr[:, 1])) if len(arr) > 1 else 0.0
         idx = 0 if side == "lower" else 1
-        # 取重复观测里更"保守"（更靠近内部）的那个作为可用行程端点。
-        limits[j][idx] = float(np.min(arr[:, 1]) if idx == 0 else np.max(arr[:, 1]))
         margins[j] = max(margins[j], spread + 0.5)
-    if any(l[0] is None or l[1] is None for l in limits):
-        raise CalibError("joints 阶段缺少某些关节的下限或上限端点测量")
-    upd["joints.measured_limits_deg"] = limits
+        observed = float(np.median(arr[:, 1]))
+        endpoint_delta[f"{j}_{side}"] = round(observed - limits[j][idx], 6)
     upd["joints.margin_deg"] = margins
     # 线缆/支架/桌面限制同样在 joints 阶段记录（指南 5.4）。缺记录时保留 draft 值，
     # 让加载器去决定是否算未测量，而不是在这里猜一个"看起来安全"的范围。
@@ -1256,6 +1416,7 @@ def _fit_joints(base: dict, records: list[Record]) -> tuple[dict[str, Any], dict
                                          {k: (float(np.ptp(np.array(vals, float), axis=0)[1])
                                               if len(vals) > 1 else 0.0)
                                           for k, vals in ends.items()}.items()}
+    res["endpoint_vs_calibration_deg"] = endpoint_delta
     # FK 验证构型数量必须达到指南 5.6 的"至少 10 个未参与拟合"
     checks = [rp for rp in (r.payload for r in samples_of(records)) if rp.get("fk_check")]
     res["fk_validation_configs"] = len(checks)
@@ -1558,6 +1719,465 @@ def _fit_timing(base: dict, records: list[Record]) -> tuple[dict[str, Any], dict
     return upd, res
 
 
+def _peak_command_acceleration(
+        rows: list[dict[str, Any]], fps: int) -> tuple[np.ndarray, int]:
+    """按独立轨迹计算命令二阶差分，返回 deg/s^2 峰值。
+
+    motion 记录在一条轨迹结束后会继续留下若干相同的到位/驻留命令；先压缩这些
+    连续重复点，再按固定控制周期 ``1/fps`` 求二阶差分。轨迹之间绝不能相减，
+    否则上一条终点到下一条起点会被误报成极大的加速度。
+    """
+    if fps <= 0:
+        raise CalibError(f"motion.fps 必须为正，实际为 {fps}")
+    grouped: dict[tuple[str, str, int], list[np.ndarray]] = {}
+    for index, payload in enumerate(rows):
+        command = np.asarray(payload["command_deg"], dtype=float)
+        if command.shape != (5,) or not np.all(np.isfinite(command)):
+            raise CalibError(f"motion command_deg[{index}] 必须是有限 float[5]")
+        key = (
+            str(payload.get("trajectory_id", f"missing-{index}")),
+            str(payload.get("segment", "")),
+            int(payload.get("direction", 0)),
+        )
+        values = grouped.setdefault(key, [])
+        if not values or not np.array_equal(command, values[-1]):
+            values.append(command)
+
+    peak = np.zeros(5, dtype=float)
+    usable_groups = 0
+    tick_s = 1.0 / float(fps)
+    for commands in grouped.values():
+        if len(commands) < 3:
+            continue
+        usable_groups += 1
+        arr = np.asarray(commands, dtype=float)
+        peak = np.maximum(
+            peak,
+            np.max(np.abs(np.diff(arr, n=2, axis=0)), axis=0) / (tick_s * tick_s),
+        )
+    if usable_groups == 0:
+        raise CalibError("motion 阶段没有至少含3个不同命令点的独立通过轨迹")
+    return peak, usable_groups
+
+
+def _derive_command_step_limits(
+        velocity_deg_s: Sequence[float], fps: int, cap_deg: float = 2.2) -> list[float]:
+    """从速度上限派生每 tick 步长，并向下量化以保证反算后绝不越限。"""
+    if fps <= 0:
+        raise CalibError(f"motion.fps 必须为正，实际为 {fps}")
+    values = np.asarray(velocity_deg_s, dtype=float)
+    if values.shape != (5,) or not np.all(np.isfinite(values)) or np.any(values <= 0.0):
+        raise CalibError("motion.max_velocity_deg_s 必须是正有限 float[5]")
+    # 不能 round 到最近的 0.001：例如 48.56/30 会变成 1.619，反算为
+    # 48.57 deg/s，反而超过 CAL-058。加微小 epsilon 只抵消二进制表示误差。
+    return [
+        math.floor(min(float(v) / fps, cap_deg) * 1000.0 + 1e-12) / 1000.0
+        for v in values
+    ]
+
+
+def _derive_start_position_tolerance(
+        rows: list[dict[str, Any]], settle_tolerance_deg: Sequence[float],
+        position_resolution: Sequence[int]) -> tuple[list[float], np.ndarray, int]:
+    """由各独立通过轨迹首帧派生起点容差。
+
+    每轴候选不低于当前到位位置容差，否则一段刚被判定到位，下一固定路径仍可能
+    立即因起点超差而拒绝；在已观测最大首帧偏差上再保留3个编码计数，并向上量化
+    到0.1度。这里不使用轨迹中的普通跟踪误差，以免把运动滞后混入起点判据。
+    """
+    first_by_trajectory: dict[tuple[str, str, int], dict[str, Any]] = {}
+    for index, payload in enumerate(rows):
+        if "command_deg" not in payload or "feedback_deg" not in payload:
+            continue
+        key = (
+            str(payload.get("trajectory_id", f"missing-{index}")),
+            str(payload.get("segment", "")),
+            int(payload.get("direction", 0)),
+        )
+        first_by_trajectory.setdefault(key, payload)
+    if not first_by_trajectory:
+        raise CalibError("motion 阶段没有可用于起点容差的独立通过轨迹")
+
+    errors = []
+    for payload in first_by_trajectory.values():
+        command = np.asarray(payload["command_deg"], dtype=float)
+        feedback = np.asarray(payload["feedback_deg"], dtype=float)
+        if command.shape != (5,) or feedback.shape != (5,):
+            raise CalibError("motion 起点 command_deg/feedback_deg 必须是 float[5]")
+        errors.append(np.abs(command - feedback))
+    observed_max = np.max(np.asarray(errors, dtype=float), axis=0)
+    settle = np.asarray(settle_tolerance_deg, dtype=float)
+    resolutions = np.asarray(position_resolution, dtype=float)[:5]
+    if settle.shape != (5,) or resolutions.shape != (5,) or np.any(resolutions <= 1):
+        raise CalibError("CAL-063 派生需要 settle float[5] 与前五轴有效编码分辨率")
+    three_count_margin = 3.0 * 360.0 / resolutions
+    required = np.maximum(observed_max + three_count_margin, settle)
+    candidate = [math.ceil(float(v) * 10.0 - 1e-12) / 10.0 for v in required]
+    return candidate, observed_max, len(first_by_trajectory)
+
+
+def _derive_following_error_tolerance(
+        rows: list[dict[str, Any]],
+        position_resolution: Sequence[int]) -> tuple[list[float], np.ndarray, np.ndarray]:
+    """用正常通过样本的逐轴最大跟踪误差加3 counts派生软阈值。"""
+    errors = []
+    for payload in rows:
+        if "command_deg" not in payload or "feedback_deg" not in payload:
+            continue
+        command = np.asarray(payload["command_deg"], dtype=float)
+        feedback = np.asarray(payload["feedback_deg"], dtype=float)
+        if command.shape != (5,) or feedback.shape != (5,):
+            raise CalibError("motion 跟踪误差 command_deg/feedback_deg 必须是 float[5]")
+        errors.append(np.abs(command - feedback))
+    if not errors:
+        raise CalibError("motion 阶段没有可用于普通跟踪误差阈值的通过样本")
+    err = np.asarray(errors, dtype=float)
+    observed_max = np.max(err, axis=0)
+    observed_p99 = np.percentile(err, 99, axis=0)
+    resolutions = np.asarray(position_resolution, dtype=float)[:5]
+    if resolutions.shape != (5,) or np.any(resolutions <= 1):
+        raise CalibError("CAL-064 派生需要前五轴有效编码分辨率")
+    three_count_margin = 3.0 * 360.0 / resolutions
+    candidate = [
+        math.ceil(float(v) * 10.0 - 1e-12) / 10.0
+        for v in observed_max + three_count_margin
+    ]
+    return candidate, observed_max, observed_p99
+
+
+def _derive_hard_following_error_tolerance(
+        soft_deg: Sequence[float], command_step_deg: Sequence[float],
+        position_resolution: Sequence[int]) -> list[float]:
+    """由软阈值、一个最大合法命令tick与3 counts派生立即停止阈值。"""
+    soft = np.asarray(soft_deg, dtype=float)
+    step = np.asarray(command_step_deg, dtype=float)
+    resolutions = np.asarray(position_resolution, dtype=float)[:5]
+    if soft.shape != (5,) or step.shape != (5,) or resolutions.shape != (5,):
+        raise CalibError("CAL-065 派生需要 soft/step/resolution 前五轴向量")
+    if np.any(soft <= 0.0) or np.any(step <= 0.0) or np.any(resolutions <= 1):
+        raise CalibError("CAL-065 派生输入必须为正")
+    three_count_margin = 3.0 * 360.0 / resolutions
+    candidate = [
+        math.ceil(float(v) * 10.0 - 1e-12) / 10.0
+        for v in soft + step + three_count_margin
+    ]
+    if np.any(np.asarray(candidate, float) <= soft):
+        raise CalibError("CAL-065 硬阈值必须逐轴严格大于普通跟踪阈值")
+    return candidate
+
+
+def _derive_following_error_dwell(fps: int, intervals: float = 1.5) -> float:
+    """阈值置于1~2 tick之间：孤立一帧可恢复，第三帧稳定停止。"""
+    if fps <= 0 or not 1.0 < intervals < 2.0:
+        raise CalibError(
+            f"CAL-066 需要正 FPS，且持续阈值须严格位于1~2周期之间，实际 {fps=}, {intervals=}"
+        )
+    return float(intervals) / float(fps)
+
+
+def _derive_settle_position_tolerance(
+        rows: list[dict[str, Any]], velocity_tolerance_deg_s: Sequence[float],
+        position_resolution: Sequence[int], settle_dwell_s: float,
+        velocity_correction_factor: float = 1.0,
+) -> tuple[list[float], np.ndarray, np.ndarray, int, int]:
+    """由各轨迹末端刚好覆盖驻留时间的连续窗口派生到位位置容差。
+
+    从每条通过轨迹的末帧向前取命令保持最终目标、且刚好覆盖当前settle dwell的最短
+    连续窗口，再验证窗口速度。这样排除运动过程，也不把驻留窗口之前的低速接近过程
+    混入。逐轴取窗口内最大位置误差，加3个编码计数后向上量化到0.1度。load_label
+    进入分组键，避免空载与负载同名轨迹被错误合并。
+    """
+    velocity_tolerance = np.asarray(velocity_tolerance_deg_s, dtype=float)
+    resolutions = np.asarray(position_resolution, dtype=float)[:5]
+    if (
+        velocity_tolerance.shape != (5,)
+        or not np.all(np.isfinite(velocity_tolerance))
+        or np.any(velocity_tolerance <= 0.0)
+        or resolutions.shape != (5,)
+        or np.any(resolutions <= 1)
+        or not math.isfinite(settle_dwell_s)
+        or settle_dwell_s <= 0.0
+        or not math.isfinite(velocity_correction_factor)
+        or velocity_correction_factor <= 0.0
+    ):
+        raise CalibError("CAL-067 派生需要正有限速度阈值、dwell、速度修正因子与有效编码分辨率")
+
+    grouped: dict[tuple[str, str, str, int], list[dict[str, Any]]] = {}
+    for index, payload in enumerate(rows):
+        if not {"command_deg", "feedback_deg", "speed_deg_s"} <= payload.keys():
+            continue
+        key = (
+            str(payload.get("load_label", "unknown")),
+            str(payload.get("trajectory_id", f"missing-{index}")),
+            str(payload.get("segment", "")),
+            int(payload.get("direction", 0)),
+        )
+        grouped.setdefault(key, []).append(payload)
+    if not grouped:
+        raise CalibError("motion 阶段没有可用于到位位置容差的通过轨迹")
+
+    stable_errors: list[np.ndarray] = []
+    usable_groups = 0
+    for key, payloads in grouped.items():
+        final_command = np.asarray(payloads[-1]["command_deg"], dtype=float)
+        if final_command.shape != (5,) or not np.all(np.isfinite(final_command)):
+            raise CalibError(f"motion 到位终点 {key} command_deg 必须是有限float[5]")
+        group_errors: list[np.ndarray] = []
+        last_time_ns = int(payloads[-1].get("time_ns", 0))
+        if last_time_ns <= 0:
+            raise CalibError(f"轨迹 {key} 末帧缺少有效time_ns，不能派生CAL-067")
+        for payload in reversed(payloads):
+            command = np.asarray(payload["command_deg"], dtype=float)
+            feedback = np.asarray(payload["feedback_deg"], dtype=float)
+            speed = np.asarray(payload["speed_deg_s"], dtype=float)
+            if command.shape != (5,) or feedback.shape != (5,) or speed.shape != (5,):
+                raise CalibError("motion 到位 command/feedback/speed 必须是float[5]")
+            if not np.array_equal(command, final_command):
+                break
+            sample_time_ns = int(payload.get("time_ns", 0))
+            if sample_time_ns <= 0 or sample_time_ns > last_time_ns:
+                raise CalibError(f"轨迹 {key} 的time_ns无效或未按时间排序")
+            if np.any(np.abs(speed) * velocity_correction_factor > velocity_tolerance):
+                raise CalibError(f"轨迹 {key} 的末端驻留窗口仍有速度超限，不能派生CAL-067")
+            group_errors.append(np.abs(command - feedback))
+            if (last_time_ns - sample_time_ns) / 1e9 >= settle_dwell_s:
+                break
+        if not group_errors:
+            raise CalibError(f"轨迹 {key} 末端没有连续低速反馈，不能派生CAL-067")
+        first_time_ns = int(payloads[-len(group_errors)].get("time_ns", 0))
+        if (last_time_ns - first_time_ns) / 1e9 < settle_dwell_s:
+            raise CalibError(f"轨迹 {key} 的末端窗口不足{settle_dwell_s}s，不能派生CAL-067")
+        usable_groups += 1
+        stable_errors.extend(reversed(group_errors))
+
+    errors = np.asarray(stable_errors, dtype=float)
+    observed_max = np.max(errors, axis=0)
+    observed_p99 = np.percentile(errors, 99, axis=0)
+    required = observed_max + 3.0 * 360.0 / resolutions
+    candidate = [math.ceil(float(v) * 10.0 - 1e-12) / 10.0 for v in required]
+    return candidate, observed_max, observed_p99, usable_groups, len(stable_errors)
+
+
+def _derive_settle_velocity_tolerance(
+        rows: list[dict[str, Any]], velocity_deg_s_per_raw: Sequence[float],
+        settle_dwell_s: float, velocity_correction_factor: float = 1.0,
+) -> tuple[list[float], np.ndarray, np.ndarray, int, int]:
+    """由每条轨迹末端刚好覆盖dwell的最短窗口派生到位速度容差。"""
+    velocity_units = np.asarray(velocity_deg_s_per_raw, dtype=float)[:5]
+    if (
+        velocity_units.shape != (5,)
+        or not np.all(np.isfinite(velocity_units))
+        or np.any(velocity_units <= 0.0)
+        or not math.isfinite(settle_dwell_s)
+        or settle_dwell_s <= 0.0
+        or not math.isfinite(velocity_correction_factor)
+        or velocity_correction_factor <= 0.0
+    ):
+        raise CalibError("CAL-068 派生需要正有限速度单位、dwell与速度修正因子")
+
+    grouped: dict[tuple[str, str, str, int], list[dict[str, Any]]] = {}
+    for index, payload in enumerate(rows):
+        if not {"command_deg", "speed_deg_s", "time_ns"} <= payload.keys():
+            continue
+        key = (
+            str(payload.get("load_label", "unknown")),
+            str(payload.get("trajectory_id", f"missing-{index}")),
+            str(payload.get("segment", "")),
+            int(payload.get("direction", 0)),
+        )
+        grouped.setdefault(key, []).append(payload)
+    if not grouped:
+        raise CalibError("motion 阶段没有可用于到位速度容差的通过轨迹")
+
+    stable_speeds: list[np.ndarray] = []
+    for key, payloads in grouped.items():
+        final_command = np.asarray(payloads[-1]["command_deg"], dtype=float)
+        last_time_ns = int(payloads[-1]["time_ns"])
+        group_speeds: list[np.ndarray] = []
+        first_time_ns = last_time_ns
+        for payload in reversed(payloads):
+            command = np.asarray(payload["command_deg"], dtype=float)
+            if command.shape != (5,) or not np.array_equal(command, final_command):
+                break
+            speed = np.asarray(payload["speed_deg_s"], dtype=float)
+            sample_time_ns = int(payload["time_ns"])
+            if speed.shape != (5,) or not np.all(np.isfinite(speed)):
+                raise CalibError("motion 到位speed_deg_s必须是有限float[5]")
+            if sample_time_ns <= 0 or sample_time_ns > last_time_ns:
+                raise CalibError(f"轨迹 {key} 的time_ns无效或未按时间排序")
+            group_speeds.append(np.abs(speed) * velocity_correction_factor)
+            first_time_ns = sample_time_ns
+            if (last_time_ns - sample_time_ns) / 1e9 >= settle_dwell_s:
+                break
+        if (last_time_ns - first_time_ns) / 1e9 < settle_dwell_s:
+            raise CalibError(f"轨迹 {key} 的末端窗口不足{settle_dwell_s}s，不能派生CAL-068")
+        stable_speeds.extend(reversed(group_speeds))
+
+    speeds = np.asarray(stable_speeds, dtype=float)
+    observed_max = np.max(speeds, axis=0)
+    observed_p99 = np.percentile(speeds, 99, axis=0)
+    required = observed_max + 3.0 * velocity_units
+    candidate = [math.ceil(float(v) * 10.0 - 1e-12) / 10.0 for v in required]
+    return candidate, observed_max, observed_p99, len(grouped), len(stable_speeds)
+
+
+def _validate_settle_dwell(
+        rows: list[dict[str, Any]], position_tolerance_deg: Sequence[float],
+        velocity_tolerance_deg_s: Sequence[float], settle_dwell_s: float,
+        velocity_correction_factor: float = 1.0,
+) -> tuple[float, float, float, int, int]:
+    """验证每条轨迹末端同时满足位置/速度判据的连续时长覆盖候选dwell。"""
+    position_tolerance = np.asarray(position_tolerance_deg, dtype=float)
+    velocity_tolerance = np.asarray(velocity_tolerance_deg_s, dtype=float)
+    if (
+        position_tolerance.shape != (5,)
+        or velocity_tolerance.shape != (5,)
+        or np.any(position_tolerance <= 0.0)
+        or np.any(velocity_tolerance <= 0.0)
+        or not math.isfinite(settle_dwell_s)
+        or settle_dwell_s <= 0.0
+        or not math.isfinite(velocity_correction_factor)
+        or velocity_correction_factor <= 0.0
+    ):
+        raise CalibError("CAL-069 验证需要正有限位置/速度阈值、dwell与速度修正因子")
+
+    grouped: dict[tuple[str, str, str, int], list[dict[str, Any]]] = {}
+    for index, payload in enumerate(rows):
+        if not {"command_deg", "feedback_deg", "speed_deg_s", "time_ns"} <= payload.keys():
+            continue
+        key = (
+            str(payload.get("load_label", "unknown")),
+            str(payload.get("trajectory_id", f"missing-{index}")),
+            str(payload.get("segment", "")),
+            int(payload.get("direction", 0)),
+        )
+        grouped.setdefault(key, []).append(payload)
+    if not grouped:
+        raise CalibError("motion 阶段没有可用于CAL-069的通过轨迹")
+
+    spans: list[float] = []
+    stable_rows = 0
+    for key, payloads in grouped.items():
+        final_command = np.asarray(payloads[-1]["command_deg"], dtype=float)
+        last_time_ns = int(payloads[-1]["time_ns"])
+        first_time_ns = last_time_ns
+        group_rows = 0
+        for payload in reversed(payloads):
+            command = np.asarray(payload["command_deg"], dtype=float)
+            feedback = np.asarray(payload["feedback_deg"], dtype=float)
+            speed = np.asarray(payload["speed_deg_s"], dtype=float)
+            sample_time_ns = int(payload["time_ns"])
+            if command.shape != (5,) or not np.array_equal(command, final_command):
+                break
+            if (
+                feedback.shape != (5,)
+                or speed.shape != (5,)
+                or sample_time_ns <= 0
+                or sample_time_ns > last_time_ns
+                or np.any(np.abs(command - feedback) > position_tolerance)
+                or np.any(np.abs(speed) * velocity_correction_factor > velocity_tolerance)
+            ):
+                break
+            first_time_ns = sample_time_ns
+            group_rows += 1
+        span_s = (last_time_ns - first_time_ns) / 1e9
+        if group_rows == 0 or span_s + 1e-12 < settle_dwell_s:
+            raise CalibError(
+                f"轨迹 {key} 末端连续到位仅{span_s:.6f}s，不足CAL-069候选{settle_dwell_s}s"
+            )
+        spans.append(span_s)
+        stable_rows += group_rows
+    return min(spans), float(np.median(spans)), max(spans), len(grouped), stable_rows
+
+
+def _derive_settle_timeout(
+        rows: list[dict[str, Any]], margin_s: float = 0.5,
+) -> tuple[float, float, float, float, int]:
+    """由最终目标首次反馈到dwell完成的实测时间加固定demo余量派生timeout。"""
+    if not math.isfinite(margin_s) or margin_s <= 0.0:
+        raise CalibError("CAL-070 timeout余量必须为正有限值")
+    grouped: dict[tuple[str, str, str, int], list[dict[str, Any]]] = {}
+    for index, payload in enumerate(rows):
+        if not {"command_deg", "time_ns"} <= payload.keys():
+            continue
+        key = (
+            str(payload.get("load_label", "unknown")),
+            str(payload.get("trajectory_id", f"missing-{index}")),
+            str(payload.get("segment", "")),
+            int(payload.get("direction", 0)),
+        )
+        grouped.setdefault(key, []).append(payload)
+    if not grouped:
+        raise CalibError("motion 阶段没有可用于CAL-070的通过轨迹")
+
+    durations: list[float] = []
+    for key, payloads in grouped.items():
+        final_command = np.asarray(payloads[-1]["command_deg"], dtype=float)
+        last_time_ns = int(payloads[-1]["time_ns"])
+        first_time_ns = last_time_ns
+        for payload in reversed(payloads):
+            command = np.asarray(payload["command_deg"], dtype=float)
+            if command.shape != (5,) or not np.array_equal(command, final_command):
+                break
+            sample_time_ns = int(payload["time_ns"])
+            if sample_time_ns <= 0 or sample_time_ns > last_time_ns:
+                raise CalibError(f"轨迹 {key} 的time_ns无效或未按时间排序")
+            first_time_ns = sample_time_ns
+        duration_s = (last_time_ns - first_time_ns) / 1e9
+        if duration_s <= 0.0:
+            raise CalibError(f"轨迹 {key} 没有可测的段末到位耗时")
+        durations.append(duration_s)
+    observed_max = max(durations)
+    candidate = math.ceil((observed_max + margin_s) * 10.0 - 1e-12) / 10.0
+    return candidate, min(durations), float(np.median(durations)), observed_max, len(grouped)
+
+
+def _max_close_axis_width_with_yaw_error(
+        length_m: float, width_m: float, yaw_offset_deg: float,
+        yaw_error_bound_deg: float,
+) -> float:
+    """求固定夹持角±偏航误差带内的最大闭合轴投影宽度。"""
+    values = (length_m, width_m, yaw_error_bound_deg)
+    if not all(math.isfinite(float(v)) for v in values):
+        raise CalibError("CAL-080 尺寸与偏航误差必须有限")
+    if length_m <= 0.0 or width_m <= 0.0 or yaw_error_bound_deg < 0.0:
+        raise CalibError("CAL-080 长宽必须为正且偏航误差不能为负")
+    lower = float(yaw_offset_deg) - float(yaw_error_bound_deg)
+    upper = float(yaw_offset_deg) + float(yaw_error_bound_deg)
+    candidates = [lower, upper, float(yaw_offset_deg)]
+    alpha = math.degrees(math.atan2(float(width_m), float(length_m)))
+    # |L cos(beta)|+|W sin(beta)| 的内部极大值位于 k*180±atan(W/L)。
+    for k in range(-4, 5):
+        for angle in (180.0 * k + alpha, 180.0 * k - alpha):
+            if lower <= angle <= upper:
+                candidates.append(angle)
+    return max(close_axis_width_at_yaw(length_m, width_m, angle) for angle in candidates)
+
+
+def _derive_preopen_pct(
+        object_envelope_m: Sequence[float], yaw_offset_deg: float,
+        yaw_error_bound_deg: float, gap_table: Sequence[dict],
+) -> tuple[float, float, float, float, float]:
+    """由物体偏航误差包络、10%/3mm净余量和实测gap表派生预张开度。"""
+    envelope = np.asarray(object_envelope_m, dtype=float)
+    if envelope.shape != (3,) or not np.all(np.isfinite(envelope)) or np.any(envelope <= 0.0):
+        raise CalibError("CAL-080 object_envelope_m必须是正有限float[3]")
+    if not gap_table:
+        raise CalibError("CAL-080 缺少实测gap_table")
+    width = _max_close_axis_width_with_yaw_error(
+        float(envelope[0]), float(envelope[1]), yaw_offset_deg, yaw_error_bound_deg
+    )
+    margin = max(0.10 * width, 0.003)
+    required_gap = width + margin
+    exact_pct = _pct_for_gap(required_gap, gap_table)
+    # 必须向上量化；四舍五入可能让插值gap略小于要求值。
+    candidate_pct = math.ceil(exact_pct * 100.0 - 1e-12) / 100.0
+    candidate_gap = gripper_pct_to_gap_simple(candidate_pct, gap_table)
+    if candidate_gap + 1e-12 < required_gap:
+        raise CalibError("CAL-080 量化后的预张开口小于物体包络与净余量之和")
+    return candidate_pct, width, margin, required_gap, candidate_gap
+
+
 def _fit_motion(base: dict, records: list[Record]) -> tuple[dict[str, Any], dict[str, Any]]:
     """指南 9.2~9.7：从"通过且留有余量"的试验里取上限，并统计跟踪误差与到位时间。"""
     ok_rows = [r.payload for r in samples_of(records) if r.payload.get("passed")]
@@ -1575,32 +2195,70 @@ def _fit_motion(base: dict, records: list[Record]) -> tuple[dict[str, Any], dict
     else:
         allow = peak_speed
     upd["motion.max_velocity_deg_s"] = [round(float(v) * 0.85, 2) for v in allow]
-    # 加速度按实测速度台阶估计：这里用相邻样本速度差的最大值。
-    cmds = np.array([p["command_deg"] for p in ok_rows], float)
-    d2 = np.abs(np.diff(cmds, n=2, axis=0)).max(axis=0) if cmds.shape[0] >= 3 else np.zeros(5)
-    upd["motion.max_acceleration_deg_s2"] = [
-        round(float(v) * 0.85 + 50.0, 2) for v in d2]
-    # 9.4：max_command_step_deg 不大于 max_velocity/FPS
+    # 按独立通过轨迹计算命令二阶差分，并除以 tick^2 恢复 deg/s^2。
+    # 50 deg/s^2 仅是 demo 下界，不与实测峰值相加；最终候选始终不高于
+    # 已通过的命令加速度峰值（峰值较低时保留 50 的既有兼容下界）。
     fps = int(base["timing"]["fps"])
-    upd["motion.max_command_step_deg"] = [
-        round(min(float(v) / fps, 2.2), 3) for v in upd["motion.max_velocity_deg_s"]]
+    peak_acceleration, acceleration_groups = _peak_command_acceleration(ok_rows, fps)
+    upd["motion.max_acceleration_deg_s2"] = [
+        round(max(float(v) * 0.85, 50.0), 2) for v in peak_acceleration]
+    # 9.4：max_command_step_deg 不大于 max_velocity/FPS
+    upd["motion.max_command_step_deg"] = _derive_command_step_limits(
+        upd["motion.max_velocity_deg_s"], fps
+    )
 
-    # 9.5：跟踪误差阈值取通过样本的分位数，hard 取失败样本里量级最小的一个再收一半
+    # 9.5：普通跟踪误差只用正常通过样本，逐轴取最大值并保留3个编码计数余量。
+    # hard 阈值仍留给 CAL-065 的独立机械保护验证，不能由正常样本自动宣称安全。
     err = np.abs(np.array([np.asarray(p["command_deg"], float)
                            - np.asarray(p["feedback_deg"], float) for p in ok_rows], float))
-    upd["motion.following_error_deg"] = [round(float(v), 2)
-                                         for v in np.percentile(err, 99, axis=0) * 2.0 + 3.0]
-    upd["motion.following_error_hard_deg"] = [
-        round(float(v) * 2.2, 2) for v in upd["motion.following_error_deg"]]
-    upd["motion.following_error_dwell_s"] = 0.10
+    following_tolerance, following_max, following_p99 = _derive_following_error_tolerance(
+        ok_rows, base["motor"]["position_resolution"]
+    )
+    upd["motion.following_error_deg"] = following_tolerance
+    upd["motion.following_error_hard_deg"] = _derive_hard_following_error_tolerance(
+        upd["motion.following_error_deg"],
+        upd["motion.max_command_step_deg"],
+        base["motor"]["position_resolution"],
+    )
+    upd["motion.following_error_dwell_s"] = _derive_following_error_dwell(fps)
 
-    # 9.6：到位阈值用静止噪声与重复到位数据
-    upd["motion.settle_position_tol_deg"] = [
-        round(float(v) + 1.0, 2) for v in np.percentile(err, 99, axis=0)]
-    upd["motion.settle_velocity_tol_deg_s"] = [8.0] * 5
-    upd["motion.settle_timeout_s"] = 3.0
-    upd["motion.settle_dwell_s"] = 0.15
-    upd["motion.start_position_tol_deg"] = [3.0] * 5
+    # 9.6：只用各独立轨迹末端的连续低速窗口，不把运动中的跟踪滞后混入到位容差。
+    settle_position, settle_max, settle_p99, settle_groups, settle_rows = (
+        _derive_settle_position_tolerance(
+            ok_rows,
+            base["motion"]["settle_velocity_tol_deg_s"],
+            base["motor"]["position_resolution"],
+            base["motion"]["settle_dwell_s"],
+        )
+    )
+    upd["motion.settle_position_tol_deg"] = settle_position
+    settle_velocity, settle_velocity_max, settle_velocity_p99, _, _ = (
+        _derive_settle_velocity_tolerance(
+            ok_rows,
+            base["motor"]["velocity_deg_s_per_raw"],
+            base["motion"]["settle_dwell_s"],
+        )
+    )
+    upd["motion.settle_velocity_tol_deg_s"] = settle_velocity
+    upd["motion.settle_dwell_s"] = float(base["motion"]["settle_dwell_s"])
+    settle_span_min, settle_span_median, settle_span_max, _, settle_dwell_rows = (
+        _validate_settle_dwell(
+            ok_rows,
+            upd["motion.settle_position_tol_deg"],
+            upd["motion.settle_velocity_tol_deg_s"],
+            upd["motion.settle_dwell_s"],
+        )
+    )
+    settle_timeout, settle_time_min, settle_time_median, settle_time_max, _ = (
+        _derive_settle_timeout(ok_rows)
+    )
+    upd["motion.settle_timeout_s"] = settle_timeout
+    start_tolerance, start_error_max, start_groups = _derive_start_position_tolerance(
+        ok_rows,
+        upd["motion.settle_position_tol_deg"],
+        base["motor"]["position_resolution"],
+    )
+    upd["motion.start_position_tol_deg"] = start_tolerance
     upd["motion.tcp_max_velocity_m_s"] = base["motion"]["tcp_max_velocity_m_s"] or 0.22
     upd["motion.tcp_max_acceleration_m_s2"] = base["motion"]["tcp_max_acceleration_m_s2"] or 1.4
     # 9.8：IK 容差必须严于真实总定位误差预算
@@ -1611,10 +2269,75 @@ def _fit_motion(base: dict, records: list[Record]) -> tuple[dict[str, Any], dict
     res = {
         "passed_rows": len(ok_rows), "failed_rows": len(bad_rows),
         "peak_speed_deg_s": [round(float(v), 2) for v in peak_speed],
+        "peak_command_acceleration_deg_s2": [
+            round(float(v), 3) for v in peak_acceleration
+        ],
+        "acceleration_trajectory_groups": acceleration_groups,
+        "start_trajectory_groups": start_groups,
+        "start_position_error_max_deg": [
+            round(float(v), 4) for v in start_error_max
+        ],
         "peak_current_ma": [round(float(v), 1) for v in cur_peak],
-        "tracking_p99_deg": [round(float(v), 3) for v in np.percentile(err, 99, axis=0)],
+        "tracking_p99_deg": [round(float(v), 3) for v in following_p99],
+        "tracking_max_deg": [round(float(v), 3) for v in following_max],
+        "settle_position_error_max_deg": [round(float(v), 4) for v in settle_max],
+        "settle_position_error_p99_deg": [round(float(v), 4) for v in settle_p99],
+        "settle_velocity_max_deg_s": [round(float(v), 4) for v in settle_velocity_max],
+        "settle_velocity_p99_deg_s": [round(float(v), 4) for v in settle_velocity_p99],
+        "settle_stable_span_min_s": round(settle_span_min, 6),
+        "settle_stable_span_median_s": round(settle_span_median, 6),
+        "settle_stable_span_max_s": round(settle_span_max, 6),
+        "settle_dwell_sample_rows": settle_dwell_rows,
+        "settle_completion_time_min_s": round(settle_time_min, 6),
+        "settle_completion_time_median_s": round(settle_time_median, 6),
+        "settle_completion_time_max_s": round(settle_time_max, 6),
+        "settle_trajectory_groups": settle_groups,
+        "settle_sample_rows": settle_rows,
     }
     return upd, res
+
+
+def _derive_contact_gap_range(
+    rows: Sequence[dict], gap_table: Sequence[dict], *, margin_m: float = 0.001
+) -> tuple[list[float], list[dict]]:
+    """首次接触开度映射到统一gap表坐标；尺测接触带间隙只作为独立物理证据。"""
+    from decimal import Decimal, ROUND_CEILING, ROUND_FLOOR
+
+    if not math.isfinite(margin_m) or margin_m < 0:
+        raise CalibError("接触参考间隙余量必须有限且非负")
+    contacts = [p for p in rows if p.get("contact_label") == "first_contact"]
+    if not contacts:
+        raise CalibError("grasp 阶段没有首次接触开度记录（指南10.2第4条）")
+    evidence = []
+    for p in contacts:
+        if p.get("pose_held_through_capture_confirmed") is False:
+            raise CalibError("首次接触摆位尚未确认保持，禁止拟合")
+        if p.get("gripper_pct") is None:
+            raise CalibError("首次接触缺少实测gripper_pct；不能用跨接触带actual_gap_m替代")
+        pct = float(p["gripper_pct"])
+        if not math.isfinite(pct):
+            raise CalibError("首次接触开度必须有限")
+        reference_gap = gripper_pct_to_gap_simple(pct, gap_table)
+        supplied = p.get("reference_gap_m")
+        if supplied is not None and not math.isclose(float(supplied), reference_gap, rel_tol=0.0, abs_tol=1e-9):
+            raise CalibError("首次接触reference_gap_m与当前gap表不一致，需重新映射")
+        actual = p.get("actual_gap_m")
+        if actual is not None and not (math.isfinite(float(actual)) and float(actual) > 0):
+            raise CalibError("实际接触尺测间隙必须有限且为正")
+        evidence.append({
+            "gripper_pct": pct,
+            "reference_gap_m": reference_gap,
+            "actual_gap_m": None if actual is None else float(actual),
+            "contact_band_mm": p.get("contact_band_distance_from_each_fingertip_mm"),
+        })
+    gaps = [p["reference_gap_m"] for p in evidence]
+    quantum = Decimal("0.0001")
+    lower = float((Decimal(str(min(gaps) - margin_m)) / quantum).to_integral_value(rounding=ROUND_FLOOR) * quantum)
+    upper = float((Decimal(str(max(gaps) + margin_m)) / quantum).to_integral_value(rounding=ROUND_CEILING) * quantum)
+    # 不裁剪或外插来掩盖表覆盖不足；百分比反查复用生产校验。
+    _pct_for_gap(lower, gap_table)
+    _pct_for_gap(upper, gap_table)
+    return [lower, upper], evidence
 
 
 def _fit_grasp(base: dict, records: list[Record]) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -1631,14 +2354,11 @@ def _fit_grasp(base: dict, records: list[Record]) -> tuple[dict[str, Any], dict[
     upd["gripper.empty_closed_pct"] = round(float(np.percentile(pcts, 95)), 2)
     upd["gripper.empty_tol_pct"] = round(float(np.std(pcts) + 1.0), 2)
 
-    gaps = [float(p["actual_gap_m"]) for p in (r.payload for r in rows)
-            if p.get("contact_label") == "first_contact" and p.get("actual_gap_m")]
-    if not gaps:
-        raise CalibError("grasp 阶段没有首次接触的实际 gap 记录（指南 10.2 第 4 条）")
-    # 区间 = 实测 min/max 再各放一个测量余量；必须与空闭合端可区分。
-    pad = 0.001
-    upd["gripper.contact_gap_range_m"] = [round(max(0.0005, min(gaps) - pad), 4),
-                                          round(max(gaps) + pad, 4)]
+    contact_range, contact_evidence = _derive_contact_gap_range(
+        [r.payload for r in rows], base["gripper"]["gap_table"]
+    )
+    gaps = [p["reference_gap_m"] for p in contact_evidence]
+    upd["gripper.contact_gap_range_m"] = contact_range
     # 接触电流：取"接触之后"的滤波候选值下界，并保证 < hard
     after = [float(p["gripper_current_ma"]) for p in (r.payload for r in rows)
              if p.get("contact_label") == "after"]
@@ -1649,7 +2369,14 @@ def _fit_grasp(base: dict, records: list[Record]) -> tuple[dict[str, Any], dict[
         upd["gripper.contact_current_ma"] = round(contact, 1)
     else:
         upd["gripper.contact_current_ma"] = base["gripper"]["contact_current_ma"]
-    upd["gripper.hard_current_ma"] = round(float(upd["gripper.contact_current_ma"]) * 2.0, 1)
+    # hard_current 不能再用 contact×2 启发式：2026-09-18 CAL-085重测证明
+    # 2×13=26mA 低于正常带物保持电流32~52mA，会在 _confirm_contact 保持期
+    # 立即误停。本通用fitter没有独立的堵转/损坏边界数据，仅保留base当前值。
+    # CAL-086演进：先按观测上界+1量化步写78mA；同日稳定持物round2实机证明
+    # 15%/s硬摆位闭合电流4帧冲到104mA、0.1s接触确认窗被78mA hard抢先停机，
+    # 操作者选方案d上调至150mA消除竞态（策略决定，非堵转/损坏上界证据），
+    # 不宣称重新标定。
+    upd["gripper.hard_current_ma"] = float(base["gripper"]["hard_current_ma"])
 
     # 10.2 第 5 条：滤波 + 连续确认 + 读写 + 一个 tick 的延迟乘闭合速度 = 额外闭合量，
     # 再用 gap_table 换算成压缩距离。超出允许压缩量时必须降速或缩短检测延迟。
@@ -1706,9 +2433,11 @@ def _fit_grasp(base: dict, records: list[Record]) -> tuple[dict[str, Any], dict[
     # 10.2 第 8 条：松爪后静止等待
     upd["gripper.release_dwell_s"] = float(base["gripper"]["release_dwell_s"] or 0.5)
     upd["gripper.hold_dwell_s"] = float(base["gripper"]["hold_dwell_s"] or 0.3)
-    # 10.2 第 3 条：开合总时限按实测开合时间放大
-    upd["gripper.close_timeout_s"] = 6.0
-    upd["gripper.open_timeout_s"] = 6.0
+    # 本通用fitter没有独立开合时序输入，仅保留base当前值，不宣称重新标定。
+    # CAL-091/092已由独立空爪报告审核写回demo4.7/4.3s；不得回写常数6s
+    # 覆盖该结果。base占位值仍是占位值，保留操作不授予实测/验证状态。
+    upd["gripper.close_timeout_s"] = float(base["gripper"]["close_timeout_s"])
+    upd["gripper.open_timeout_s"] = float(base["gripper"]["open_timeout_s"])
 
     # 10.3 第 1/2 条：中心偏移与固定夹持偏移由试验选定，这里从记录里读标签
     # 10.2 第 2 条：预张开度必须覆盖"目标在固定夹持方向上的闭合轴宽度"并留净余量；
@@ -1719,14 +2448,16 @@ def _fit_grasp(base: dict, records: list[Record]) -> tuple[dict[str, Any], dict[
     if dims and gap_rows:
         yaw_off = float(upd.get("grasp.yaw_offset_deg",
                                 base["grasp"]["yaw_offset_deg"] or 0.0))
-        # 闭合轴宽度 abs(cos(beta))*length + abs(sin(beta))*width（指南 2.4），
-        # 直接转调生产代码里那一份实现，标定与运行不会给出两个数。
-        widths = [close_axis_width_at_yaw(float(d[0]), float(d[1]), yaw_off) for d in dims]
-        need = max(widths)
-        # 净余量取"宽度的 10%"与 3mm 里更大的那个：既吃掉测量误差，也让指尖有
-        # 进入空间而不是擦着物体表面下刀。
-        margin = max(0.10 * need, 0.003)
-        upd["gripper.preopen_pct"] = round(_pct_for_gap(need + margin, gap_rows), 2)
+        yaw_error = float(base["grasp"]["target_yaw_error_bound_deg"] or 0.0)
+        # 不能只算名义yaw：CAL-080须覆盖固定夹持角±目标偏航误差的最坏投影。
+        derived = [
+            _derive_preopen_pct(d, yaw_off, yaw_error, gap_rows)
+            for d in dims
+        ]
+        preopen, need, margin, _required_gap, _candidate_gap = max(
+            derived, key=lambda item: item[3]
+        )
+        upd["gripper.preopen_pct"] = preopen
         # 释放开度只留半个余量：太小会夹着不放，太大会在撤离时碰固定环境。
         upd["gripper.release_pct"] = round(_pct_for_gap(need + 0.5 * margin, gap_rows), 2)
         g_max = float(gap_rows[-1]["gripper_pct"])
@@ -1736,9 +2467,14 @@ def _fit_grasp(base: dict, records: list[Record]) -> tuple[dict[str, Any], dict[
                 "必须换指垫或缩小适用目标尺寸（指南 10.2 第 2 条）")
     res = {
         "empty_close_cycles": len(empty_close),
+        "gripper_timeout_source": "preserved_base_not_fitted; review separate timing evidence",
+        "hard_current_source": "preserved_base_not_fitted; contact×2 heuristic invalidated by CAL-085 retest 2026-09-18 (26mA < normal hold 32~52mA); review separate stall/damage-boundary evidence",
         "closure_axis_width_m": None if need is None else round(need, 4),
         "preopen_margin_m": None if margin is None else round(margin, 4),
         "first_contact_gaps_m": [round(g, 4) for g in sorted(set(gaps))],
+        "first_contact_gap_coordinate": "gap_table_reference_plane",
+        "first_contact_physical_and_reference_evidence": contact_evidence,
+        "extra_compression_coordinate": "gap_table_reference_only; not a physical compression bound for other contact bands",
         "contact_current_ma_candidates": [round(float(np.percentile(before, 99)), 1),
                                           round(float(np.percentile(after, 5)), 1)] if after and before else [],
         "trial_summaries": len(offs),
@@ -1874,8 +2610,8 @@ def _stage_checks(stage: str, raw: dict, records: list[Record], input_sha: str,
                              float(abs(opened - closed)), 1.0, ">=", "offline", refs))
         checks.append(_check("编码分辨率大于 1", "motor.position_resolution",
                              float(min(P["motor"]["position_resolution"])), 1.0, ">=", "offline", refs))
-        checks.append(_check("电流比例非零", "motor.current_ma_per_raw",
-                             float(min(abs(v) for v in P["motor"]["current_ma_per_raw"])),
+        checks.append(_check("电流比例为正", "motor.current_ma_per_raw",
+                             float(min(P["motor"]["current_ma_per_raw"])),
                              1e-9, ">=", "offline", refs))
         checks.append(_check("6 通道同型号", "motor.models",
                              float(len(set(P["motor"]["models"]))), 1.0, "==", "offline", refs))
@@ -1895,10 +2631,15 @@ def _stage_checks(stage: str, raw: dict, records: list[Record], input_sha: str,
                  if r.payload.get("reference_current_ma")]
         if pairs:
             errs = []
+            models = P["motor"]["models"]
+            scales = P["motor"]["current_ma_per_raw"]
+            zeros = P["motor"]["current_zero_raw"]
             for raws, refs_ma in pairs:
-                scale = float(np.mean(P["motor"]["current_ma_per_raw"]))
-                zero = float(np.mean(P["motor"]["current_zero_raw"]))
-                errs.extend(abs((rv - zero) * scale - mv) for rv, mv in zip(raws, refs_ma))
+                for i, (raw_value, reference_ma) in enumerate(zip(raws, refs_ma)):
+                    decoded = _decode_current_count(models[i], raw_value)
+                    converted = (decoded - float(zeros[i])) * float(scales[i])
+                    # 参考电流表读的是幅值；反馈方向由 CAL-013 单独验证。
+                    errs.append(abs(abs(converted) - abs(float(reference_ma))))
             checks.append(_check("电流换算与参考值偏差(mA)", "motor.current_ma_per_raw",
                                  float(np.percentile(errs, 95)), 25.0, "<=", ev_type, refs))
     elif stage == "joints":
@@ -2170,10 +2911,15 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--output", required=True, type=Path)
     p.add_argument("--hardware", action="store_true",
                    help="按指南第 3 节前置条件从真机采集；不给则使用模拟源")
+    p.add_argument("--require-torque-disabled", action="store_true",
+                   help="motor 真机采集前只读六台 Torque_Enable，任一非 0 即拒绝采集")
     p.add_argument("--reference", type=Path, help="外部量具/示教记录的 JSON 文件")
     p.add_argument("--repeats", type=int, default=5)
     p.add_argument("--operator")
     p.add_argument("--power")
+    p.add_argument("--ambient-temperature-c", type=float,
+                   help="采集时环境温度（摄氏度），写入 metadata")
+    p.add_argument("--base-mount", help="采集时基座固定方式/位置标签，写入 metadata")
     p.add_argument("--pad")
     p.add_argument("--load")
     p.set_defaults(func=cmd_capture)

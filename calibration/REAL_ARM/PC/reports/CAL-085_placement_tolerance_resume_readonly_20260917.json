@@ -1,0 +1,158 @@
+{
+  "parameter_id": "CAL-085",
+  "source": "hardware_read_only_resume_after_tolerance_request",
+  "operator_request": "放大误差允许范围，继续标定",
+  "profile_sha256": "1ea15d62d288bc02f56ccabe09593f60d68ad3fd6f5f37632589995dc7c18bb4",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "models": [
+    777,
+    777,
+    777,
+    777,
+    777,
+    777
+  ],
+  "eeprom_matches_authoritative_motor_calibration": true,
+  "burst": {
+    "captured_at": "2026-09-17T12:37:11.562889+08:00",
+    "raw_position_by_sample": [
+      [
+        842,
+        865,
+        3083,
+        2384,
+        2045,
+        1837
+      ],
+      [
+        842,
+        865,
+        3083,
+        2384,
+        2045,
+        1837
+      ],
+      [
+        842,
+        865,
+        3083,
+        2384,
+        2045,
+        1837
+      ],
+      [
+        842,
+        865,
+        3083,
+        2384,
+        2045,
+        1837
+      ],
+      [
+        842,
+        865,
+        3083,
+        2384,
+        2045,
+        1837
+      ],
+      [
+        842,
+        865,
+        3083,
+        2384,
+        2045,
+        1837
+      ],
+      [
+        842,
+        865,
+        3083,
+        2384,
+        2045,
+        1837
+      ],
+      [
+        842,
+        865,
+        3083,
+        2384,
+        2045,
+        1837
+      ],
+      [
+        842,
+        865,
+        3083,
+        2384,
+        2045,
+        1837
+      ],
+      [
+        842,
+        865,
+        3083,
+        2384,
+        2045,
+        1837
+      ]
+    ],
+    "raw_position_representative": [
+      842,
+      865,
+      3083,
+      2384,
+      2045,
+      1837
+    ],
+    "raw_position_static_span": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_before": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_after": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "gripper_raw": 1837,
+  "gripper_pct": 24.177396280400572,
+  "reference_gap_m": 0.03948326180257511,
+  "write_instructions_sent": 0,
+  "motion_instructions_sent": 0,
+  "eeprom_written": false,
+  "profile_written": false,
+  "baseline_deviation_from1843_raw": -6,
+  "authorized_placement_tolerance_raw": 15,
+  "placement_gate_passed": true,
+  "physical_contact_confirmation_status": "operator reseating readiness to be reconfirmed before subsequent motion"
+}

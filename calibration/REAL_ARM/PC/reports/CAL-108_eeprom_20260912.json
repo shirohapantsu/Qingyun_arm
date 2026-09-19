@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-108",
+  "status": "VERIFIED",
+  "measured_at": "2026-09-12T18:34:07.089106+08:00",
+  "source": "hardware_read_only",
+  "input": "../raw/cal108_eeprom_20260912.json",
+  "input_sha256": "aa299db324f4a6edaa8f08b50840cf35690fb21446bfa263d4f5fac14f49788b",
+  "control_table_sha256": "71f7f7beb17169781bd26a33b165ed4c5c3df7b9c477d36860f9d6011eb00428",
+  "motor_calibration_sha256": "ad315322ad4d19cc322c8f21d86d9667d9df9eca2de325bebbd72fa62deefff5",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "serial_resolved_device": "/dev/ttyACM0",
+  "usb_identity": "1a86:55d3 / 5B14114904",
+  "torque_enabled_by_motor": [0, 0, 0, 0, 0, 0],
+  "identity_summary": {
+    "ids": [1, 2, 3, 4, 5, 6],
+    "model_number": [777, 777, 777, 777, 777, 777],
+    "firmware": ["3.10", "3.10", "3.10", "3.10", "3.10", "3.10"],
+    "all_match_profile": true
+  },
+  "common_eeprom_values": {
+    "baud_rate_raw": 0,
+    "response_status_level": 1,
+    "max_temperature_limit_raw": 70,
+    "max_voltage_limit_raw": 140,
+    "min_voltage_limit_raw": 40,
+    "phase_raw": 12,
+    "operating_mode_raw": 0,
+    "angular_resolution_raw": 1
+  },
+  "per_motor_summary": {
+    "shoulder_pan": {
+      "eeprom_position_limits": [675, 3393],
+      "eeprom_homing_offset": -391,
+      "max_torque_limit_raw": 1000,
+      "protection_current_raw": 310
+    },
+    "shoulder_lift": {
+      "eeprom_position_limits": [834, 3309],
+      "eeprom_homing_offset": -1949,
+      "max_torque_limit_raw": 1000,
+      "protection_current_raw": 310
+    },
+    "elbow_flex": {
+      "eeprom_position_limits": [751, 3089],
+      "eeprom_homing_offset": 1787,
+      "max_torque_limit_raw": 1000,
+      "protection_current_raw": 310
+    },
+    "wrist_flex": {
+      "eeprom_position_limits": [744, 3183],
+      "eeprom_homing_offset": -1804,
+      "max_torque_limit_raw": 1000,
+      "protection_current_raw": 310
+    },
+    "wrist_roll": {
+      "eeprom_position_limits": [0, 4095],
+      "eeprom_homing_offset": 1111,
+      "max_torque_limit_raw": 1000,
+      "protection_current_raw": 310
+    },
+    "gripper": {
+      "eeprom_position_limits": [1543, 3057],
+      "eeprom_homing_offset": -1676,
+      "max_torque_limit_raw": 500,
+      "protection_current_raw": 250
+    }
+  },
+  "cal012_consistency_findings": {
+    "motor_calibration_homing_offset": [-438, -1961, 1791, -1795, 1079, -1600],
+    "eeprom_homing_offset": [-391, -1949, 1787, -1804, 1111, -1676],
+    "eeprom_minus_file_homing_delta": [47, 12, -4, -9, 32, -76],
+    "motor_calibration_ranges": [[718, 3424], [865, 3333], [796, 3095], [729, 3192], [0, 4095], [1458, 2980]],
+    "eeprom_position_limits": [[675, 3393], [834, 3309], [751, 3089], [744, 3183], [0, 4095], [1543, 3057]],
+    "file_range_min_minus_eeprom_min": [43, 31, 45, -15, 0, -85],
+    "file_range_max_minus_eeprom_max": [31, 24, 6, 9, 0, -77],
+    "range_not_contained_by_eeprom_limit_axes": ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "gripper"],
+    "lerobot_0_5_1_mapping": "read_calibration and write_calibration map range_min/range_max/homing_offset directly to Min_Position_Limit/Max_Position_Limit/Homing_Offset; is_calibrated compares them for exact equality.",
+    "operator_history": "The current workspace file was obtained before a second calibration was run on the physical arm.",
+    "authority_decision_2026_09_13": "Use calibration/REAL_ARM/PC/motor_calibration.json (SHA256 ad315322ad4d19cc322c8f21d86d9667d9df9eca2de325bebbd72fa62deefff5) as the authority for conflicting calibration fields.",
+    "interpretation": "The coordinate semantics are identical. This historical snapshot represents the later second-calibration state, while the operator-selected workspace file is authoritative.",
+    "resolution_2026_09_13": "Hardware was subsequently synchronized to the authoritative file with exact per-field readback; see CAL-012_eeprom_sync_20260913.json."
+  },
+  "checks": {
+    "stable_port_identity_checked_before_access": true,
+    "port_unoccupied_before_access": true,
+    "read_only_register_transactions": true,
+    "all_six_torque_disabled": true,
+    "all_identity_fields_match": true,
+    "full_eeprom_bytes_0_through_39_saved": true
+  }
+}

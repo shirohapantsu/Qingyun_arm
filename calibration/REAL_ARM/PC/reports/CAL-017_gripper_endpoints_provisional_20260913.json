@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-017",
+  "status": "VERIFIED_FOR_DEMO",
+  "scope": "current_demo_only",
+  "integrated_at": "2026-09-13T16:39:56+08:00",
+  "parameters": [
+    "motor.gripper_closed_raw",
+    "motor.gripper_open_raw"
+  ],
+  "hardware": {
+    "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+    "resolved_port": "/dev/ttyACM0",
+    "usb_identity": {
+      "vid": "1a86",
+      "pid": "55d3",
+      "serial": "5B14114904"
+    },
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_in_workspace",
+    "servo_id": 6,
+    "model_number": 777,
+    "torque_enabled_by_motor": [0, 0, 0, 0, 0, 0],
+    "official_gripper_range": [1458, 2980]
+  },
+  "method": {
+    "positioning": "The operator manually alternated between first full pad contact without further pad compression and maximum usable opening without continuous hard-stop preload.",
+    "bus_access": "read_only",
+    "planned_repeats_per_endpoint": 5,
+    "completed_repeats_per_endpoint": 2,
+    "samples_per_placement": 10,
+    "stop_reason": "The operator explicitly requested that the remaining three repeats per endpoint be skipped."
+  },
+  "observations": {
+    "closed_representatives": [1495, 1499],
+    "open_representatives": [2897, 2938],
+    "closed_repeat_span_counts": 4,
+    "open_repeat_span_counts": 41,
+    "within_placement_static_span_counts": [0, 0, 0, 0]
+  },
+  "before": {
+    "gripper_closed_raw": 500,
+    "gripper_open_raw": 3600,
+    "raw_span": 3100,
+    "valid_against_official_range": false
+  },
+  "after": {
+    "gripper_closed_raw": 1499,
+    "gripper_open_raw": 2897,
+    "raw_span": 1398,
+    "gripper_pct_per_raw": 0.0715307582260372,
+    "selection": "Conservative interior-most endpoint: max(observed closed), min(observed open).",
+    "distance_from_official_lower_limit_counts": 41,
+    "distance_from_official_upper_limit_counts": 83
+  },
+  "checks": {
+    "stable_port_identity_checked_before_access": true,
+    "all_six_ids_and_models_match": true,
+    "all_six_torque_disabled_before_session": true,
+    "torque_disabled_before_and_after_each_saved_placement": true,
+    "both_candidates_inside_official_range": true,
+    "closed_and_open_candidates_distinct": true,
+    "observed_direction_open_raw_greater_than_closed_raw": true,
+    "each_static_burst_stable": true,
+    "formal_five_repeat_requirement_met": false,
+    "current_demo_usability_requirement_met": true,
+    "write_instructions_sent": 0,
+    "motion_instructions_sent": 0,
+    "eeprom_written": false
+  },
+  "evidence": {
+    "partial_readback": "../raw/cal017_gripper_endpoints_partial_20260913.json",
+    "partial_readback_sha256": "c63b3af71bac7aecc3d501cd185d571440a0b747bafdccc4776c7492f8ab45a1",
+    "read_tool": "../../../../scripts/read_gripper_endpoints.py",
+    "read_tool_sha256": "dcb71b3a824683f31f60cb4c1738b2ba62250cf6ac7b02de74a8e5d893d1cd6a"
+  },
+  "implementation": {
+    "profile_sha256": "fa4594ebed194446e3900e62219f6ce4caa0c0e751f1a71a34eb2e829589f90c",
+    "calibrate_script_sha256": "dcdd7cf54b66d372fca013bbfbee2a53026e0bab29b393a1b31934b4123648eb"
+  },
+  "limitations": [
+    "The values are accepted as conservative endpoints for this demo-only calibration package; the five-alternating-repeat rule applies only if the scope is expanded beyond the current demo.",
+    "The 41-count open repeat span should be remeasured before reuse in a production or precision profile.",
+    "Downstream gap, angle, TCP, speed-percent, empty-close and grasp-contact parameters remain uncalibrated and are not validated by these endpoints."
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-060",
+  "status": "CONFIRMED",
+  "completed_at": "2026-09-15T20:00:00+08:00",
+  "parameter": "motion.max_command_step_deg",
+  "method": "Per axis, floor(min(CAL-058 max_velocity_deg_s / CAL-002 fps, 2.2) * 1000) / 1000. Downward three-decimal quantization guarantees that the effective per-tick velocity does not exceed CAL-058 after decimal storage.",
+  "inputs": {
+    "CAL-002_fps": 30,
+    "CAL-058_max_velocity_deg_s": [48.56, 48.56, 44.82, 44.82, 48.56],
+    "CAL-059_max_acceleration_deg_s2": [209.77, 209.77, 202.23, 202.23, 209.77],
+    "hard_cap_deg_per_tick": 2.2,
+    "CAL-059_final_report": "CAL-059_joint_max_acceleration_final_20260915.json",
+    "CAL-059_final_report_sha256": "1eb31709fd5f0d2dd3f2912494e47ddc8e18c435e2f81b68e53b29e36b7a4eb2"
+  },
+  "derivation": {
+    "unquantized_velocity_over_fps_deg_per_tick": [
+      1.6186666666666667,
+      1.6186666666666667,
+      1.494,
+      1.494,
+      1.6186666666666667
+    ],
+    "obsolete_nearest_rounding_candidate_deg_per_tick": [1.619, 1.619, 1.494, 1.494, 1.619],
+    "obsolete_candidate_effective_velocity_deg_s": [48.57, 48.57, 44.82, 44.82, 48.57],
+    "obsolete_candidate_issue": "J1, J2, and J5 exceed their calibrated 48.56 deg/s limits by 0.01 deg/s after reverse conversion.",
+    "downward_quantized_deg_per_tick": [1.618, 1.618, 1.494, 1.494, 1.618],
+    "effective_velocity_deg_s": [48.54, 48.54, 44.82, 44.82, 48.54],
+    "velocity_headroom_deg_s": [0.02, 0.02, 0.0, 0.0, 0.02],
+    "all_axes_not_above_CAL-058": true
+  },
+  "fit_correction": {
+    "function": "scripts.calibrate._derive_command_step_limits",
+    "change": "Replace nearest 0.001 rounding with downward 0.001 quantization.",
+    "regression_test": "test_motion单tick步长向下量化不得反超速度上限"
+  },
+  "fit": {
+    "before_deg_per_tick": [2.2, 2.2, 2.2, 2.2, 2.2],
+    "after_deg_per_tick": [1.618, 1.618, 1.494, 1.494, 1.618]
+  },
+  "profile_sha256_before": "1168ef336b315bfc8f041402e983c3ed33863ac6bb17d3cdbdea6cd8d6c751dc",
+  "profile_sha256_after": "3cee7c4b33cfaf838bb8d6553dadee036a447d1172a749eab65de8dc4914ee94",
+  "profile_written": true,
+  "hardware_accessed": false,
+  "eeprom_written": false,
+  "post_write_verification": {
+    "related_tests_passed": 261,
+    "related_tests_failed": 0,
+    "profile_routes_checked": 20,
+    "profile_route_nodes_checked": 668,
+    "max_actual_step_across_routes_deg": 1.606268435770808,
+    "home_waypoint_gripper_percentages": [0, 25, 50, 75, 100],
+    "five_axis_local_round_trips_checked": true,
+    "joint_limit_motion_and_collision_result": "PASS",
+    "result": "PASS"
+  },
+  "group_completion": {
+    "parameters": ["CAL-058", "CAL-059", "CAL-060"],
+    "name": "joint dynamic command limits",
+    "result": "COMPLETE_FOR_CURRENT_DEMO"
+  },
+  "limitations": [
+    "This is a derived discrete command bound, not an independently measured motor capability.",
+    "The demo scope remains tied to 12 V, 26.8 C, the fixed wooden base, the current EEPROM state, and the 92.4 g maximum available sample.",
+    "TCP/vision-dependent dynamic limits remain deferred by operator instruction."
+  ]
+}

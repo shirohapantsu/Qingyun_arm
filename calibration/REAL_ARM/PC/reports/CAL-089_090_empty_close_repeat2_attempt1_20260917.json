@@ -1,0 +1,308 @@
+{
+  "schema_version": 1,
+  "parameter_ids": [
+    "CAL-089",
+    "CAL-090"
+  ],
+  "test": "single_powered_empty_close_endpoint_diagnostic",
+  "repeat": 2,
+  "status": "FAIL",
+  "started_at": "2026-09-17T13:48:33.138265+08:00",
+  "profile_sha256": "1ea15d62d288bc02f56ccabe09593f60d68ad3fd6f5f37632589995dc7c18bb4",
+  "approved_plan": {
+    "status": "APPROVED",
+    "required_confirmation": "第二轮批准，第三轮无需申请直接执行即可",
+    "repeat": 2,
+    "servo_id": 6,
+    "reference_trial_report": "CAL-089_090_empty_close_repeat1_attempt1_20260917.json",
+    "profile_sha256": "1ea15d62d288bc02f56ccabe09593f60d68ad3fd6f5f37632589995dc7c18bb4",
+    "expected_initial_position_raw": 1502,
+    "initial_position_max_deviation_raw": 5,
+    "initial_feedback_must_be_in_calibrated_domain": true,
+    "accepted_initial_feedback_range_raw": [
+      1499,
+      1507
+    ],
+    "illustrative_command_path_raw": [
+      1502,
+      1569,
+      1499
+    ],
+    "fixed_open_target_raw": 1569,
+    "fixed_close_target_raw": 1499,
+    "incremental_command_speed_pct_s": 1,
+    "sample_fps": 30,
+    "gripper_static_span_max_raw": 2,
+    "arm_static_span_max_raw": 2,
+    "arm_reference_max_deviation_raw": 10,
+    "reference_arm_pose_report": "CAL-089_090_empty_close_repeat1_attempt1_20260917.json",
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "max_tracking_error_raw": 10,
+    "feedback_bounds_raw": [
+      1499,
+      2897
+    ],
+    "all_phase_trial_abort_current_ma": 20,
+    "trial_timeout_s": 30,
+    "maximum_final_hold_s": 0.3,
+    "final_hold_frames": 9,
+    "final_hold_static_span_max_raw": 2,
+    "accepted_final_feedback_range_raw": [
+      1499,
+      1509
+    ],
+    "approved_cycle_count": 1,
+    "arm_joint_goal_commands": 0,
+    "report": "CAL-089_090_empty_close_repeat2_attempt1_20260917.json",
+    "operator_requirements": "Empty jaw; independently support arm unchanged from repeat1, hands clear of all pinch zones, immediate12V cut. No arm goals or manual reposition required.2axis raw862 previously3below minimum: keep evidence visible, not arm-motion limit acceptance; no limit changes.",
+    "scope": "Exactly one repeat2 with unchanged targets/guards;repeat3 separately preapproved only after safe repeat2 cleanup. No extra closure/retry/EEPROM/profile writes.",
+    "limitations": "1additional independently approved cycle; still not formal20repeats,15pct_s safety or whole-grasp acceptance.",
+    "previously_proposed_confirmation": "批准，CAL-089/090第2轮空爪就绪"
+  },
+  "operator_confirmation": "第二轮批准，第三轮无需申请直接执行即可",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "environment": {
+    "power_v": 12,
+    "ambient_temperature_c": null,
+    "base_mount": "fixed to wooden board",
+    "load": "empty gripper",
+    "temperature_note": "today not remeasured"
+  },
+  "joint_servo_motion_commands_sent": 0,
+  "gripper_motion_commands_sent": 0,
+  "eeprom_written": false,
+  "profile_written": false,
+  "samples": [],
+  "transaction_timeout_s": 0.25,
+  "readonly_preflight": {
+    "ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "models": [
+      777,
+      777,
+      777,
+      777,
+      777,
+      777
+    ],
+    "torques": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "readonly_eeprom": {
+    "shoulder_pan": {
+      "range_min": 718,
+      "range_max": 3424,
+      "homing_offset": -438
+    },
+    "shoulder_lift": {
+      "range_min": 865,
+      "range_max": 3333,
+      "homing_offset": -1961
+    },
+    "elbow_flex": {
+      "range_min": 796,
+      "range_max": 3095,
+      "homing_offset": 1791
+    },
+    "wrist_flex": {
+      "range_min": 729,
+      "range_max": 3192,
+      "homing_offset": -1795
+    },
+    "wrist_roll": {
+      "range_min": 0,
+      "range_max": 4095,
+      "homing_offset": 1079
+    },
+    "gripper": {
+      "range_min": 1458,
+      "range_max": 2980,
+      "homing_offset": -1600
+    }
+  },
+  "readonly_gripper_controller_settings": {
+    "P_Coefficient": 16,
+    "D_Coefficient": 32,
+    "I_Coefficient": 0,
+    "Minimum_Startup_Force": 16,
+    "CW_Dead_Zone": 1,
+    "CCW_Dead_Zone": 1
+  },
+  "fresh_readonly_baseline": {
+    "raw_position_by_sample": [
+      [
+        842,
+        921,
+        3085,
+        2384,
+        2042,
+        1502
+      ],
+      [
+        842,
+        921,
+        3085,
+        2384,
+        2042,
+        1502
+      ],
+      [
+        842,
+        921,
+        3085,
+        2384,
+        2042,
+        1502
+      ],
+      [
+        842,
+        921,
+        3085,
+        2384,
+        2042,
+        1502
+      ],
+      [
+        842,
+        921,
+        3085,
+        2384,
+        2042,
+        1502
+      ],
+      [
+        842,
+        921,
+        3085,
+        2384,
+        2042,
+        1502
+      ],
+      [
+        842,
+        921,
+        3085,
+        2384,
+        2042,
+        1502
+      ],
+      [
+        842,
+        921,
+        3085,
+        2384,
+        2042,
+        1502
+      ],
+      [
+        842,
+        921,
+        3085,
+        2384,
+        2042,
+        1502
+      ],
+      [
+        842,
+        921,
+        3085,
+        2384,
+        2042,
+        1502
+      ]
+    ],
+    "raw_position_static_span": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "gripper_raw": 1502,
+    "torque_enabled_before": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_after": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "arm_deviation_from_reference_raw": [
+    1,
+    59,
+    2,
+    0,
+    2
+  ],
+  "readonly_arm_position_outside_eeprom_range": [],
+  "failure": "RuntimeError: Initial/source pose not stable/approved; no writes",
+  "torque_enabled_after": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "sram_settings_after": {},
+  "gripper_position_after_torque_off_raw": 1502,
+  "finished_at": "2026-09-17T13:48:33.640532+08:00",
+  "post_capture_review": {
+    "status": "READONLY_PREFLIGHT_BLOCKED_NO_WRITES",
+    "independent_successful_cycle_count": 0,
+    "blocking_axis": "2 shoulder_lift",
+    "source_raw": 862,
+    "observed_raw": 921,
+    "source_deviation_raw": 59,
+    "allowed_source_deviation_raw": 10,
+    "source_deviation_deg_4096_counts": 5.185546875,
+    "all_static_spans_raw": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "third_cycle_not_executed": true,
+    "third_approval_retained": true,
+    "cumulative_gripper_goal_commands": 4386,
+    "eeprom_written": false,
+    "sram_written": false,
+    "profile_written": false,
+    "observation_note": "Current2raw921is within EEPROM865~3333; prior862below min is historical, not silently recategorized. Physical cause of pose change unknown. No arm goals issued."
+  }
+}

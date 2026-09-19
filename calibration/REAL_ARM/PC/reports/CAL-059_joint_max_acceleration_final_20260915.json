@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-059",
+  "status": "CONFIRMED",
+  "completed_at": "2026-09-15T19:47:45.926666+08:00",
+  "parameter": "motion.max_acceleration_deg_s2",
+  "method": "With the calibrated CAL-058 velocity limits active, execute three increasing acceleration levels on each joint in both directions around the first safe waypoint. Take 85 percent of the highest passed per-axis discrete command acceleration, computed independently within each trajectory as abs(second_difference(command))/tick_s^2.",
+  "scope": "current demo, 92.4 g maximum available sample; not a full-workspace or production payload claim",
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_to_flat_wooden_work_surface_no_gap",
+    "demo_max_load_g": 92.4,
+    "control_fps": 30
+  },
+  "fit_correction_before_capture": {
+    "obsolete_behavior": "Concatenated all trajectories, omitted division by tick_s^2, and added 50 after the 0.85 margin.",
+    "corrected_behavior": "Group by trajectory/segment/direction, compress consecutive duplicate settle commands, divide each within-trajectory second difference by tick_s^2, apply 0.85 margin, and use 50 deg/s^2 only as a demo floor.",
+    "regression_test": "test_motion加速度按独立轨迹和tick平方换算"
+  },
+  "attempt1": {
+    "source_report": "CAL-059_joint_acceleration_92p4g_attempt1_20260915.json",
+    "source_report_sha256": "81e7315ff0694f7d566b484749c022a3177755a1b93c28ac1a60e26c805f0bcf",
+    "source_raw": "../raw/cal059_joint_acceleration_92p4g_attempt1_20260915.jsonl",
+    "source_raw_sha256": "1537516a3d334479a8d42ccf8022dddcf1eac2bc335643deb4e699f65cc00613",
+    "result": "READ timeout on servo 5 before goal seed or torque enable; zero motion samples",
+    "torque_enabled_after": [0, 0, 0, 0, 0, 0]
+  },
+  "attempt2": {
+    "source_report": "CAL-059_joint_acceleration_92p4g_attempt2_20260915.json",
+    "source_report_sha256": "5be3fc2502013f9571145f85558dbdd0a01bd5c2deaf80c588feb718c568d3cd",
+    "source_raw": "../raw/cal059_joint_acceleration_92p4g_attempt2_20260915.jsonl",
+    "source_raw_sha256": "049a16b0e76bd507cd29c64f454b83b3ca976b98c69c50b78cbf04b8dae4ca31",
+    "requested_acceleration_levels_deg_s2": [120.0, 190.0, 260.0],
+    "joint_offsets_deg": [14.0, 14.0, 12.0, 12.0, 14.0],
+    "unique_trajectory_count": 30,
+    "passed_sample_rows": 1110,
+    "failed_sample_rows": 0,
+    "command_acceleration_by_level_deg_s2": {
+      "120": [115.540992, 115.540992, 117.139189, 117.139189, 115.540992],
+      "190": [180.0225, 180.0225, 171.283943, 171.283943, 180.0225],
+      "260": [246.789641, 246.789641, 237.922668, 237.922668, 246.789641]
+    },
+    "measured_peak_command_acceleration_deg_s2": [
+      246.78964149208193,
+      246.7896414920851,
+      237.92266845703125,
+      237.92266845703125,
+      246.78964149208193
+    ],
+    "measured_peak_velocity_deg_s": [
+      43.9453125,
+      48.33984375,
+      39.55078125,
+      39.55078125,
+      43.9453125
+    ],
+    "following_error_p99_deg": [
+      2.946666640384621,
+      4.190922468115696,
+      4.235114624450992,
+      2.643261719588398,
+      2.803118044382545
+    ],
+    "following_error_max_deg": [
+      3.522568775634401,
+      5.346744599810222,
+      5.04915811727335,
+      3.215846051226606,
+      3.3247665778322055
+    ],
+    "peak_joint_current_ma": [32.5, 91.0, 91.0, 26.0, 19.5],
+    "software_hard_current_ma": [900.0, 900.0, 900.0, 900.0, 900.0],
+    "gripper_pct_min": 25.321888412017167,
+    "gripper_pct_max": 25.321888412017167,
+    "gripper_opening_drift_pct": 0.0,
+    "temporary_settle_position_tolerance_deg": [2.8, 2.8, 2.8, 2.8, 2.8],
+    "temporary_settle_timeout_s": 8.0,
+    "temporary_settle_values_promoted": false,
+    "torque_enabled_after": [0, 0, 0, 0, 0, 0],
+    "operator_observation": "无异常（无异常振动、异响、碰撞或负载滑移）"
+  },
+  "fit": {
+    "rule": "highest passed per-axis discrete command acceleration times 0.85",
+    "before_deg_s2": [260.0, 260.0, 260.0, 260.0, 260.0],
+    "after_deg_s2": [209.77, 209.77, 202.23, 202.23, 209.77]
+  },
+  "current_revalidation": {
+    "peak_ma": [32.5, 91.0, 91.0, 26.0, 19.5],
+    "software_hard_limit_ma": [900.0, 900.0, 900.0, 900.0, 900.0],
+    "eeprom_protection_current_ma": [2015.0, 2015.0, 2015.0, 2015.0, 2015.0],
+    "result": "PASS_WITH_LARGE_MARGIN"
+  },
+  "profile_sha256_before": "87d46d7600a2204af1445b9eb557813c4c5d25ef6f0a578ed6c44e82f3b1d27e",
+  "profile_sha256_after": "1168ef336b315bfc8f041402e983c3ed33863ac6bb17d3cdbdea6cd8d6c751dc",
+  "profile_written": true,
+  "eeprom_written": false,
+  "post_write_verification": {
+    "calibration_tests_passed": 49,
+    "motion_and_safety_tests_passed": 211,
+    "targeted_tests_failed": 0,
+    "full_repository_run": "stopped at 22 percent per prior operator instruction to avoid per-parameter full-suite testing; no failures observed before stop",
+    "profile_routes_checked": 20,
+    "profile_route_nodes_checked": 668,
+    "home_waypoint_gripper_percentages": [0, 25, 50, 75, 100],
+    "five_axis_local_round_trips_checked": true,
+    "result": "PASS"
+  },
+  "downstream": {
+    "CAL-060": "derive max_command_step_deg from CAL-058 velocity and 30 Hz after this completed dependency",
+    "CAL-063_to_CAL-070": "use loaded tracking and endpoint evidence; temporary 2.8 deg settle tolerance remains unpromoted"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-016",
+  "status": "VERIFIED_CORRECTION",
+  "completed_at": "2026-09-15T19:30:00+08:00",
+  "parameter": "motor.velocity_deg_s_per_raw",
+  "reason": "CAL-058 motion exposed an exact 50x mismatch between converted Present_Velocity and position-over-time velocity.",
+  "authority": {
+    "manufacturer_product_page": "https://www.feetechrc.com/20210430-56680.html",
+    "manufacturer_definition": "STS3215 speed feedback is the number of encoder steps moved per unit time (one second).",
+    "manufacturer_sdk": "https://gitee.com/ftservo/FTServo_Linux/blob/main/src/SMS_STS.cpp",
+    "sdk_behavior": "ReadSpeed reads addresses 58-59 and only decodes bit-15 sign-magnitude; it does not multiply by address 82.",
+    "position_resolution_count_per_revolution": 4096
+  },
+  "hardware_crosscheck": {
+    "source_raw_jsonl": "../raw/cal058_joint_velocity_unloaded_20260915.jsonl",
+    "source_raw_sha256": "edcddd37541a0da3f8ffb85b2d674d004abd4ee924633b1ca49b1af943c8e933",
+    "motion_sample_rows": 1983,
+    "compared_moving_samples": 1070,
+    "feedback_vs_position_difference_same_sign_fraction": 1.0,
+    "feedback_vs_position_difference_correlation": 0.9931766660497237,
+    "median_abs_position_difference_to_feedback_ratio": 0.9975495715767082,
+    "median_abs_error_deg_s": 2.145184270511848,
+    "crosscheck_conversion": "stored_CAL058_speed_deg_s / 50",
+    "commanded_high_level_deg_s": [60.0, 60.0, 55.0, 60.0, 60.0],
+    "corrected_measured_peak_deg_s": [57.12890625, 61.5234375, 52.734375, 52.734375, 57.12890625]
+  },
+  "interpretation": {
+    "velocity_unit_factor_address_82_readback": [50, 50, 50, 50, 50, 50],
+    "address_82_role": "firmware internal/factory velocity parameter; not a Present_Velocity feedback multiplier",
+    "obsolete_formula": "50 * 360 / 4096",
+    "correct_formula": "360 / 4096",
+    "obsolete_value": 4.39453125,
+    "correct_value": 0.087890625,
+    "correction_factor": 0.02
+  },
+  "before": [4.39453125, 4.39453125, 4.39453125, 4.39453125, 4.39453125, 4.39453125],
+  "after": [0.087890625, 0.087890625, 0.087890625, 0.087890625, 0.087890625, 0.087890625],
+  "unit": "(deg/s)/raw count",
+  "profile_sha256_after": "1d50e9bcbe68b5fd2431d7b602538c980ef695c872c79340088bfe3fd56223e0",
+  "eeprom_written": false,
+  "hardware_motion_repeated_for_correction": false,
+  "supersedes": "CAL-016_velocity_scale_20260913.json"
+}

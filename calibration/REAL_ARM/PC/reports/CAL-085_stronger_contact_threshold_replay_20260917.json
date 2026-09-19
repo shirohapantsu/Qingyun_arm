@@ -1,0 +1,503 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-085",
+  "source": "offline_causal_hardware_data_replay_no_new_motion",
+  "fixture_report": "CAL-085_fixture_stronger_contact_attempt1_20260917.json",
+  "matched_new_target_static_empty_control_pending": true,
+  "window_samples": 3,
+  "contact_dwell_s": 0.1,
+  "current_comparison": "strict > on absolute3-sample mean",
+  "contact_gap_range_m": [
+    0.022,
+    0.042
+  ],
+  "empty_exclusion_pct": 5,
+  "fixture_hold_currents_ma": [
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13,
+    13
+  ],
+  "candidate_contact_threshold_ma": 10,
+  "fixture_threshold_replays": {
+    "10": {
+      "peak_filtered_mean_ma": 13,
+      "longest_qualifying_run_s": 0.6686141380050685,
+      "hit_count": 20,
+      "first_hit": {
+        "phase": "fixture_closing",
+        "position_raw": 1820,
+        "command_raw": 1808,
+        "mean_ma": 10.833333333333334,
+        "continuous_above_s": 0.10005191000527702
+      },
+      "hold_trace": [
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.4019502679875586
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.43513455797801726
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.4686273789848201
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.5018308259896003
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.5354453999898396
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.568773565988522
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.6019000959931873
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.6350826029956806
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.6686141380050685
+        }
+      ]
+    },
+    "11": {
+      "peak_filtered_mean_ma": 13,
+      "longest_qualifying_run_s": 0.635034049017122,
+      "hit_count": 17,
+      "first_hit": {
+        "phase": "fixture_closing",
+        "position_raw": 1818,
+        "command_raw": 1804,
+        "mean_ma": 13,
+        "continuous_above_s": 0.13331770699005574
+      },
+      "hold_trace": [
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.3683701789996121
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.40155446899007075
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.4350472899968736
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.46825073700165376
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.5018653110018931
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.5351934770005755
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.5683200070052408
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.6015025140077341
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.635034049017122
+        }
+      ]
+    },
+    "12": {
+      "peak_filtered_mean_ma": 13,
+      "longest_qualifying_run_s": 0.635034049017122,
+      "hit_count": 17,
+      "first_hit": {
+        "phase": "fixture_closing",
+        "position_raw": 1818,
+        "command_raw": 1804,
+        "mean_ma": 13,
+        "continuous_above_s": 0.13331770699005574
+      },
+      "hold_trace": [
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.3683701789996121
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.40155446899007075
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.4350472899968736
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.46825073700165376
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.5018653110018931
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.5351934770005755
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.5683200070052408
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.6015025140077341
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.635034049017122
+        }
+      ]
+    },
+    "13": {
+      "peak_filtered_mean_ma": 13,
+      "longest_qualifying_run_s": 0,
+      "hit_count": 0,
+      "first_hit": null,
+      "hold_trace": [
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0
+        }
+      ]
+    },
+    "9.1": {
+      "peak_filtered_mean_ma": 13,
+      "longest_qualifying_run_s": 0.6686141380050685,
+      "hit_count": 20,
+      "first_hit": {
+        "phase": "fixture_closing",
+        "position_raw": 1820,
+        "command_raw": 1808,
+        "mean_ma": 10.833333333333334,
+        "continuous_above_s": 0.10005191000527702
+      },
+      "hold_trace": [
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.4019502679875586
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.43513455797801726
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.4686273789848201
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.5018308259896003
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.5354453999898396
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.568773565988522
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.6019000959931873
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.6350826029956806
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0.6686141380050685
+        }
+      ]
+    },
+    "19.5": {
+      "peak_filtered_mean_ma": 13,
+      "longest_qualifying_run_s": 0,
+      "hit_count": 0,
+      "first_hit": null,
+      "hold_trace": [
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0
+        },
+        {
+          "phase": "fixture_hold",
+          "mean_ma": 13,
+          "raw_current_ma": 13,
+          "continuous_above_s": 0
+        }
+      ]
+    }
+  },
+  "historical_empty_threshold_10_ma_replays": [
+    {
+      "role": "empty_baseline",
+      "report": "CAL-085_empty_current_repeat1_20260916.json",
+      "operator_observation": "无异常",
+      "threshold_10_ma_replay": {
+        "peak_filtered_mean_ma": 6.5,
+        "longest_qualifying_run_s": 0,
+        "hit_count": 0,
+        "first_hit": null
+      }
+    },
+    {
+      "role": "expanded_empty_range_control",
+      "report": "CAL-085_empty_expanded_control_repeat1_20260916.json",
+      "operator_observation": "无异常",
+      "threshold_10_ma_replay": {
+        "peak_filtered_mean_ma": 6.5,
+        "longest_qualifying_run_s": 0,
+        "hit_count": 0,
+        "first_hit": null
+      }
+    },
+    {
+      "role": "updated_baseline_empty_range_control",
+      "report": "CAL-085_empty_updated_baseline_control_repeat1_20260916.json",
+      "operator_observation": null,
+      "threshold_10_ma_replay": {
+        "peak_filtered_mean_ma": 8.666666666666666,
+        "longest_qualifying_run_s": 0,
+        "hit_count": 0,
+        "first_hit": null
+      }
+    },
+    {
+      "role": "updated_baseline_empty_range_control",
+      "report": "CAL-085_empty_updated_baseline_control_repeat2_reposition_attempt1_20260916.json",
+      "operator_observation": "无异常",
+      "threshold_10_ma_replay": {
+        "peak_filtered_mean_ma": 6.5,
+        "longest_qualifying_run_s": 0,
+        "hit_count": 0,
+        "first_hit": null
+      }
+    },
+    {
+      "role": "complete_contact_domain_empty_control",
+      "report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+      "operator_observation": "无异常",
+      "threshold_10_ma_replay": {
+        "peak_filtered_mean_ma": 6.5,
+        "longest_qualifying_run_s": 0,
+        "hit_count": 0,
+        "first_hit": null
+      }
+    },
+    {
+      "role": "sustained_empty_current_control",
+      "report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+      "operator_observation": "无异常",
+      "threshold_10_ma_replay": {
+        "peak_filtered_mean_ma": 6.5,
+        "longest_qualifying_run_s": 0,
+        "hit_count": 0,
+        "first_hit": null
+      }
+    }
+  ],
+  "conclusion": {
+    "status": "PROMISING_DEMO_CANDIDATE_PENDING_CURRENT_PHYSICAL_OBSERVATION_AND_MATCHED_1801_EMPTY_HOLD",
+    "candidate10_detects_stronger_fixture": true,
+    "confirmed_and_unconfirmed_recorded_empty_false_positive_count": 0,
+    "historical_max_empty_mean_ma": 8.666666666666666,
+    "fixture_continuous_run_above10_s": 0.6686141380050685,
+    "earlier_low_force_no_valid_threshold_report_retained": true,
+    "profile_written": false,
+    "limitations": "Plastic fixture1%/s only, static1801 empty comparison stillpending; single stronger capture and current operator observation needed, not fullgrasp/holding-force/15%/real-fruit or calibration-profile verification."
+  }
+}

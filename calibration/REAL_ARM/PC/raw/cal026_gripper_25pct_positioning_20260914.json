@@ -1,0 +1,1168 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-026",
+  "operation": "position_gripper_for_manual_gap_measurement",
+  "started_at": "2026-09-14T14:29:04.178152+08:00",
+  "success": false,
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256": "cfd4830f99fabd90a9b2f889b22cbf39f5bdb90ae6fca78d49c0c6d527247bbd",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_workcell"
+  },
+  "target_raw": 1849,
+  "calibrated_safe_endpoints_raw": [
+    1499,
+    2897
+  ],
+  "official_gripper_range_raw": [
+    1458,
+    2980
+  ],
+  "temporary_sram_settings": {
+    "Acceleration": 5,
+    "Goal_Time": 0,
+    "Goal_Velocity": 5,
+    "Torque_Limit": 200
+  },
+  "eeprom_written": false,
+  "joint_servo_motion_commands_sent": 0,
+  "gripper_motion_commands_sent": 1,
+  "samples": [
+    {
+      "time": "2026-09-14T14:29:04.195486+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:04.247399+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:04.299140+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:04.351115+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:04.402838+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:04.454644+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:04.506635+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:04.558662+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:04.610701+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:04.662479+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:04.714271+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:04.766027+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:04.818340+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:04.870094+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:04.922281+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:04.974064+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:05.025867+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:05.077748+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:05.129527+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:05.181706+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:05.233679+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:05.285591+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:05.337930+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:05.389969+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:05.441914+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:05.493888+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:05.545756+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:05.597590+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:05.649405+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:05.701294+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:05.753267+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:05.805086+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:05.857343+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:05.909263+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:05.961245+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:06.012873+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:06.064961+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:06.117125+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:06.169190+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:06.221110+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:06.273361+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:06.325504+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:06.377363+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:06.429037+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:06.480724+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:06.532790+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:06.584773+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:06.636480+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:06.688373+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:06.740660+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:06.792766+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:06.844914+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:06.897699+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:06.949964+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.002267+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.054288+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.106190+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.157863+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.209517+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.261254+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.312802+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.365327+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.417016+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.468338+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.519961+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.571485+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.623186+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.675172+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.727321+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.779154+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.831055+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.883333+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.935670+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:07.987630+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:08.039352+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:08.091185+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:08.142957+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:08.194659+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:08.246558+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:08.298178+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:08.350032+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:08.402178+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:08.454149+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:08.505846+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:08.557728+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:08.609261+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:08.661218+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:08.713050+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:08.765092+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:08.817152+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:08.869057+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:08.921316+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:08.973233+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:09.025428+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:09.077272+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:09.129378+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:09.181388+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:09.233230+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:09.285044+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:09.336924+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:09.388938+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:09.441031+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:09.492959+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:09.545154+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:09.596862+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:09.648784+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:09.700870+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:09.752703+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:09.804937+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:09.856906+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:09.909267+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:09.960990+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.013253+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.065380+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.117382+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.169148+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.220612+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.272648+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.324461+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.376391+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.428352+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.479917+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.531912+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.583711+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.635688+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.687261+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.739139+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.790950+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.842610+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.894531+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.946232+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:10.997934+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:11.049656+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:11.101346+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:11.152751+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:11.204709+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:11.257386+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:11.309187+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:11.360753+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:11.412609+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:11.465022+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:11.516835+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:11.568749+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:11.620812+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:11.672824+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:11.724198+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:11.775907+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:11.827413+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:11.878956+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:11.930483+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:11.982137+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:12.033638+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:12.085094+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:12.136562+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "time": "2026-09-14T14:29:12.188453+08:00",
+      "position_raw": 2048,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    }
+  ],
+  "response_status_level_by_motor": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "model_numbers": [
+    777,
+    777,
+    777,
+    777,
+    777,
+    777
+  ],
+  "torque_enabled_before": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "start_raw": 2048,
+  "original_sram_settings": {
+    "Acceleration": 254,
+    "Goal_Time": 0,
+    "Goal_Velocity": 0,
+    "Torque_Limit": 500
+  },
+  "error": "RuntimeError: gripper did not settle at raw 1849 in time",
+  "final_torque_check_error": "MotorCommunicationError: 应答 ID 与请求 ID 不符：请求 1，收到 6",
+  "finished_at": "2026-09-14T14:29:12.241739+08:00"
+}

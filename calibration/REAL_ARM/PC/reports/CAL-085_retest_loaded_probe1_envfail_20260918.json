@@ -1,0 +1,66 @@
+{
+  "schema_version": 2,
+  "parameter_id": "CAL-085",
+  "test": "production_speed_single_run_loaded",
+  "mode": "loaded",
+  "status": "FAIL_PRE_ACCESS",
+  "started_at": "2026-09-18T12:20:52.201482+08:00",
+  "operator_confirmation": "批准，CAL-085重测阶段1就绪",
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256": "fe6aaf95e8418975d6eb966fe20ad55a8743084f63c443474aa838c21beffb2f",
+  "motor_calibration_sha256": "ad315322ad4d19cc322c8f21d86d9667d9df9eca2de325bebbd72fa62deefff5",
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": null,
+    "base_mount": "fixed_to_wooden_work_surface_no_gap",
+    "load": "independently supported plastic fixture, 20mm contact band"
+  },
+  "trajectory_from_profile": {
+    "preopen_pct": 37.65,
+    "preopen_raw": 2025,
+    "close_speed_pct_s": 15.0,
+    "open_speed_pct_s": 20.0,
+    "empty_gate_pct": 1.21,
+    "contact_gap_range_m": [
+      0.022,
+      0.042
+    ],
+    "window_samples": 3,
+    "fps": 30.0,
+    "tick_s": 0.03333333333333333,
+    "max_tick_lateness_s": 0.02,
+    "closed_raw": 1499,
+    "open_raw": 2897
+  },
+  "diagnostic_bounds": {
+    "abort_current_ma": 65.0,
+    "abort_tracking_raw": 150,
+    "freeze_lag_raw": 75,
+    "stall_window_samples": 4,
+    "stall_max_move_raw": 2,
+    "freeze_zone_min_pct": 6.21,
+    "closing_budget_s": 5.0,
+    "opening_budget_s": 5.0,
+    "hold_frames": 9,
+    "note": "全部为采集诊断保护，非生产参数；生产判据离线重放"
+  },
+  "eeprom_written": false,
+  "profile_written": false,
+  "joint_servo_motion_commands_sent": 0,
+  "gripper_motion_commands_sent": 0,
+  "preposition_samples": [],
+  "samples": [],
+  "post_torque_off_samples": [],
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "failure": "MotorStateError: 真机电机驱动需要 pyserial（本机未安装）。换算层（MotorMapping 与第 2 节的共享函数）不需要它，可以照常做离线单元测试。",
+  "result": {
+    "stop_reason": null
+  },
+  "finished_at": "2026-09-18T12:20:52.322117+08:00"
+}

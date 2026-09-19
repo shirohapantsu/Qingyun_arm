@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-085",
+  "source": "offline_causal_replay_no_new_motion",
+  "candidate_contact_threshold_ma": 10,
+  "window_samples": 3,
+  "contact_dwell_s": 0.1,
+  "comparison": "absolute mean strictly greater than10mA; sample timestamp continuous dwell",
+  "contact_gap_range_m": [
+    0.022,
+    0.042
+  ],
+  "empty_exclusion_pct": 5.0,
+  "empty": {
+    "report": "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json",
+    "included_phases": [
+      "empty_closing",
+      "final_hold"
+    ],
+    "peak_filtered_mean_ma": 6.5,
+    "longest_qualifying_run_s": 0.0,
+    "hit_count": 0,
+    "first_hit": null,
+    "hold_filtered_means_ma": [
+      2.1666666666666665,
+      4.333333333333333,
+      4.333333333333333,
+      4.333333333333333,
+      4.333333333333333,
+      4.333333333333333,
+      2.1666666666666665,
+      0.0,
+      2.1666666666666665
+    ]
+  },
+  "fixture": {
+    "report": "CAL-085_fixture_stronger_contact_attempt1_20260917.json",
+    "included_phases": [
+      "fixture_closing",
+      "fixture_hold"
+    ],
+    "peak_filtered_mean_ma": 13.0,
+    "longest_qualifying_run_s": 0.6686141380050685,
+    "hit_count": 20,
+    "first_hit": {
+      "phase": "fixture_closing",
+      "position_raw": 1820,
+      "command_raw": 1808,
+      "mean_ma": 10.833333333333334,
+      "continuous_above_s": 0.10005191000527702
+    },
+    "hold_filtered_means_ma": [
+      13.0,
+      13.0,
+      13.0,
+      13.0,
+      13.0,
+      13.0,
+      13.0,
+      13.0,
+      13.0
+    ]
+  },
+  "same_open_close_commands_raw": [
+    1871,
+    1801
+  ],
+  "same_hold_frames": 9,
+  "same_sram_settings": true,
+  "initial_unloaded_position_is_not_new_contact_zero": true,
+  "operator_empty_observation_pending": false,
+  "operator_empty_observation": "无异常",
+  "operator_latest_fixture_stable_grip_confirmation_pending": true,
+  "operator_latest_fixture_observation": "无异常",
+  "physical_grip_status": "UNVERIFIED",
+  "physical_grip_note": "Repeated no-abnormality reply preserved, not expanded into explicit stable grip or no-slip evidence; no repeated identical request or new motion.",
+  "contact_threshold_fitted": false,
+  "limitations": "One plastic-fixture pair at1pct/s; not calibrated force, pressure, production15pct/s or real-fruit safety; fixture-only25raw tracking remains excluded from production and empty control."
+}

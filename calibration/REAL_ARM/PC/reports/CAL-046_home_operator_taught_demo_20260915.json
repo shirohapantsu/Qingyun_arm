@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-046",
+  "parameter": "workspace.home_joints_deg",
+  "date": "2026-09-15",
+  "status": "CONFIRMED_FOR_DEMO_PENDING_GROUP_MOTION_TEST",
+  "profile_changed": true,
+  "profile_sha256_before": "04c7e28def4f2d5a87beeaf63132faf9477ddee3f053136f908c91d7623a20ec",
+  "profile_sha256_after": "cb9e4116648a74140b7566d64239a853858bd71fc76c37195de30fef2b272bce",
+  "source_evidence": "../raw/cal046_home_operator_taught_20260915.json",
+  "operator_decision": "The simulation candidate could not be placed manually; use the newly selected physical pose as CAL-046 home.",
+  "home_joints_deg": [
+    0.2637362637362637,
+    -44.561406593406595,
+    35.0760989010989,
+    57.39739560439561,
+    1.142857142857143
+  ],
+  "raw_position_representative": [2057, 1739, 2252, 2663, 2045, 1508],
+  "samples": 15,
+  "raw_position_static_span": [0, 0, 0, 0, 0, 0],
+  "torque_enabled_before_and_after": [0, 0, 0, 0, 0, 0],
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_to_wooden_work_surface_no_gap"
+  },
+  "checks": {
+    "stable_serial_verified_before_read": true,
+    "resolved_port": "/dev/ttyACM0",
+    "usb_identity": "1a86:55d3 serial 5B14114904",
+    "all_joints_inside_effective_limits": true,
+    "collision_check_gripper_pct": [0.0, 0.6437768240343348, 55.0, 70.0, 100.0],
+    "collision_check_passed_all_openings": true,
+    "motion_instructions_sent": 0,
+    "eeprom_written": false
+  },
+  "scope": "Current REAL_ARM/PC demo. This closes selection and static validation of CAL-046 only.",
+  "deferred_validation": "Per operator instruction, do not run a separate motion test after CAL-046. Perform unloaded low-speed route validation after CAL-047 completes, then perform the prescribed demo-load route validation with the motion group."
+}

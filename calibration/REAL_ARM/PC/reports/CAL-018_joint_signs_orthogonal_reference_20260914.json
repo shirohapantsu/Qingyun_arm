@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-018",
+  "status": "VERIFIED_FOR_DEMO",
+  "captured_at": "2026-09-14",
+  "parameter": "joints.sign",
+  "result": {
+    "joint_names": [
+      "shoulder_pan",
+      "shoulder_lift",
+      "elbow_flex",
+      "wrist_flex",
+      "wrist_roll"
+    ],
+    "joint_sign": [1, 1, 1, 1, -1],
+    "formula": "q_urdf_deg = joint_sign * q_bus_deg + zero_offset_deg"
+  },
+  "direction_reference_pose": {
+    "name": "urdf_orthogonal_joint_center_reference",
+    "q_reference_deg": [0.0, -13.968, 16.175, -2.207, 0.0],
+    "geometry_mm": {
+      "servo_2_to_3": {
+        "forward": 0.0,
+        "vertical_up": 116.0
+      },
+      "servo_3_to_4": {
+        "forward": 135.0,
+        "vertical_up": 0.0
+      },
+      "servo_4_to_5": {
+        "forward": 61.1,
+        "lateral_positive_y": 18.1,
+        "vertical_up": 0.0
+      }
+    },
+    "warning": "Known nonzero pose derived from the repository-bound URDF; it is neither q=[0]*5 nor follower_zero.webp."
+  },
+  "observations": [
+    {
+      "joint": "shoulder_pan",
+      "servo_id": 1,
+      "baseline_raw": 2113,
+      "urdf_positive_raw": 2239,
+      "urdf_negative_raw": 1718,
+      "positive_delta_counts": 126,
+      "negative_delta_counts": -395,
+      "joint_sign": 1
+    },
+    {
+      "joint": "shoulder_lift",
+      "servo_id": 2,
+      "baseline_raw": 2112,
+      "urdf_positive_raw": 2275,
+      "urdf_negative_raw": 1778,
+      "positive_delta_counts": 163,
+      "negative_delta_counts": -334,
+      "joint_sign": 1
+    },
+    {
+      "joint": "elbow_flex",
+      "servo_id": 3,
+      "baseline_raw": 2066,
+      "urdf_positive_raw": 2162,
+      "urdf_negative_raw": 1888,
+      "positive_delta_counts": 96,
+      "negative_delta_counts": -178,
+      "joint_sign": 1
+    },
+    {
+      "joint": "wrist_flex",
+      "servo_id": 4,
+      "baseline_raw": 2014,
+      "urdf_positive_raw": 2248,
+      "urdf_negative_raw": 1754,
+      "positive_delta_counts": 234,
+      "negative_delta_counts": -260,
+      "joint_sign": 1
+    },
+    {
+      "joint": "wrist_roll",
+      "servo_id": 5,
+      "baseline_raw": 2062,
+      "urdf_positive_raw": 1824,
+      "urdf_negative_raw": 2396,
+      "positive_delta_counts": -238,
+      "negative_delta_counts": 334,
+      "joint_sign": -1
+    }
+  ],
+  "checks": {
+    "all_positive_and_negative_poses_on_opposite_sides_of_baseline": true,
+    "all_motion_magnitudes_exceed_30_counts": true,
+    "all_observations_inside_official_raw_ranges": true,
+    "stable_port_identity_checked_before_each_pose": true,
+    "all_six_torque_disabled_before_and_after_each_pose": true,
+    "write_instructions_sent": 0,
+    "motion_instructions_sent": 0,
+    "eeprom_written": false
+  },
+  "individual_reports": [
+    {
+      "path": "CAL-018_shoulder_pan_direction_orthogonal_reference_20260914.json",
+      "sha256": "a2b7e7b926b6270f76ae7f9b58d16da7bb76ea76b2659c84aafe43f1f3222a68"
+    },
+    {
+      "path": "CAL-018_shoulder_lift_direction_orthogonal_reference_20260914.json",
+      "sha256": "2cc2042bb2c8fd424cf1a05a767734c17610786c2ae02bafe5535878aac538a4"
+    },
+    {
+      "path": "CAL-018_elbow_flex_direction_orthogonal_reference_20260914.json",
+      "sha256": "563b4b7b28f407b002f684adb3b1b8ad2d4e190b11175b7c45bd2a459d9dd12f"
+    },
+    {
+      "path": "CAL-018_wrist_flex_direction_orthogonal_reference_20260914.json",
+      "sha256": "4fbd57f2b1f19fc1a0d198826689e01b7da441153dc3232b34a6d87e2642a11a"
+    },
+    {
+      "path": "CAL-018_wrist_roll_direction_orthogonal_reference_20260914.json",
+      "sha256": "7cd0b764cef8a849fc2f14006c3d71c8b808baa764b1b8035fe8fa6992c087cb"
+    }
+  ],
+  "integration": {
+    "supersedes_report": "CAL-018_joint_signs_20260913.json",
+    "old_profile_sha256": "fa4594ebed194446e3900e62219f6ce4caa0c0e751f1a71a34eb2e829589f90c",
+    "new_profile_sha256": "ec1de31a39599552c4dbbc494206d558cc1a404a215a33f56133f3b290fa8dce",
+    "profile_field_written": "joints.sign",
+    "zero_offset_deg_remains_null": true,
+    "measured_limits_deg_remains_null": true,
+    "runtime_joints_mapping_remains_disabled_until_CAL_019": true
+  }
+}

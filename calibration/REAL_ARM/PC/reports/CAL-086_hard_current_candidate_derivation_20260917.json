@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-086",
+  "source": "offline_derivation_and_existing_sample_replay_no_motion",
+  "status": "UNVERIFIED",
+  "profile_sha256": "1ea15d62d288bc02f56ccabe09593f60d68ad3fd6f5f37632589995dc7c18bb4",
+  "current_profile_contact_current_ma": 220,
+  "current_profile_hard_current_ma": 450,
+  "candidate_contact_current_ma": 10,
+  "derivation": "candidate_contact_current_ma * 2.0 per scripts/calibrate.py fit; engineering heuristic not a measured damage boundary",
+  "candidate_hard_current_ma": 20,
+  "dependency_cal085_status": "UNVERIFIED physical grip;10mA candidate not integrated",
+  "existing_current_profile_fitter_result_ma": 440,
+  "current_guard_comparison": "strict abs unfiltered current > hard_current_ma on every executor monitor",
+  "quantization_ma_per_raw": 6.5,
+  "greatest_nontripping_positive_raw": 3,
+  "greatest_nontripping_current_ma": 19.5,
+  "first_tripping_positive_raw": 4,
+  "first_tripping_current_ma": 26,
+  "pure_boundary_checks": {
+    "19.5_gt20": false,
+    "20_gt20": false,
+    "26_gt20": true
+  },
+  "existing_recorded_pairs": [
+    {
+      "report": "CAL-085_fixture_stronger_contact_attempt1_20260917.json",
+      "all_phase_peak_abs_current_ma": 13.0,
+      "frames": 260,
+      "raw_current_above20_frames": 0,
+      "candidate_margin_to_recorded_peak_ma": 7.0
+    },
+    {
+      "report": "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json",
+      "all_phase_peak_abs_current_ma": 6.5,
+      "frames": 288,
+      "raw_current_above20_frames": 0,
+      "candidate_margin_to_recorded_peak_ma": 13.5
+    }
+  ],
+  "cannot_write_hard20_alone": true,
+  "profile_written": false,
+  "eeprom_written": false,
+  "new_motion_commands": 0,
+  "hardware_stop_response_verified": false,
+  "fruit_damage_boundary_verified": false,
+  "limitations": "Candidate20 applies only together with candidate contact10; cannot replace450 while current contact220. No overload stall or deliberate current escalation. Recorded peak13 supports normal-data non-trigger only, not stop latency/fruit force/thermal/controller protection/15pct_s operation."
+}

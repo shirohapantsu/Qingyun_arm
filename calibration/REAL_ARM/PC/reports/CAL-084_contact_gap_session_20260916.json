@@ -1,0 +1,218 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-084",
+  "status": "CONFIRMED_DEMO_REFERENCE_COORDINATE",
+  "contact_band_distance_from_each_fingertip_mm": 10,
+  "sample_role": "operator_selected_minimum_contact_width",
+  "profile_sha256": "1f1e305912fb367eb4215c6a502b03c6f653d7eef65a0163b7b87a8ee4d90d8f",
+  "preflight": {
+    "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+    "resolved_port": "/dev/ttyACM0",
+    "usb_identity": {
+      "vid": "1a86",
+      "pid": "55d3",
+      "serial": "5B14114904"
+    },
+    "ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "models": [
+      777,
+      777,
+      777,
+      777,
+      777,
+      777
+    ],
+    "torque_before": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_after": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "positions_raw": [
+      2156,
+      989,
+      3082,
+      2756,
+      2045,
+      1611
+    ],
+    "positions_are_contact_samples": false
+  },
+  "contact_placements": [
+    {
+      "sample_role": "minimum",
+      "repeat": 1,
+      "operator_measured_gap_mm": 18.2,
+      "gripper_raw": 1663,
+      "gripper_pct": 11.7310443490701,
+      "reference_gap_m": 0.024099570815450645,
+      "actual_gap_m": 0.0182,
+      "pose_held_through_capture_confirmed": true,
+      "accepted_contact_observation": true,
+      "report": "CAL-084_minimum_contact_repeat1_20260916.json",
+      "accepted_for_profile_fit": true,
+      "reason": "Operator-confirmed first contact; physical and gap-table reference coordinates explicitly separated and fitter integration checked",
+      "contact_label": "first_contact",
+      "contact_band_distance_from_each_fingertip_mm": 10
+    },
+    {
+      "sample_role": "minimum",
+      "repeat": 2,
+      "contact_band_distance_from_each_fingertip_mm": 10,
+      "operator_measured_gap_mm": 18,
+      "gripper_raw": 1651,
+      "gripper_pct": 10.872675250357654,
+      "actual_gap_m": 0.018,
+      "reference_gap_m": 0.02303862660944206,
+      "pose_held_through_capture_confirmed": true,
+      "accepted_contact_observation": true,
+      "pose_readiness_inferred_from_measurement_reply": true,
+      "report": "CAL-084_minimum_contact_repeat2_20260916.json",
+      "accepted_for_profile_fit": true,
+      "reason": "Operator-confirmed first contact; physical and gap-table reference coordinates explicitly separated and fitter integration checked",
+      "contact_label": "first_contact"
+    },
+    {
+      "sample_role": "minimum",
+      "repeat": 3,
+      "contact_band_distance_from_each_fingertip_mm": 10,
+      "operator_measured_gap_mm": 19.1,
+      "gripper_raw": 1661,
+      "gripper_pct": 11.587982832618026,
+      "actual_gap_m": 0.019100000000000002,
+      "reference_gap_m": 0.023922746781115882,
+      "pose_held_through_capture_confirmed": true,
+      "accepted_contact_observation": true,
+      "pose_readiness_inferred_from_measurement_reply": true,
+      "report": "CAL-084_minimum_contact_repeat3_20260916.json",
+      "accepted_for_profile_fit": true,
+      "reason": "Operator-confirmed first contact; physical and gap-table reference coordinates explicitly separated and fitter integration checked",
+      "contact_label": "first_contact"
+    },
+    {
+      "sample_role": "maximum",
+      "repeat": 1,
+      "contact_band_distance_from_each_fingertip_mm": 20,
+      "operator_measured_gap_mm": 40.4,
+      "gripper_raw": 1854,
+      "gripper_pct": 25.393419170243206,
+      "actual_gap_m": 0.0404,
+      "reference_gap_m": 0.04098311874105866,
+      "pose_held_through_capture_confirmed": true,
+      "pose_readiness_inferred_from_measurement_reply": true,
+      "report": "CAL-084_maximum_contact_repeat1_20260916.json",
+      "accepted_for_profile_fit": true,
+      "reason": "Operator-confirmed first contact; physical and gap-table reference coordinates explicitly separated and fitter integration checked",
+      "accepted_contact_observation": true,
+      "contact_label": "first_contact"
+    },
+    {
+      "sample_role": "maximum",
+      "repeat": 2,
+      "contact_band_distance_from_each_fingertip_mm": 20,
+      "operator_measured_gap_mm": 39.5,
+      "gripper_raw": 1836,
+      "gripper_pct": 24.105865522174536,
+      "actual_gap_m": 0.0395,
+      "reference_gap_m": 0.03939484978540773,
+      "pose_held_through_capture_confirmed": true,
+      "pose_readiness_inferred_from_measurement_reply": true,
+      "report": "CAL-084_maximum_contact_repeat2_20260916.json",
+      "accepted_for_profile_fit": true,
+      "reason": "Operator-confirmed first contact; physical and gap-table reference coordinates explicitly separated and fitter integration checked",
+      "accepted_contact_observation": true,
+      "contact_label": "first_contact"
+    },
+    {
+      "sample_role": "maximum",
+      "repeat": 3,
+      "contact_band_distance_from_each_fingertip_mm": 20,
+      "operator_measured_gap_mm": 39.8,
+      "gripper_raw": 1842,
+      "gripper_pct": 24.53505007153076,
+      "actual_gap_m": 0.039799999999999995,
+      "reference_gap_m": 0.03992532188841202,
+      "pose_held_through_capture_confirmed": true,
+      "pose_readiness_inferred_from_measurement_reply": true,
+      "report": "CAL-084_maximum_contact_repeat3_20260916.json",
+      "accepted_for_profile_fit": true,
+      "reason": "Operator-confirmed first contact; physical and gap-table reference coordinates explicitly separated and fitter integration checked",
+      "accepted_contact_observation": true,
+      "contact_label": "first_contact"
+    }
+  ],
+  "candidate_basis": "Confirmed observed reference extrema plus/minus 1mm demo engineering margin, outward quantization to 0.1mm; not certified uncertainty",
+  "minimum_summary_confirmed": {
+    "repeats": 3,
+    "direct_gap_range_mm": [
+      18,
+      19.1
+    ],
+    "raw_range": [
+      1651,
+      1663
+    ],
+    "raw_span": 12,
+    "pct_range": [
+      10.872675250357654,
+      11.7310443490701
+    ],
+    "reference_gap_range_mm": [
+      23.03862660944206,
+      24.099570815450644
+    ]
+  },
+  "gap_table_measurement_plane_mm_behind_hard_fingertip": 20,
+  "reference_plane_mismatch": true,
+  "operator_geometry_explanation": "small targets require contact near 10mm to avoid fingertip interference with operating plane; large targets can contact near 20mm",
+  "contact_strategy": "record actual target-dependent contact bands; use existing 20mm gap table only as a common opening-coordinate reference for contact gating",
+  "pending_operator_direction": "CAL-085 preliminary contact-test material selection",
+  "write_instructions_sent": 0,
+  "motion_instructions_sent": 0,
+  "profile_written": true,
+  "eeprom_written": false,
+  "profile_sha256_after_integration": "1ea15d62d288bc02f56ccabe09593f60d68ad3fd6f5f37632589995dc7c18bb4",
+  "maximum_summary_confirmed": {
+    "repeats": 3,
+    "direct_gap_range_mm": [
+      39.5,
+      40.4
+    ],
+    "raw_range": [
+      1836,
+      1854
+    ],
+    "raw_span": 18,
+    "pct_range": [
+      24.105865522174536,
+      25.393419170243206
+    ],
+    "reference_gap_range_mm": [
+      39.39484978540773,
+      40.98311874105866
+    ]
+  },
+  "selected_reference_gap_range_m": [
+    0.022,
+    0.042
+  ],
+  "integration": "Reference-coordinate fitter implemented; all six mappings and complete configuration checked; regression tests queued for contact subgroup closure",
+  "reference_plane_handling": "Actual contact planes may differ; no physical gap equality is assumed"
+}

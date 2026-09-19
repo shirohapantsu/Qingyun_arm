@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-064",
+  "status": "CONFIRMED",
+  "completed_at": "2026-09-16T11:44:51+08:00",
+  "parameter": "motion.following_error_deg",
+  "method": "Deduplicate passed CAL-058 and CAL-059 trajectories, compute per-axis maximum absolute command-feedback error over all normal samples, add three encoder counts, and round upward to 0.1 degree. Replay samples in time order against the current 0.10 s dwell rule.",
+  "scope": "current demo motion family at 12 V, including unloaded and 92.4 g loaded tests",
+  "source_raw": [
+    {
+      "path": "../raw/cal058_joint_velocity_unloaded_20260915.jsonl",
+      "sha256": "edcddd37541a0da3f8ffb85b2d674d004abd4ee924633b1ca49b1af943c8e933"
+    },
+    {
+      "path": "../raw/cal058_joint_velocity_92p4g_attempt2_20260915.jsonl",
+      "sha256": "1ddbfa92a1a97f1bc72c5bd7db1b1ddf2492e77b4673f5263c8b2b26d5645965"
+    },
+    {
+      "path": "../raw/cal058_joint_velocity_92p4g_attempt3_20260915.jsonl",
+      "sha256": "9a7c65506741ca3daf3b3ee84a055d7717dda6ad392477bcdbd44cdc5d775e29"
+    },
+    {
+      "path": "../raw/cal059_joint_acceleration_92p4g_attempt2_20260915.jsonl",
+      "sha256": "049a16b0e76bd507cd29c64f454b83b3ca976b98c69c50b78cbf04b8dae4ca31"
+    }
+  ],
+  "deduplication": {
+    "rule": "CAL-058 attempt3 replaces the overlapping passed trajectory from attempt2; failed rows are excluded.",
+    "CAL-058_unloaded_trajectories": 30,
+    "CAL-058_loaded_unique_trajectories": 30,
+    "CAL-059_loaded_trajectories": 30,
+    "total_unique_trajectories": 90,
+    "total_passed_sample_rows": 4997
+  },
+  "statistics": {
+    "p95_deg": [
+      1.6575309631786366,
+      2.593632624081451,
+      2.730480127105836,
+      1.3473163600016071,
+      1.5981691569835008
+    ],
+    "p99_deg": [
+      3.3257524468783943,
+      4.057130017908524,
+      4.495255126873198,
+      2.9794684681783346,
+      3.2048540514298947
+    ],
+    "max_deg": [
+      4.720929250463993,
+      6.892135994316671,
+      6.43010327572668,
+      4.552298901098908,
+      4.592088793881192
+    ],
+    "three_count_margin_deg": [
+      0.263671875,
+      0.263671875,
+      0.263671875,
+      0.263671875,
+      0.263671875
+    ]
+  },
+  "fit": {
+    "obsolete_rule": "P99 * 2 + 3 degrees",
+    "obsolete_rule_issue": "The arbitrary multiplier and additive offset can exceed every observed normal error and has no independent physical safety basis.",
+    "rule": "ceil((normal_passed_max + 3 counts) * 10) / 10",
+    "before_deg": [12.0, 12.0, 12.0, 12.0, 12.0],
+    "after_deg": [5.0, 7.2, 6.7, 4.9, 4.9]
+  },
+  "temporal_replay_before_write": {
+    "following_error_dwell_s": 0.1,
+    "sample_rows": 4997,
+    "samples_above_candidate": 0,
+    "soft_dwell_trip_events": 0,
+    "result": "PASS"
+  },
+  "fit_correction": {
+    "function": "scripts.calibrate._derive_following_error_tolerance",
+    "regression_test": "test_motion普通跟踪误差用通过样本最大值加编码余量"
+  },
+  "profile_sha256_before": "cce0103646ec3d963b709ab7c5955e6e16ad97ae65fd9fc591e161ae4585541d",
+  "profile_sha256_after": "762cb64d4063a925e9f2af7e582ffb0a0fe2a5c72e87a0f10ddfaf38f602be1e",
+  "profile_written": true,
+  "hardware_accessed_for_this_derivation": false,
+  "eeprom_written": false,
+  "post_write_verification": {
+    "physical_sample_rows_replayed": 4997,
+    "rows_with_any_axis_above_configured_threshold": 0,
+    "focused_tests_passed": 2,
+    "focused_tests_failed": 0,
+    "severe_simulated_lag_still_triggers_tracking_error": true,
+    "full_motion_group_regression": "deferred until CAL-063 through CAL-070 form a complete group, per operator instruction",
+    "result": "PASS"
+  },
+  "downstream": {
+    "CAL-065": "independently establish immediate hard following-error protection; do not accept an arbitrary multiple as a safety claim",
+    "CAL-066": "calibrate the sustained-error dwell using temporal behavior"
+  }
+}

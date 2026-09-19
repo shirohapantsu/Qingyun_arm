@@ -1,0 +1,543 @@
+{
+  "schema_version": 1,
+  "parameter_ids": [
+    "CAL-091",
+    "CAL-092"
+  ],
+  "status": "CONDITIONAL_DEMO_FIT_PENDING_OPERATOR_OBSERVATION",
+  "cycles": [
+    {
+      "repeat": 1,
+      "report": "CAL-091_092_empty_timing_repeat1_attempt1_20260917.json",
+      "source_sha256": "96e25a444afe2eaf0360b6fa829c26ba6b5c4c9fab3fa508cd46a487435e617d",
+      "status": "PASS_PENDING_OPERATOR_OBSERVATION",
+      "result": {
+        "opening_s": 3.5343837340187747,
+        "closing_s": 3.902252086001681,
+        "peak_abs_current_ma": 13,
+        "max_open_tracking_error_raw": 99,
+        "max_close_tracking_error_raw": 59
+      },
+      "opening_result": {
+        "runtime_completion_elapsed_s": 3.5343837340187747,
+        "strict_completion_elapsed_s": 3.5343837340187747,
+        "final_position_raw": 2264,
+        "final_feedback_pct": 54.72103004291846,
+        "final_velocity_pct_s": 0
+      },
+      "closing_result": {
+        "empty_gate_elapsed_s": 3.902252086001681,
+        "final_position_raw": 1514,
+        "final_feedback_pct": 1.0729613733905579,
+        "last_command_raw": 1499,
+        "closed_command_floor_reached": true,
+        "hold_added": false
+      },
+      "powered_duration_s": 7.436887381016277,
+      "gripper_motion_commands_sent": 223,
+      "gripper_position_after_torque_off_raw": 1511,
+      "operator_observation": null,
+      "sram_settings_after": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "original_sram_settings": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline": {
+        "raw_position_by_sample": [
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1500
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1500
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1500
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1500
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1500
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1500
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1500
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1500
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1500
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1500
+          ]
+        ],
+        "raw_position_static_span": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "torque_enabled_after": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "arm_deviation_from_reference_raw": [
+        1,
+        0,
+        1,
+        6,
+        0
+      ],
+      "started_at": "2026-09-17T18:29:44.425993+08:00",
+      "finished_at": "2026-09-17T18:29:52.724151+08:00"
+    },
+    {
+      "repeat": 2,
+      "report": "CAL-091_092_empty_timing_repeat2_attempt1_20260917.json",
+      "source_sha256": "d3abcaa5e14110cb449f6036114daa41debc44cbe938fc643b9709811cfb6881",
+      "status": "PASS_PENDING_OPERATOR_OBSERVATION",
+      "result": {
+        "opening_s": 3.5011613089882303,
+        "closing_s": 3.903568847978022,
+        "peak_abs_current_ma": 13,
+        "max_open_tracking_error_raw": 98,
+        "max_close_tracking_error_raw": 59
+      },
+      "opening_result": {
+        "runtime_completion_elapsed_s": 3.5011613089882303,
+        "strict_completion_elapsed_s": 3.5011613089882303,
+        "final_position_raw": 2264,
+        "final_feedback_pct": 54.72103004291846,
+        "final_velocity_pct_s": 0
+      },
+      "closing_result": {
+        "empty_gate_elapsed_s": 3.903568847978022,
+        "final_position_raw": 1515,
+        "final_feedback_pct": 1.1444921316165952,
+        "last_command_raw": 1499,
+        "closed_command_floor_reached": true,
+        "hold_added": false
+      },
+      "powered_duration_s": 7.405057383002713,
+      "gripper_motion_commands_sent": 222,
+      "gripper_position_after_torque_off_raw": 1512,
+      "operator_observation": null,
+      "sram_settings_after": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "original_sram_settings": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline": {
+        "raw_position_by_sample": [
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1511
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1511
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1511
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1511
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1511
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1511
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1511
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1511
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1511
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1511
+          ]
+        ],
+        "raw_position_static_span": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "torque_enabled_after": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "arm_deviation_from_reference_raw": [
+        1,
+        0,
+        1,
+        6,
+        0
+      ],
+      "started_at": "2026-09-17T18:30:10.515851+08:00",
+      "finished_at": "2026-09-17T18:30:18.770150+08:00"
+    },
+    {
+      "repeat": 3,
+      "report": "CAL-091_092_empty_timing_repeat3_attempt1_20260917.json",
+      "source_sha256": "1dfa8934e6398b73270fde35f99bbbc7f5d4ba26cf31a0ae2b32eacd660b5b48",
+      "status": "PASS_PENDING_OPERATOR_OBSERVATION",
+      "result": {
+        "opening_s": 3.466794559994014,
+        "closing_s": 3.9018542840203736,
+        "peak_abs_current_ma": 13,
+        "max_open_tracking_error_raw": 99,
+        "max_close_tracking_error_raw": 59
+      },
+      "opening_result": {
+        "runtime_completion_elapsed_s": 3.466794559994014,
+        "strict_completion_elapsed_s": 3.466794559994014,
+        "final_position_raw": 2263,
+        "final_feedback_pct": 54.64949928469242,
+        "final_velocity_pct_s": 0
+      },
+      "closing_result": {
+        "empty_gate_elapsed_s": 3.9018542840203736,
+        "final_position_raw": 1514,
+        "final_feedback_pct": 1.0729613733905579,
+        "last_command_raw": 1499,
+        "closed_command_floor_reached": true,
+        "hold_added": false
+      },
+      "powered_duration_s": 7.368910074001178,
+      "gripper_motion_commands_sent": 221,
+      "gripper_position_after_torque_off_raw": 1511,
+      "operator_observation": null,
+      "sram_settings_after": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "original_sram_settings": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "baseline": {
+        "raw_position_by_sample": [
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1512
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1512
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1512
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1512
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1512
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1512
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1512
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1512
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1512
+          ],
+          [
+            842,
+            921,
+            3086,
+            2390,
+            2042,
+            1512
+          ]
+        ],
+        "raw_position_static_span": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "torque_enabled_after": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "arm_deviation_from_reference_raw": [
+        1,
+        0,
+        1,
+        6,
+        0
+      ],
+      "started_at": "2026-09-17T18:31:32.817979+08:00",
+      "finished_at": "2026-09-17T18:31:41.036836+08:00"
+    }
+  ],
+  "conditional_fit": {
+    "opening": {
+      "observed_completion_s": [
+        3.5343837340187747,
+        3.5011613089882303,
+        3.466794559994014
+      ],
+      "max_observed_completion_s": 3.5343837340187747,
+      "engineering_margin_s": 0.706876746803755,
+      "conditional_timeout_candidate_s": 4.3,
+      "current_timeout_s": 6
+    },
+    "closing": {
+      "observed_completion_s": [
+        3.902252086001681,
+        3.903568847978022,
+        3.9018542840203736
+      ],
+      "max_observed_completion_s": 3.903568847978022,
+      "engineering_margin_s": 0.7807137695956045,
+      "conditional_timeout_candidate_s": 4.7,
+      "current_timeout_s": 6
+    }
+  },
+  "new_gripper_goals": 666,
+  "cumulative_gripper_goals": 5644,
+  "profile_sha256_unchanged": "aabb213608b99f707433f1c7add925fcd7b0972c53aafbb7acdacee83a6af85d",
+  "checks": "ranges/deadlines/current/tracking/empty_gate/all_off/restore/monotonic_timestamps PASS",
+  "operator_observation_pending_repeats": [
+    1,
+    2,
+    3
+  ],
+  "engineering_formula": "Per direction ceil_to0.1s(max actual completion + max(0.5s,20%max actual completion))",
+  "new_arm_goals": 0,
+  "eeprom_written": false,
+  "profile_written": false,
+  "full_tests_run": false,
+  "profile_status": "draft",
+  "verification": null,
+  "limitations": [
+    "Three EMPTY-only cycles, independently supported torque-off arms; not force/slip/fruit/release/contact branch certification.",
+    "Opening actual55pct goals only, initial raw1500/1511/1512; not full100pct or exact every intermediate target worst-time evidence.",
+    "Opening criterion depends on current uncalibrated gripper.settle_tol_pct2 and settle_speed_pct_s3 plus diagnostic5raw/speed0 and0.15s dwell; changing criteria requires timing re-review.",
+    "Closing stops on first feedback<=1.21pct, no terminal pressure hold. All three command floor1499was reached before feedback gate; this does not justify extra closed hold.",
+    "Command speeds20/15pct_s, test SRAM5/0/0/500 and readonly controller/current quantization apply only this configuration.",
+    "Candidate margins are engineering allowances, not proven worst-case safety bounds; never integrate one global full-domain timeout from these partial-domain empty traces.",
+    "Historical CAL-ISSUE-044 axis2raw862 below865 remains OPEN; jaw-only consistency does not certify arm-motion effective limit domain.",
+    "No production gate bypass or full tests; current profile open/close6s unchanged until operator review."
+  ]
+}

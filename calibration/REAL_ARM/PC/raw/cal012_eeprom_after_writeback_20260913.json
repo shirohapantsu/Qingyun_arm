@@ -1,0 +1,1302 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-108",
+  "captured_at": "2026-09-13T11:46:33.955636+08:00",
+  "source": "hardware_read_only",
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256": "74257b89751fea1ce41eec5558e79d4593be2419635de42cec504f7f78eae28b",
+  "motor_calibration": "calibration/REAL_ARM/PC/motor_calibration.json",
+  "motor_calibration_sha256": "ad315322ad4d19cc322c8f21d86d9667d9df9eca2de325bebbd72fa62deefff5",
+  "control_table": "libs/so_arm_core/motors/feetech/tables.py",
+  "control_table_sha256": "71f7f7beb17169781bd26a33b165ed4c5c3df7b9c477d36860f9d6011eb00428",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_in_workspace"
+  },
+  "torque_enabled_by_motor": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "identity_checks": [
+    {
+      "name": "shoulder_pan",
+      "configured_id": 1,
+      "id_matches": true,
+      "model_number": 777,
+      "model_matches_sts3215": true,
+      "firmware": "3.10",
+      "firmware_matches_profile": true
+    },
+    {
+      "name": "shoulder_lift",
+      "configured_id": 2,
+      "id_matches": true,
+      "model_number": 777,
+      "model_matches_sts3215": true,
+      "firmware": "3.10",
+      "firmware_matches_profile": true
+    },
+    {
+      "name": "elbow_flex",
+      "configured_id": 3,
+      "id_matches": true,
+      "model_number": 777,
+      "model_matches_sts3215": true,
+      "firmware": "3.10",
+      "firmware_matches_profile": true
+    },
+    {
+      "name": "wrist_flex",
+      "configured_id": 4,
+      "id_matches": true,
+      "model_number": 777,
+      "model_matches_sts3215": true,
+      "firmware": "3.10",
+      "firmware_matches_profile": true
+    },
+    {
+      "name": "wrist_roll",
+      "configured_id": 5,
+      "id_matches": true,
+      "model_number": 777,
+      "model_matches_sts3215": true,
+      "firmware": "3.10",
+      "firmware_matches_profile": true
+    },
+    {
+      "name": "gripper",
+      "configured_id": 6,
+      "id_matches": true,
+      "model_number": 777,
+      "model_matches_sts3215": true,
+      "firmware": "3.10",
+      "firmware_matches_profile": true
+    }
+  ],
+  "motors": [
+    {
+      "name": "shoulder_pan",
+      "configured_id": 1,
+      "model": "sts3215",
+      "eeprom_start": 0,
+      "eeprom_length": 40,
+      "raw_hex": "030a00090301000001ce02600d468c28e8030c2c2f10200010000101360101b6090014c8500ac8c8",
+      "registers": {
+        "Firmware_Major_Version": {
+          "address": 0,
+          "length": 1,
+          "raw": 3,
+          "decoded": 3
+        },
+        "Firmware_Minor_Version": {
+          "address": 1,
+          "length": 1,
+          "raw": 10,
+          "decoded": 10
+        },
+        "Model_Number": {
+          "address": 3,
+          "length": 2,
+          "raw": 777,
+          "decoded": 777
+        },
+        "ID": {
+          "address": 5,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "Baud_Rate": {
+          "address": 6,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Return_Delay_Time": {
+          "address": 7,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Response_Status_Level": {
+          "address": 8,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "Min_Position_Limit": {
+          "address": 9,
+          "length": 2,
+          "raw": 718,
+          "decoded": 718
+        },
+        "Max_Position_Limit": {
+          "address": 11,
+          "length": 2,
+          "raw": 3424,
+          "decoded": 3424
+        },
+        "Max_Temperature_Limit": {
+          "address": 13,
+          "length": 1,
+          "raw": 70,
+          "decoded": 70
+        },
+        "Max_Voltage_Limit": {
+          "address": 14,
+          "length": 1,
+          "raw": 140,
+          "decoded": 140
+        },
+        "Min_Voltage_Limit": {
+          "address": 15,
+          "length": 1,
+          "raw": 40,
+          "decoded": 40
+        },
+        "Max_Torque_Limit": {
+          "address": 16,
+          "length": 2,
+          "raw": 1000,
+          "decoded": 1000
+        },
+        "Phase": {
+          "address": 18,
+          "length": 1,
+          "raw": 12,
+          "decoded": 12
+        },
+        "Unloading_Condition": {
+          "address": 19,
+          "length": 1,
+          "raw": 44,
+          "decoded": 44
+        },
+        "LED_Alarm_Condition": {
+          "address": 20,
+          "length": 1,
+          "raw": 47,
+          "decoded": 47
+        },
+        "P_Coefficient": {
+          "address": 21,
+          "length": 1,
+          "raw": 16,
+          "decoded": 16
+        },
+        "D_Coefficient": {
+          "address": 22,
+          "length": 1,
+          "raw": 32,
+          "decoded": 32
+        },
+        "I_Coefficient": {
+          "address": 23,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Minimum_Startup_Force": {
+          "address": 24,
+          "length": 2,
+          "raw": 16,
+          "decoded": 16
+        },
+        "CW_Dead_Zone": {
+          "address": 26,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "CCW_Dead_Zone": {
+          "address": 27,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "Protection_Current": {
+          "address": 28,
+          "length": 2,
+          "raw": 310,
+          "decoded": 310
+        },
+        "Angular_Resolution": {
+          "address": 30,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "Homing_Offset": {
+          "address": 31,
+          "length": 2,
+          "raw": 2486,
+          "decoded": -438
+        },
+        "Operating_Mode": {
+          "address": 33,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Protective_Torque": {
+          "address": 34,
+          "length": 1,
+          "raw": 20,
+          "decoded": 20
+        },
+        "Protection_Time": {
+          "address": 35,
+          "length": 1,
+          "raw": 200,
+          "decoded": 200
+        },
+        "Overload_Torque": {
+          "address": 36,
+          "length": 1,
+          "raw": 80,
+          "decoded": 80
+        },
+        "Velocity_closed_loop_P_proportional_coefficient": {
+          "address": 37,
+          "length": 1,
+          "raw": 10,
+          "decoded": 10
+        },
+        "Over_Current_Protection_Time": {
+          "address": 38,
+          "length": 1,
+          "raw": 200,
+          "decoded": 200
+        },
+        "Velocity_closed_loop_I_integral_coefficient": {
+          "address": 39,
+          "length": 1,
+          "raw": 200,
+          "decoded": 200
+        }
+      }
+    },
+    {
+      "name": "shoulder_lift",
+      "configured_id": 2,
+      "model": "sts3215",
+      "eeprom_start": 0,
+      "eeprom_length": 40,
+      "raw_hex": "030a000903020000016103050d468c28e8030c2c2f10200010000101360101a90f0014c8500ac8c8",
+      "registers": {
+        "Firmware_Major_Version": {
+          "address": 0,
+          "length": 1,
+          "raw": 3,
+          "decoded": 3
+        },
+        "Firmware_Minor_Version": {
+          "address": 1,
+          "length": 1,
+          "raw": 10,
+          "decoded": 10
+        },
+        "Model_Number": {
+          "address": 3,
+          "length": 2,
+          "raw": 777,
+          "decoded": 777
+        },
+        "ID": {
+          "address": 5,
+          "length": 1,
+          "raw": 2,
+          "decoded": 2
+        },
+        "Baud_Rate": {
+          "address": 6,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Return_Delay_Time": {
+          "address": 7,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Response_Status_Level": {
+          "address": 8,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "Min_Position_Limit": {
+          "address": 9,
+          "length": 2,
+          "raw": 865,
+          "decoded": 865
+        },
+        "Max_Position_Limit": {
+          "address": 11,
+          "length": 2,
+          "raw": 3333,
+          "decoded": 3333
+        },
+        "Max_Temperature_Limit": {
+          "address": 13,
+          "length": 1,
+          "raw": 70,
+          "decoded": 70
+        },
+        "Max_Voltage_Limit": {
+          "address": 14,
+          "length": 1,
+          "raw": 140,
+          "decoded": 140
+        },
+        "Min_Voltage_Limit": {
+          "address": 15,
+          "length": 1,
+          "raw": 40,
+          "decoded": 40
+        },
+        "Max_Torque_Limit": {
+          "address": 16,
+          "length": 2,
+          "raw": 1000,
+          "decoded": 1000
+        },
+        "Phase": {
+          "address": 18,
+          "length": 1,
+          "raw": 12,
+          "decoded": 12
+        },
+        "Unloading_Condition": {
+          "address": 19,
+          "length": 1,
+          "raw": 44,
+          "decoded": 44
+        },
+        "LED_Alarm_Condition": {
+          "address": 20,
+          "length": 1,
+          "raw": 47,
+          "decoded": 47
+        },
+        "P_Coefficient": {
+          "address": 21,
+          "length": 1,
+          "raw": 16,
+          "decoded": 16
+        },
+        "D_Coefficient": {
+          "address": 22,
+          "length": 1,
+          "raw": 32,
+          "decoded": 32
+        },
+        "I_Coefficient": {
+          "address": 23,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Minimum_Startup_Force": {
+          "address": 24,
+          "length": 2,
+          "raw": 16,
+          "decoded": 16
+        },
+        "CW_Dead_Zone": {
+          "address": 26,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "CCW_Dead_Zone": {
+          "address": 27,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "Protection_Current": {
+          "address": 28,
+          "length": 2,
+          "raw": 310,
+          "decoded": 310
+        },
+        "Angular_Resolution": {
+          "address": 30,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "Homing_Offset": {
+          "address": 31,
+          "length": 2,
+          "raw": 4009,
+          "decoded": -1961
+        },
+        "Operating_Mode": {
+          "address": 33,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Protective_Torque": {
+          "address": 34,
+          "length": 1,
+          "raw": 20,
+          "decoded": 20
+        },
+        "Protection_Time": {
+          "address": 35,
+          "length": 1,
+          "raw": 200,
+          "decoded": 200
+        },
+        "Overload_Torque": {
+          "address": 36,
+          "length": 1,
+          "raw": 80,
+          "decoded": 80
+        },
+        "Velocity_closed_loop_P_proportional_coefficient": {
+          "address": 37,
+          "length": 1,
+          "raw": 10,
+          "decoded": 10
+        },
+        "Over_Current_Protection_Time": {
+          "address": 38,
+          "length": 1,
+          "raw": 200,
+          "decoded": 200
+        },
+        "Velocity_closed_loop_I_integral_coefficient": {
+          "address": 39,
+          "length": 1,
+          "raw": 200,
+          "decoded": 200
+        }
+      }
+    },
+    {
+      "name": "elbow_flex",
+      "configured_id": 3,
+      "model": "sts3215",
+      "eeprom_start": 0,
+      "eeprom_length": 40,
+      "raw_hex": "030a000903030000011c03170c468c28e8030c2c2f10200010000101360101ff060014c8500ac8c8",
+      "registers": {
+        "Firmware_Major_Version": {
+          "address": 0,
+          "length": 1,
+          "raw": 3,
+          "decoded": 3
+        },
+        "Firmware_Minor_Version": {
+          "address": 1,
+          "length": 1,
+          "raw": 10,
+          "decoded": 10
+        },
+        "Model_Number": {
+          "address": 3,
+          "length": 2,
+          "raw": 777,
+          "decoded": 777
+        },
+        "ID": {
+          "address": 5,
+          "length": 1,
+          "raw": 3,
+          "decoded": 3
+        },
+        "Baud_Rate": {
+          "address": 6,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Return_Delay_Time": {
+          "address": 7,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Response_Status_Level": {
+          "address": 8,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "Min_Position_Limit": {
+          "address": 9,
+          "length": 2,
+          "raw": 796,
+          "decoded": 796
+        },
+        "Max_Position_Limit": {
+          "address": 11,
+          "length": 2,
+          "raw": 3095,
+          "decoded": 3095
+        },
+        "Max_Temperature_Limit": {
+          "address": 13,
+          "length": 1,
+          "raw": 70,
+          "decoded": 70
+        },
+        "Max_Voltage_Limit": {
+          "address": 14,
+          "length": 1,
+          "raw": 140,
+          "decoded": 140
+        },
+        "Min_Voltage_Limit": {
+          "address": 15,
+          "length": 1,
+          "raw": 40,
+          "decoded": 40
+        },
+        "Max_Torque_Limit": {
+          "address": 16,
+          "length": 2,
+          "raw": 1000,
+          "decoded": 1000
+        },
+        "Phase": {
+          "address": 18,
+          "length": 1,
+          "raw": 12,
+          "decoded": 12
+        },
+        "Unloading_Condition": {
+          "address": 19,
+          "length": 1,
+          "raw": 44,
+          "decoded": 44
+        },
+        "LED_Alarm_Condition": {
+          "address": 20,
+          "length": 1,
+          "raw": 47,
+          "decoded": 47
+        },
+        "P_Coefficient": {
+          "address": 21,
+          "length": 1,
+          "raw": 16,
+          "decoded": 16
+        },
+        "D_Coefficient": {
+          "address": 22,
+          "length": 1,
+          "raw": 32,
+          "decoded": 32
+        },
+        "I_Coefficient": {
+          "address": 23,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Minimum_Startup_Force": {
+          "address": 24,
+          "length": 2,
+          "raw": 16,
+          "decoded": 16
+        },
+        "CW_Dead_Zone": {
+          "address": 26,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "CCW_Dead_Zone": {
+          "address": 27,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "Protection_Current": {
+          "address": 28,
+          "length": 2,
+          "raw": 310,
+          "decoded": 310
+        },
+        "Angular_Resolution": {
+          "address": 30,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "Homing_Offset": {
+          "address": 31,
+          "length": 2,
+          "raw": 1791,
+          "decoded": 1791
+        },
+        "Operating_Mode": {
+          "address": 33,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Protective_Torque": {
+          "address": 34,
+          "length": 1,
+          "raw": 20,
+          "decoded": 20
+        },
+        "Protection_Time": {
+          "address": 35,
+          "length": 1,
+          "raw": 200,
+          "decoded": 200
+        },
+        "Overload_Torque": {
+          "address": 36,
+          "length": 1,
+          "raw": 80,
+          "decoded": 80
+        },
+        "Velocity_closed_loop_P_proportional_coefficient": {
+          "address": 37,
+          "length": 1,
+          "raw": 10,
+          "decoded": 10
+        },
+        "Over_Current_Protection_Time": {
+          "address": 38,
+          "length": 1,
+          "raw": 200,
+          "decoded": 200
+        },
+        "Velocity_closed_loop_I_integral_coefficient": {
+          "address": 39,
+          "length": 1,
+          "raw": 200,
+          "decoded": 200
+        }
+      }
+    },
+    {
+      "name": "wrist_flex",
+      "configured_id": 4,
+      "model": "sts3215",
+      "eeprom_start": 0,
+      "eeprom_length": 40,
+      "raw_hex": "030a00090304000001d902780c468c28e8030c2c2f10200010000101360101030f0014c8500ac8c8",
+      "registers": {
+        "Firmware_Major_Version": {
+          "address": 0,
+          "length": 1,
+          "raw": 3,
+          "decoded": 3
+        },
+        "Firmware_Minor_Version": {
+          "address": 1,
+          "length": 1,
+          "raw": 10,
+          "decoded": 10
+        },
+        "Model_Number": {
+          "address": 3,
+          "length": 2,
+          "raw": 777,
+          "decoded": 777
+        },
+        "ID": {
+          "address": 5,
+          "length": 1,
+          "raw": 4,
+          "decoded": 4
+        },
+        "Baud_Rate": {
+          "address": 6,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Return_Delay_Time": {
+          "address": 7,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Response_Status_Level": {
+          "address": 8,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "Min_Position_Limit": {
+          "address": 9,
+          "length": 2,
+          "raw": 729,
+          "decoded": 729
+        },
+        "Max_Position_Limit": {
+          "address": 11,
+          "length": 2,
+          "raw": 3192,
+          "decoded": 3192
+        },
+        "Max_Temperature_Limit": {
+          "address": 13,
+          "length": 1,
+          "raw": 70,
+          "decoded": 70
+        },
+        "Max_Voltage_Limit": {
+          "address": 14,
+          "length": 1,
+          "raw": 140,
+          "decoded": 140
+        },
+        "Min_Voltage_Limit": {
+          "address": 15,
+          "length": 1,
+          "raw": 40,
+          "decoded": 40
+        },
+        "Max_Torque_Limit": {
+          "address": 16,
+          "length": 2,
+          "raw": 1000,
+          "decoded": 1000
+        },
+        "Phase": {
+          "address": 18,
+          "length": 1,
+          "raw": 12,
+          "decoded": 12
+        },
+        "Unloading_Condition": {
+          "address": 19,
+          "length": 1,
+          "raw": 44,
+          "decoded": 44
+        },
+        "LED_Alarm_Condition": {
+          "address": 20,
+          "length": 1,
+          "raw": 47,
+          "decoded": 47
+        },
+        "P_Coefficient": {
+          "address": 21,
+          "length": 1,
+          "raw": 16,
+          "decoded": 16
+        },
+        "D_Coefficient": {
+          "address": 22,
+          "length": 1,
+          "raw": 32,
+          "decoded": 32
+        },
+        "I_Coefficient": {
+          "address": 23,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Minimum_Startup_Force": {
+          "address": 24,
+          "length": 2,
+          "raw": 16,
+          "decoded": 16
+        },
+        "CW_Dead_Zone": {
+          "address": 26,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "CCW_Dead_Zone": {
+          "address": 27,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "Protection_Current": {
+          "address": 28,
+          "length": 2,
+          "raw": 310,
+          "decoded": 310
+        },
+        "Angular_Resolution": {
+          "address": 30,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "Homing_Offset": {
+          "address": 31,
+          "length": 2,
+          "raw": 3843,
+          "decoded": -1795
+        },
+        "Operating_Mode": {
+          "address": 33,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Protective_Torque": {
+          "address": 34,
+          "length": 1,
+          "raw": 20,
+          "decoded": 20
+        },
+        "Protection_Time": {
+          "address": 35,
+          "length": 1,
+          "raw": 200,
+          "decoded": 200
+        },
+        "Overload_Torque": {
+          "address": 36,
+          "length": 1,
+          "raw": 80,
+          "decoded": 80
+        },
+        "Velocity_closed_loop_P_proportional_coefficient": {
+          "address": 37,
+          "length": 1,
+          "raw": 10,
+          "decoded": 10
+        },
+        "Over_Current_Protection_Time": {
+          "address": 38,
+          "length": 1,
+          "raw": 200,
+          "decoded": 200
+        },
+        "Velocity_closed_loop_I_integral_coefficient": {
+          "address": 39,
+          "length": 1,
+          "raw": 200,
+          "decoded": 200
+        }
+      }
+    },
+    {
+      "name": "wrist_roll",
+      "configured_id": 5,
+      "model": "sts3215",
+      "eeprom_start": 0,
+      "eeprom_length": 40,
+      "raw_hex": "030a000903050000010000ff0f468c28e8030c2c2f1020001000010136010137040014c8500ac8c8",
+      "registers": {
+        "Firmware_Major_Version": {
+          "address": 0,
+          "length": 1,
+          "raw": 3,
+          "decoded": 3
+        },
+        "Firmware_Minor_Version": {
+          "address": 1,
+          "length": 1,
+          "raw": 10,
+          "decoded": 10
+        },
+        "Model_Number": {
+          "address": 3,
+          "length": 2,
+          "raw": 777,
+          "decoded": 777
+        },
+        "ID": {
+          "address": 5,
+          "length": 1,
+          "raw": 5,
+          "decoded": 5
+        },
+        "Baud_Rate": {
+          "address": 6,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Return_Delay_Time": {
+          "address": 7,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Response_Status_Level": {
+          "address": 8,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "Min_Position_Limit": {
+          "address": 9,
+          "length": 2,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Max_Position_Limit": {
+          "address": 11,
+          "length": 2,
+          "raw": 4095,
+          "decoded": 4095
+        },
+        "Max_Temperature_Limit": {
+          "address": 13,
+          "length": 1,
+          "raw": 70,
+          "decoded": 70
+        },
+        "Max_Voltage_Limit": {
+          "address": 14,
+          "length": 1,
+          "raw": 140,
+          "decoded": 140
+        },
+        "Min_Voltage_Limit": {
+          "address": 15,
+          "length": 1,
+          "raw": 40,
+          "decoded": 40
+        },
+        "Max_Torque_Limit": {
+          "address": 16,
+          "length": 2,
+          "raw": 1000,
+          "decoded": 1000
+        },
+        "Phase": {
+          "address": 18,
+          "length": 1,
+          "raw": 12,
+          "decoded": 12
+        },
+        "Unloading_Condition": {
+          "address": 19,
+          "length": 1,
+          "raw": 44,
+          "decoded": 44
+        },
+        "LED_Alarm_Condition": {
+          "address": 20,
+          "length": 1,
+          "raw": 47,
+          "decoded": 47
+        },
+        "P_Coefficient": {
+          "address": 21,
+          "length": 1,
+          "raw": 16,
+          "decoded": 16
+        },
+        "D_Coefficient": {
+          "address": 22,
+          "length": 1,
+          "raw": 32,
+          "decoded": 32
+        },
+        "I_Coefficient": {
+          "address": 23,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Minimum_Startup_Force": {
+          "address": 24,
+          "length": 2,
+          "raw": 16,
+          "decoded": 16
+        },
+        "CW_Dead_Zone": {
+          "address": 26,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "CCW_Dead_Zone": {
+          "address": 27,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "Protection_Current": {
+          "address": 28,
+          "length": 2,
+          "raw": 310,
+          "decoded": 310
+        },
+        "Angular_Resolution": {
+          "address": 30,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "Homing_Offset": {
+          "address": 31,
+          "length": 2,
+          "raw": 1079,
+          "decoded": 1079
+        },
+        "Operating_Mode": {
+          "address": 33,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Protective_Torque": {
+          "address": 34,
+          "length": 1,
+          "raw": 20,
+          "decoded": 20
+        },
+        "Protection_Time": {
+          "address": 35,
+          "length": 1,
+          "raw": 200,
+          "decoded": 200
+        },
+        "Overload_Torque": {
+          "address": 36,
+          "length": 1,
+          "raw": 80,
+          "decoded": 80
+        },
+        "Velocity_closed_loop_P_proportional_coefficient": {
+          "address": 37,
+          "length": 1,
+          "raw": 10,
+          "decoded": 10
+        },
+        "Over_Current_Protection_Time": {
+          "address": 38,
+          "length": 1,
+          "raw": 200,
+          "decoded": 200
+        },
+        "Velocity_closed_loop_I_integral_coefficient": {
+          "address": 39,
+          "length": 1,
+          "raw": 200,
+          "decoded": 200
+        }
+      }
+    },
+    {
+      "name": "gripper",
+      "configured_id": 6,
+      "model": "sts3215",
+      "eeprom_start": 0,
+      "eeprom_length": 40,
+      "raw_hex": "030a00090306000001b205a40b468c28f4010c2c2f10200010000101fa0001400e0014c8190ac8c8",
+      "registers": {
+        "Firmware_Major_Version": {
+          "address": 0,
+          "length": 1,
+          "raw": 3,
+          "decoded": 3
+        },
+        "Firmware_Minor_Version": {
+          "address": 1,
+          "length": 1,
+          "raw": 10,
+          "decoded": 10
+        },
+        "Model_Number": {
+          "address": 3,
+          "length": 2,
+          "raw": 777,
+          "decoded": 777
+        },
+        "ID": {
+          "address": 5,
+          "length": 1,
+          "raw": 6,
+          "decoded": 6
+        },
+        "Baud_Rate": {
+          "address": 6,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Return_Delay_Time": {
+          "address": 7,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Response_Status_Level": {
+          "address": 8,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "Min_Position_Limit": {
+          "address": 9,
+          "length": 2,
+          "raw": 1458,
+          "decoded": 1458
+        },
+        "Max_Position_Limit": {
+          "address": 11,
+          "length": 2,
+          "raw": 2980,
+          "decoded": 2980
+        },
+        "Max_Temperature_Limit": {
+          "address": 13,
+          "length": 1,
+          "raw": 70,
+          "decoded": 70
+        },
+        "Max_Voltage_Limit": {
+          "address": 14,
+          "length": 1,
+          "raw": 140,
+          "decoded": 140
+        },
+        "Min_Voltage_Limit": {
+          "address": 15,
+          "length": 1,
+          "raw": 40,
+          "decoded": 40
+        },
+        "Max_Torque_Limit": {
+          "address": 16,
+          "length": 2,
+          "raw": 500,
+          "decoded": 500
+        },
+        "Phase": {
+          "address": 18,
+          "length": 1,
+          "raw": 12,
+          "decoded": 12
+        },
+        "Unloading_Condition": {
+          "address": 19,
+          "length": 1,
+          "raw": 44,
+          "decoded": 44
+        },
+        "LED_Alarm_Condition": {
+          "address": 20,
+          "length": 1,
+          "raw": 47,
+          "decoded": 47
+        },
+        "P_Coefficient": {
+          "address": 21,
+          "length": 1,
+          "raw": 16,
+          "decoded": 16
+        },
+        "D_Coefficient": {
+          "address": 22,
+          "length": 1,
+          "raw": 32,
+          "decoded": 32
+        },
+        "I_Coefficient": {
+          "address": 23,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Minimum_Startup_Force": {
+          "address": 24,
+          "length": 2,
+          "raw": 16,
+          "decoded": 16
+        },
+        "CW_Dead_Zone": {
+          "address": 26,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "CCW_Dead_Zone": {
+          "address": 27,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "Protection_Current": {
+          "address": 28,
+          "length": 2,
+          "raw": 250,
+          "decoded": 250
+        },
+        "Angular_Resolution": {
+          "address": 30,
+          "length": 1,
+          "raw": 1,
+          "decoded": 1
+        },
+        "Homing_Offset": {
+          "address": 31,
+          "length": 2,
+          "raw": 3648,
+          "decoded": -1600
+        },
+        "Operating_Mode": {
+          "address": 33,
+          "length": 1,
+          "raw": 0,
+          "decoded": 0
+        },
+        "Protective_Torque": {
+          "address": 34,
+          "length": 1,
+          "raw": 20,
+          "decoded": 20
+        },
+        "Protection_Time": {
+          "address": 35,
+          "length": 1,
+          "raw": 200,
+          "decoded": 200
+        },
+        "Overload_Torque": {
+          "address": 36,
+          "length": 1,
+          "raw": 25,
+          "decoded": 25
+        },
+        "Velocity_closed_loop_P_proportional_coefficient": {
+          "address": 37,
+          "length": 1,
+          "raw": 10,
+          "decoded": 10
+        },
+        "Over_Current_Protection_Time": {
+          "address": 38,
+          "length": 1,
+          "raw": 200,
+          "decoded": 200
+        },
+        "Velocity_closed_loop_I_integral_coefficient": {
+          "address": 39,
+          "length": 1,
+          "raw": 200,
+          "decoded": 200
+        }
+      }
+    }
+  ]
+}

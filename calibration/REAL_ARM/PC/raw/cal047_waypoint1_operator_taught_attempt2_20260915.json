@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-047",
+  "status": "CALIBRATING",
+  "captured_at": "2026-09-15T12:26:26.941131+08:00",
+  "source": "manual_joint_space_waypoint_hardware_read_only",
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256": "cb9e4116648a74140b7566d64239a853858bd71fc76c37195de30fef2b272bce",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_to_wooden_work_surface_no_gap"
+  },
+  "operator_confirmation": "cal047_waypoint1_repositioned_ready",
+  "motor_names": [
+    "shoulder_pan",
+    "shoulder_lift",
+    "elbow_flex",
+    "wrist_flex",
+    "wrist_roll",
+    "gripper"
+  ],
+  "ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "model_numbers": [
+    777,
+    777,
+    777,
+    777,
+    777,
+    777
+  ],
+  "torque_enabled_by_motor": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "samples": 15,
+  "pose": {
+    "captured_at": "2026-09-15T12:26:26.197829+08:00",
+    "raw_position_by_sample": [
+      [
+        2130,
+        1672,
+        1977,
+        2716,
+        2046,
+        1718
+      ],
+      [
+        2130,
+        1672,
+        1977,
+        2716,
+        2046,
+        1718
+      ],
+      [
+        2130,
+        1672,
+        1977,
+        2716,
+        2046,
+        1718
+      ],
+      [
+        2130,
+        1672,
+        1977,
+        2716,
+        2046,
+        1718
+      ],
+      [
+        2130,
+        1672,
+        1977,
+        2716,
+        2046,
+        1718
+      ],
+      [
+        2130,
+        1672,
+        1977,
+        2716,
+        2046,
+        1718
+      ],
+      [
+        2130,
+        1672,
+        1977,
+        2716,
+        2046,
+        1718
+      ],
+      [
+        2130,
+        1672,
+        1977,
+        2716,
+        2046,
+        1718
+      ],
+      [
+        2130,
+        1672,
+        1977,
+        2716,
+        2046,
+        1718
+      ],
+      [
+        2130,
+        1672,
+        1977,
+        2716,
+        2046,
+        1718
+      ],
+      [
+        2130,
+        1672,
+        1977,
+        2716,
+        2046,
+        1718
+      ],
+      [
+        2130,
+        1672,
+        1977,
+        2716,
+        2046,
+        1718
+      ],
+      [
+        2130,
+        1672,
+        1977,
+        2716,
+        2046,
+        1718
+      ],
+      [
+        2130,
+        1672,
+        1977,
+        2716,
+        2046,
+        1718
+      ],
+      [
+        2130,
+        1672,
+        1977,
+        2716,
+        2046,
+        1718
+      ]
+    ],
+    "raw_position_representative": [
+      2130,
+      1672,
+      1977,
+      2716,
+      2046,
+      1718
+    ],
+    "raw_position_static_span": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_before": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_after": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "waypoint_role": "waypoint",
+  "order": 1,
+  "q_urdf_deg": [
+    6.681318681318682,
+    -50.451516483516485,
+    10.900274725274727,
+    62.05673626373627,
+    1.054945054945055
+  ],
+  "effective_limits_deg": [
+    [
+      -107.99987525598623,
+      107.99987525598623
+    ],
+    [
+      -98.00004285756798,
+      93.57046153846156
+    ],
+    [
+      -90.92390109890111,
+      94.82986737710912
+    ],
+    [
+      -92.99984017946129,
+      92.99984017946129
+    ],
+    [
+      -155.21102461697095,
+      160.78934171036462
+    ]
+  ],
+  "write_instructions_sent": 0,
+  "motion_instructions_sent": 0,
+  "eeprom_written": false
+}

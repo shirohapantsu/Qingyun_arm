@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-063",
+  "status": "CONFIRMED",
+  "completed_at": "2026-09-15T20:12:33+08:00",
+  "parameter": "motion.start_position_tol_deg",
+  "method": "For each independent passed trajectory, use only the first command/feedback frame. Per axis, add three encoder counts to the maximum observed absolute start offset, take the maximum with the current settle position tolerance, then round upward to 0.1 degree.",
+  "scope": "current demo trajectories and current settle tolerance; re-derive when payload, trajectory family, or settle tolerance changes",
+  "sources": [
+    {
+      "scope": "CAL-058 unloaded",
+      "path": "../raw/cal058_joint_velocity_unloaded_20260915.jsonl",
+      "sha256": "edcddd37541a0da3f8ffb85b2d674d004abd4ee924633b1ca49b1af943c8e933",
+      "unique_passed_trajectory_starts": 30
+    },
+    {
+      "scope": "CAL-058 loaded attempt2 partial",
+      "path": "../raw/cal058_joint_velocity_92p4g_attempt2_20260915.jsonl",
+      "sha256": "1ddbfa92a1a97f1bc72c5bd7db1b1ddf2492e77b4673f5263c8b2b26d5645965",
+      "merge_rule": "passed starts only; later attempt3 replaces the overlapping trajectory"
+    },
+    {
+      "scope": "CAL-058 loaded attempt3",
+      "path": "../raw/cal058_joint_velocity_92p4g_attempt3_20260915.jsonl",
+      "sha256": "9a7c65506741ca3daf3b3ee84a055d7717dda6ad392477bcdbd44cdc5d775e29",
+      "combined_CAL-058_loaded_unique_passed_trajectory_starts": 30
+    },
+    {
+      "scope": "CAL-059 loaded",
+      "path": "../raw/cal059_joint_acceleration_92p4g_attempt2_20260915.jsonl",
+      "sha256": "049a16b0e76bd507cd29c64f454b83b3ca976b98c69c50b78cbf04b8dae4ca31",
+      "unique_passed_trajectory_starts": 30
+    }
+  ],
+  "coverage": {
+    "total_unique_trajectory_starts": 90,
+    "CAL-058_unloaded": 30,
+    "CAL-058_loaded_92p4g": 30,
+    "CAL-059_loaded_92p4g": 30,
+    "directions": ["positive", "negative"],
+    "all_five_joints_active_across_test_set": true
+  },
+  "statistics": {
+    "observed_start_error_max_deg": [
+      0.549450549450551,
+      1.758241758241759,
+      2.637362637362637,
+      1.0109890109890074,
+      0.6373626373626351
+    ],
+    "observed_start_error_p99_deg": [
+      0.5494505494505487,
+      1.601758241758243,
+      2.637362637362637,
+      0.8153846153846124,
+      0.6373626373626351
+    ],
+    "position_resolution_counts_per_revolution": [4096, 4096, 4096, 4096, 4096],
+    "three_count_margin_deg": [
+      0.263671875,
+      0.263671875,
+      0.263671875,
+      0.263671875,
+      0.263671875
+    ],
+    "current_settle_position_tolerance_floor_deg": [2.5, 2.5, 2.5, 2.5, 2.5],
+    "unrounded_required_deg": [
+      2.5,
+      2.5,
+      2.901034512362637,
+      2.5,
+      2.5
+    ]
+  },
+  "fit": {
+    "before_deg": [3.0, 3.0, 3.0, 3.0, 3.0],
+    "after_deg": [2.5, 2.5, 3.0, 2.5, 2.5],
+    "reason": "Tighten unobserved allowance per axis while retaining compatibility with the current settle acceptance region."
+  },
+  "fit_correction": {
+    "obsolete_behavior": "Always emitted [3.0] * 5 without using trajectory data.",
+    "corrected_function": "scripts.calibrate._derive_start_position_tolerance",
+    "regression_test": "test_motion起点容差只取各轨迹首帧并不低于到位容差"
+  },
+  "profile_sha256_before": "3cee7c4b33cfaf838bb8d6553dadee036a447d1172a749eab65de8dc4914ee94",
+  "profile_sha256_after": "cce0103646ec3d963b709ab7c5955e6e16ad97ae65fd9fc591e161ae4585541d",
+  "profile_written": true,
+  "hardware_accessed_for_this_derivation": false,
+  "eeprom_written": false,
+  "post_write_verification": {
+    "historical_physical_starts_replayed": 90,
+    "historical_physical_starts_passed": 90,
+    "historical_physical_starts_failed": 0,
+    "focused_behavior_tests_passed": 4,
+    "focused_behavior_tests_failed": 0,
+    "full_motion_group_regression": "deferred until CAL-063 through CAL-070 form a complete group, per operator instruction",
+    "result": "PASS"
+  },
+  "downstream": {
+    "CAL-064": "fit normal following error from all passed dynamic samples, not only first frames",
+    "CAL-067": "if settle_position_tol_deg changes, re-derive CAL-063 so start tolerance remains compatible"
+  }
+}

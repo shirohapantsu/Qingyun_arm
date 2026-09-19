@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "calibration_ids": ["CAL-033", "CAL-034"],
+  "date": "2026-09-14",
+  "scope": "REAL_ARM/PC demo collision geometry",
+  "status": "confirmed_demo",
+  "profile_sha256": "62da9cf9057c5bdc301467f990e4a5e9217f8f05193744364d28fa50eea7665a",
+  "urdf_sha256": "3a65d2d35e68a8d2f0c2cc176d19b884506543c93ba72980145b80abe276022c",
+  "motor_calibration_sha256": "ad315322ad4d19cc322c8f21d86d9667d9df9eca2de325bebbd72fa62deefff5",
+  "tools": {
+    "fit": {"path": "scripts/fit_urdf_link_capsules.py", "sha256": "b5c6ce0d58749b0e003e340c960fd4a3d3a08c4929cbf1849d25f2d9a1f5a903"},
+    "validate": {"path": "scripts/validate_urdf_capsule_fit.py", "sha256": "82a203d4b89ebd11bf1f0265c8a06a2bc78015afcc7aa79913e6f7d0b38c9225"},
+    "runtime_safety": {"path": "qingyun/grabbing/safety.py", "sha256": "20de8c268c864307e4546466952a7075a51487f66313ac13156ddcae4eff0ad8"}
+  },
+  "fit_method": {
+    "decomposition": "one conservative capsule per URDF collision mesh",
+    "mesh_count": 17,
+    "capsule_count": 17,
+    "coverage_proof": "all three vertices of every STL triangle are contained by its assigned convex capsule; therefore the full triangle is contained",
+    "cad_margin_m": 0.0005,
+    "installed_pad_outgrowth_m": 0.003,
+    "installed_pad_basis": {
+      "fixed": "48+/-1 mm long, 10/15/20+/-1 mm wide, 2+/-1 mm thick including adhesive, directly fitted to the hard finger, tip aligned",
+      "moving": "40+/-1 mm long, 10/15/20+/-1 mm wide, 2+/-1 mm thick including adhesive, directly fitted to the hard finger, tip aligned"
+    }
+  },
+  "capsules_by_link": {
+    "base_link": 4,
+    "shoulder_link": 3,
+    "upper_arm_link": 2,
+    "lower_arm_link": 3,
+    "wrist_link": 2,
+    "gripper_link": 2,
+    "moving_jaw_so101_v1_link": 1
+  },
+  "ignore_pair_audit": {
+    "pair_count": 62,
+    "categories": {"same_link_decomposition": 15, "direct_urdf_neighbors": 36, "specific_coarse_capsule_false_overlaps": 11},
+    "specific_false_overlap_pairs": [
+      ["base_01", "upper_arm_02"], ["base_02", "upper_arm_02"],
+      ["gripper_02", "lower_arm_01"], ["gripper_02", "lower_arm_03"],
+      ["lower_arm_01", "shoulder_01"], ["lower_arm_01", "shoulder_03"],
+      ["lower_arm_02", "shoulder_01"],
+      ["moving_jaw_so101_v1_01", "wrist_01"], ["moving_jaw_so101_v1_01", "wrist_02"],
+      ["shoulder_01", "wrist_02"], ["upper_arm_02", "wrist_02"]
+    ],
+    "minimum_nominal_mesh_distance_m_for_affected_link_pairs": {
+      "base_link x upper_arm_link": 0.046665908360990764,
+      "gripper_link x lower_arm_link": 0.04989986492566963,
+      "lower_arm_link x shoulder_link": 0.030980736030671755,
+      "moving_jaw_so101_v1_link x wrist_link": 0.009638142398496476,
+      "shoulder_link x wrist_link": 0.04464210006968518,
+      "upper_arm_link x wrist_link": 0.04588541781446327
+    }
+  },
+  "table_contact_semantics": {
+    "exempt_links": ["base_link", "shoulder_link"],
+    "scope": "table half-space only",
+    "reason": "both are parts of the bolted base assembly; shoulder_pan rotates only about the table normal, so shoulder housing height is invariant",
+    "still_checked": ["fixed obstacles", "object envelope", "self collision"]
+  },
+  "representative_pose_validation": {
+    "obstacles_excluded": "CAL-032 was explicitly deferred and its AABBs remain simulation placeholders",
+    "poses": ["home", "safe_waypoint_1", "safe_waypoint_2", "URDF orthogonal"],
+    "gripper_pct": [0, 25, 50, 75, 100],
+    "combination_count": 20,
+    "table_failures": 0,
+    "nonignored_self_collision_failures": 0,
+    "generated_candidate_matches_profile": true,
+    "result": "pass"
+  },
+  "limitations": [
+    "This is a demo CAD-derived conservative model, not a full physical-arm geometry survey.",
+    "Unmodeled cables, protruding screws, later accessories, and final workcell obstacles require revalidation.",
+    "CAL-032, CAL-035, CAL-036 and full path/workspace tests remain incomplete; this report does not establish end-to-end collision safety."
+  ]
+}

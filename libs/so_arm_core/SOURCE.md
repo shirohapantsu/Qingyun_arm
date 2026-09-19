@@ -1,7 +1,8 @@
 # vendor 来源与验证记录
 
-本目录（`libs/so_arm_core/`）内的文件是从外部项目原样复制进来的第三方源文件，
-在本项目内锁定，不做本地改动。复制时保留了原始版权声明与许可证头。
+本目录（`libs/so_arm_core/`）内的文件是从外部项目复制进来的第三方源文件，
+在本项目内锁定；除下述明确列出、带独立上游证据的审计补丁外不做本地改动。
+复制时保留了原始版权声明与许可证头。
 
 ## 1. 上游来源
 
@@ -21,7 +22,7 @@
 | `so101_new_calib.urdf` | `SO-ARM100/Simulation/SO101/so101_new_calib.urdf` | 是 |
 | `assets/*.stl` | `SO-ARM100/Simulation/SO101/assets/*.stl` | 是 |
 | `motors/encoding_utils.py` | `src/lerobot/motors/encoding_utils.py` | 是 |
-| `motors/feetech/tables.py` | `src/lerobot/motors/feetech/tables.py` | 是 |
+| `motors/feetech/tables.py` | `src/lerobot/motors/feetech/tables.py` | 否；仅含下述 CAL-013 审计补丁 |
 | `__init__.py`、`motors/__init__.py`、`motors/feetech/__init__.py` | 本项目新增的包声明文件 | 不适用 |
 
 `assets/` 是 URDF 中 `<mesh filename="assets/..."/>` 相对引用的目标。placo 在解析
@@ -35,6 +36,16 @@ CAD 源文件）不被 URDF 引用，未复制。
 收益。本项目用 `pyserial` 直接实现 STS 协议组包（见
 `qingyun/grabbing/motor_control.py`），但寄存器地址、编码分辨率与符号位定义一律
 以本目录 vendor 的 `motors/feetech/tables.py` 为准，避免第二份真值表。
+
+### 1.1 CAL-013 审计补丁
+
+LeRobot 0.5.1 的 `STS_SMS_SERIES_ENCODINGS_TABLE` 漏列 `Present_Current`，会使
+地址69~70的负向电流被当成巨大无符号数。飞特官方
+[`FTServo_Linux/src/SMS_STS.cpp`](https://gitee.com/ftservo/FTServo_Linux/blob/main/src/SMS_STS.cpp)
+中的 `SMS_STS::ReadCurrent()` 明确检查 bit 15，并按
+`-(Current & ~(1 << 15))` 解码；这与同文件的位置/速度符号-幅值规则一致。
+因此本地表只增加 `"Present_Current": 15`，不修改寄存器地址、宽度或其它编码。
+该补丁由负电流编码回归测试约束；详细处置见 CAL-013 标定记录。
 
 ## 2. 验证过的依赖版本
 
@@ -60,7 +71,7 @@ placo 或 pin，需重新确认 `import placo` 通过。
 356645b7f6c68172055c13642791d5eddcb5df49e4fdea12780e4b1bc01371fe  kinematics.py
 3a65d2d35e68a8d2f0c2cc176d19b884506543c93ba72980145b80abe276022c  so101_new_calib.urdf
 5285eb2b3f62399e95a2fa4b2fcab631bcad547124e8cc9b6a61525148bc924a  motors/encoding_utils.py
-71f7f7beb17169781bd26a33b165ed4c5c3df7b9c477d36860f9d6011eb00428  motors/feetech/tables.py
+97de986f147b098c4f9450ec1967c66dd063d40ae1e2522961bf23450f8d4dcf  motors/feetech/tables.py
 8cd2f241037ea377af1191fffe0dd9d9006beea6dcc48543660ed41647072424  assets/base_motor_holder_so101_v1.stl
 bb12b7026575e1f70ccc7240051f9d943553bf34e5128537de6cd86fae33924d  assets/base_so101_v2.stl
 31242ae6fb59d8b15c66617b88ad8e9bded62d57c35d11c0c43a70d2f4caa95b  assets/motor_holder_so101_base_v1.stl

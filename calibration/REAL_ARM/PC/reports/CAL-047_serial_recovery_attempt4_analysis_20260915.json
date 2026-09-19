@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-047",
+  "date": "2026-09-15",
+  "status": "NEAR_PASS_AT_ENCODER_QUANTIZATION_BOUNDARY",
+  "profile_sha256": "52e2b621a303368f0774cf9ee439da852f2992480b0dfec1c21c55dad4106ba9",
+  "source_evidence": "CAL-047_serial_recovery_to_waypoint_attempt4_20260915.json",
+  "source_sha256": "bc9dbc5a2497f9f120dd2a1fc7784ea2fa64e7d7c3f8de0c7c2e81074746b9a2",
+  "trajectory_duration_s": 20.0,
+  "configured_settle_timeout_s": 3.0,
+  "effective_settle_timeout_s": 10.0,
+  "target_deg": [6.681318681318682, -50.451516483516485, 10.900274725274727, 62.05673626373627, 1.054945054945055],
+  "feedback_before_torque_disable_deg": [6.857142857142858, -50.62734065934066, 13.449725274725276, 62.84794505494506, 1.2307692307692308],
+  "absolute_error_deg": [0.17582417582417587, 0.17582417582417587, 2.5494505494505493, 0.7912087912087896, 0.17582417582417587],
+  "velocity_deg_s": [0.0, 0.0, 0.0, 0.0, 0.0],
+  "current_ma": [6.5, 0.0, 45.5, 6.5, 0.0],
+  "configured_tolerance_deg": [2.5, 2.5, 2.5, 2.5, 2.5],
+  "failing_axis": {
+    "servo_id": 3,
+    "name": "elbow_flex",
+    "error_deg": 2.5494505494505493,
+    "excess_over_tolerance_deg": 0.049450549450549274,
+    "position_resolution_deg_per_count": 0.08791208791208792,
+    "error_counts": 29,
+    "largest_representable_error_below_2_5_deg_counts": 28,
+    "largest_representable_error_below_2_5_deg": 2.4615384615384617
+  },
+  "torque_enabled_after_cleanup": [0, 0, 0, 0, 0, 0],
+  "interpretation": "The powered endpoint was captured before torque disable, so gravity sag after cleanup does not contaminate this result. Extending settle time from 3 to 10 seconds did not pass because the stationary elbow error is one encoder count above the largest error representable below the 2.5 degree threshold.",
+  "proposed_demo_only_retest": "Use a temporary 2.6 degree settle tolerance without changing the profile, then calibrate the permanent settle tolerance under CAL-063 from repeated powered endpoint samples.",
+  "profile_changed": false,
+  "eeprom_written": false
+}

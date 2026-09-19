@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-022",
+  "status": "CONFIRMED_FOR_DEMO",
+  "captured_at": "2026-09-14",
+  "parameter": "joints.margin_deg",
+  "source": "operator_confirmed_existing_demo_margin",
+  "result": {
+    "margin_deg": [2.0, 2.0, 2.0, 2.0, 2.0]
+  },
+  "basis": [
+    "The operator explicitly confirmed retaining the existing 2 degree per-joint demo margin.",
+    "The value is applied after intersecting URDF, measured, and application limits.",
+    "No fitter or hardware endpoint-repeat data was used to reduce or increase the existing value."
+  ],
+  "scope_and_limitations": {
+    "accepted_scope": "demo_only",
+    "endpoint_repeat_measurement_performed": false,
+    "dynamic_stop_overshoot_measured": false,
+    "joint_backlash_measured": false,
+    "formal_safety_margin_claimed": false,
+    "profile_status_remains_draft": true
+  },
+  "integration": {
+    "profile_sha256": "cfd4830f99fabd90a9b2f889b22cbf39f5bdb90ae6fca78d49c0c6d527247bbd",
+    "profile_field_changed": false,
+    "hardware_accessed": false,
+    "motion_instructions_sent": 0,
+    "eeprom_written": false,
+    "software_test_policy": "deferred_until_completion_of_the_joints_module"
+  }
+}

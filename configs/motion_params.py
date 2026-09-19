@@ -94,7 +94,7 @@ class MotorParams:
     models: tuple[str, ...]                     # (6,)
     firmware: tuple[str, ...]                   # (6,)
     position_resolution: NDArray[np.int64]      # (6,) 编码分辨率，每项 >1
-    current_ma_per_raw: FloatArray              # (6,) mA/raw，每项非零
+    current_ma_per_raw: FloatArray              # (6,) mA/raw，每项为正
     current_zero_raw: FloatArray                # (6,) 零偏 raw
     velocity_deg_s_per_raw: FloatArray          # (6,) deg/s per raw count
     gripper_closed_raw: int
@@ -263,7 +263,7 @@ class GripperParams:
     release_pct: float
     open_speed_pct_s: float
     close_speed_pct_s: float
-    contact_gap_range_m: FloatArray  # (2,) 0<min<max
+    contact_gap_range_m: FloatArray  # (2,) 0<min<max；首次接触开度在gap表参考平面的坐标范围
     contact_current_ma: float
     hard_current_ma: float
     window_samples: int
@@ -520,9 +520,9 @@ def _parse_motor(path: str, payload: Any) -> MotorParams:
     if np.any(res <= 1):
         raise ParamsError(f"{path}.position_resolution", f"每项必须大于 1，实际 {res.tolist()}")
     cpm = _fvec(f"{path}.current_ma_per_raw", d["current_ma_per_raw"], (6,))
-    if np.any(cpm == 0.0):
-        # 比例为 0 会让所有电流读数都算成 0mA，接触判据与过流保护同时失效。
-        raise ParamsError(f"{path}.current_ma_per_raw", f"每项必须非零，实际 {cpm.tolist()}")
+    if np.any(cpm <= 0.0):
+        # 非正比例会让电流方向或量级失真，接触判据与过流保护都会失效。
+        raise ParamsError(f"{path}.current_ma_per_raw", f"每项必须为正，实际 {cpm.tolist()}")
     vpr = _fvec(f"{path}.velocity_deg_s_per_raw", d["velocity_deg_s_per_raw"], (6,))
     if np.any(vpr <= 0.0):
         raise ParamsError(f"{path}.velocity_deg_s_per_raw", f"每项必须为正，实际 {vpr.tolist()}")

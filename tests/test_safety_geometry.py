@@ -30,6 +30,7 @@ from qingyun.grabbing.safety import (
     segment_halfspace_distance,
     segment_obb_distance,
     segment_segment_distance,
+    TABLE_CONTACT_LINKS,
 )
 
 
@@ -182,12 +183,16 @@ def test_明显插入桌面的姿态被拒绝(params):
         assert "碰桌" in text or "碰固定障碍" in text or "自碰撞" in text
 
 
-def test_基座胶囊体只豁免桌面检查不豁免障碍(params):
-    """技术文档 1.2：基座与桌面固定；5.3：不豁免连杆/手指碰桌以外的干涉。"""
+def test_固定底座总成只豁免桌面检查不豁免障碍(params):
+    """基座/肩座是安装接触件；桌面豁免不得顺手放过其它干涉。"""
     model, env, ck = _checker(params)
     assert BASE_LINK in {c.link for c in params.collision.link_capsules}
     exempt = {c.id for c in params.collision.link_capsules if c.link == BASE_LINK}
     assert exempt and exempt <= ck._table_exempt
+    shoulder = {c.id for c in params.collision.link_capsules if c.link == "shoulder_link"}
+    assert shoulder and shoulder <= ck._table_exempt
+    assert {c.link for c in params.collision.link_capsules if c.id in ck._table_exempt} \
+        <= TABLE_CONTACT_LINKS
     # 把一个障碍硬搬到基座上：桌面豁免不能顺手放过障碍碰撞。
     object.__setattr__(params.workspace.obstacles[0], "bounds_m",
                        np.array([[0.0, -0.03, 0.0], [0.04, 0.03, 0.06]]))

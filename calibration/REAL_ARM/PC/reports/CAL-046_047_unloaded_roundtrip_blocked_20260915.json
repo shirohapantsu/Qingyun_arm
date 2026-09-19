@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "parameter_ids": ["CAL-046", "CAL-047", "CAL-051"],
+  "date": "2026-09-15",
+  "status": "BLOCKED_BEFORE_PLANNED_TRAJECTORY",
+  "profile_sha256": "6a971b5c19b5316a56702980968103f9de0f998c8520758b0ccb47835b188bd1",
+  "profile_changed": false,
+  "planned_test": "unloaded low-speed waypoint -> home -> waypoint",
+  "planned_joint_trajectory_legs_completed": 0,
+  "attempts": [
+    {
+      "evidence": "../raw/cal046_047_unloaded_roundtrip_20260915.json",
+      "stage": "after current-position SRAM goal seed and torque enable, before ArmController trajectory",
+      "failure": "20 ms runtime read of id=1 Torque_Enable timed out",
+      "cleanup_issue": "initial controller cleanup did not provide a valid all-axis readback; independent long-budget read found axes 3 and 5 enabled, then explicitly disabled all six and read back [0,0,0,0,0,0]"
+    },
+    {
+      "evidence": "../raw/cal046_047_unloaded_roundtrip_attempt2_20260915.json",
+      "stage": "current-position SRAM Goal_Position readback, before torque enable",
+      "failure": "id=4 Goal_Position read timed out",
+      "planned_motion_sent": false
+    },
+    {
+      "evidence": null,
+      "stage": "strict read-only preflight",
+      "failure": "all six Torque_Enable registers unexpectedly read 1, so the script refused all goal and motion commands",
+      "planned_motion_sent": false,
+      "corrective_action": "explicitly wrote SRAM Torque_Enable=0 to all six and read back all zero"
+    }
+  ],
+  "final_safety_state": {
+    "two_readonly_checks_separated_by_seconds": 5,
+    "torque_enabled_both_checks": [0, 0, 0, 0, 0, 0],
+    "raw_position_both_checks": [2148, 1553, 2070, 2479, 2045, 1491],
+    "q_urdf_deg_first_five": [
+      8.263736263736265,
+      -60.91305494505495,
+      19.076098901098902,
+      41.22157142857143,
+      1.142857142857143
+    ],
+    "position_stable": true,
+    "gripper_raw_outside_demo_closed_endpoint_by_counts": 8
+  },
+  "safety_conclusion": "No planned home/waypoint trajectory leg started. Do not retry until the start pose and gripper are restored and CAL-051 establishes a valid read-timeout policy; the current static CAL-046/047 values remain unchanged.",
+  "operator_observed_motion_or_manual_reposition": {
+    "attempts_1_and_2": "no motion observed",
+    "attempt_3": "operator manually repositioned the arm",
+    "uncommanded_active_motion_observed": false,
+    "reported_by_operator": true
+  },
+  "eeprom_written": false
+}

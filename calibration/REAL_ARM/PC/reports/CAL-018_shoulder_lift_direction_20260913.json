@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-018",
+  "status": "RETRACTED_DIRECTION_REFERENCE_ERROR",
+  "scope": "joint_element_1_shoulder_lift",
+  "captured_at": "2026-09-13",
+  "parameter": "joints.sign[1]",
+  "joint": {
+    "index": 1,
+    "name": "shoulder_lift",
+    "servo_id": 2,
+    "parent_link": "shoulder_link",
+    "child_link": "upper_arm_link",
+    "urdf_axis_joint_frame": [0.0, 0.0, 1.0],
+    "urdf_axis_parent_frame_at_zero": [0.0, 1.0, 0.0],
+    "positive_physical_reference": "Keep shoulder_pan fixed and raise the upper arm toward the front/up direction, moving the elbow joint upward and away from the base column."
+  },
+  "hardware": {
+    "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+    "resolved_port": "/dev/ttyACM0",
+    "usb_identity": {
+      "vid": "1a86",
+      "pid": "55d3",
+      "serial": "5B14114904"
+    },
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_in_workspace",
+    "model_number": 777,
+    "official_raw_range": [865, 3333],
+    "torque_enabled_by_motor": [0, 0, 0, 0, 0, 0]
+  },
+  "observations": {
+    "baseline_raw": 1108,
+    "urdf_positive_raw": 1151,
+    "urdf_negative_raw": 990,
+    "positive_delta_counts": 43,
+    "negative_delta_counts": -118,
+    "positive_delta_bus_deg": 3.78021978022,
+    "negative_delta_bus_deg": -10.373626373626,
+    "static_span_counts_by_pose": [0, 0, 0],
+    "samples_per_pose": 10,
+    "excluded_setup_observation": "The first recentering attempt moved servo 3 elbow_flex rather than servo 2; it had no URDF direction label and was excluded."
+  },
+  "result": {
+    "joint_sign": 1,
+    "formula": "q_urdf_deg = joint_sign * q_bus_deg + zero_offset_deg",
+    "reason": "The operator-confirmed URDF-positive move increased q_bus/raw, while the URDF-negative move decreased it and landed on the opposite side of baseline."
+  },
+  "checks": {
+    "stable_port_identity_checked_before_each_pose": true,
+    "all_six_torque_disabled_before_and_after_each_pose": true,
+    "positive_and_negative_on_opposite_sides_of_baseline": true,
+    "both_motion_magnitudes_exceed_30_counts": true,
+    "all_observations_inside_official_range": true,
+    "write_instructions_sent": 0,
+    "motion_instructions_sent": 0,
+    "eeprom_written": false
+  },
+  "evidence": {
+    "baseline_pose": "../raw/cal018_shoulder_lift_baseline_corrected_20260913.json",
+    "baseline_pose_sha256": "2a0eddaf02b7ec2a182ebcfda5ef871c141a6ae3431fc0dbe3555823f4e8d51b",
+    "positive_pose": "../raw/cal018_shoulder_lift_positive_20260913.json",
+    "positive_pose_sha256": "6d61694876590db87de5a2caf37b0044b1cdca2f2abd7dc124410887c35a8d9e",
+    "negative_pose": "../raw/cal018_shoulder_lift_negative_20260913.json",
+    "negative_pose_sha256": "d663f9a58c030265be92f5d243f5a8d4f1a7bf0e729c1246aca5a4fd343c821a",
+    "direction_reader_sha256": "a2237b0ddfd8f6dfe0fa41c8aafffb7fd4ac618f2522d377d14023f44385d929",
+    "one_shot_reader_sha256": "e46edf2df5dd04a245efc6f5324216d276037b495a94186032e445da9abc0fc8"
+  },
+  "implementation": {
+    "profile_write_deferred_until_all_five_sign_elements_are_measured": true
+  },
+  "retraction": {
+    "reason": "The operator-positive instruction said forward/up; local URDF FK at q=0 shows positive motion moves servo 3 forward and downward.",
+    "raw_evidence_preserved": true
+  }
+}

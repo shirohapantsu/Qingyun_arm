@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-053",
+  "parameter": "timing.max_feedback_span_s",
+  "date": "2026-09-15",
+  "status": "VERIFIED_FOR_UNLOADED_STATIC_DEMO",
+  "profile_changed": true,
+  "profile_sha256_before": "6a971b5c19b5316a56702980968103f9de0f998c8520758b0ccb47835b188bd1",
+  "profile_sha256_after": "b7a2ceadf5325cca15547a33fc0df26de5907c4e628c67c797d8d19d31a8a06d",
+  "source_evidence": "../raw/cal051_feedback_read_timing_1000ticks_20260915.jsonl",
+  "source_sha256": "91f2d95bbe8729021deb3ed3f1b2c4af99a134682a96fba08191938232c36f5d",
+  "test": {
+    "ticks": 1000,
+    "fps": 30.0,
+    "successful_reads": 1000,
+    "failed_reads": 0,
+    "transaction": "six servos, one contiguous 15-byte feedback block per servo, one shared deadline per whole-arm read",
+    "environment": {
+      "power": "12V",
+      "ambient_temperature_c": 26.8,
+      "base_mount": "fixed_to_wooden_work_surface_no_gap",
+      "load_label": "unloaded_static"
+    },
+    "torque_enabled_before": [0, 0, 0, 0, 0, 0],
+    "torque_enabled_after": [0, 0, 0, 0, 0, 0],
+    "raw_position_stable": true,
+    "motion_instructions_sent": 0,
+    "write_instructions_sent": 0,
+    "eeprom_written": false
+  },
+  "feedback_span_ms": {
+    "p50": 4.397647,
+    "p95": 4.8719945,
+    "p99": 5.69207893,
+    "p999": 7.192189545,
+    "max": 7.754172
+  },
+  "fitter_formula": "round(max(P999, max) * 1.2, 4)",
+  "formula_unrounded_s": 0.0093050064,
+  "old_value_s": 0.03,
+  "fitted_value_s": 0.0093,
+  "all_source_samples_within_fitted_value": true,
+  "margin_over_observed_max_ms": 1.545828,
+  "decision": "Apply 9.3 ms. Unlike read_timeout_s, this field is a feedback-coherence rejection threshold: retaining 30 ms would accept samples spanning almost a full 30 Hz control tick. The fitted value preserves a 20 percent margin over the observed maximum.",
+  "scope_limit": "Derived from unloaded, torque-off, static whole-arm reads on the final serial path. Active-motion and stressed-CPU validation remain required before a production safety claim."
+}

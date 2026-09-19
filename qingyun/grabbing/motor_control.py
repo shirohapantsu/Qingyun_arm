@@ -86,6 +86,8 @@ from libs.so_arm_core.motors.feetech.tables import (
 __all__ = [
     "bus_deg_to_urdf_deg",
     "urdf_deg_to_bus_deg",
+    "calibrated_range_to_bus_limits_deg",
+    "calibrated_range_to_urdf_limits_deg",
     "raw_to_gripper_pct",
     "gripper_pct_to_raw",
     "load_motor_calibration",
@@ -219,6 +221,48 @@ def _check_sign(sign: NDArray) -> None:
         raise MotorLimitError(
             f"joints.sign 只能取 ±1，实际 {flat.tolist()} 在第 {bad.tolist()} 项不合法"
         )
+
+
+def calibrated_range_to_bus_limits_deg(
+    range_min: int, range_max: int, resolution: int
+) -> tuple[float, float]:
+    """官方校准 raw 行程端点 → 总线角行程（deg）。
+
+    这不是 URDF limit，而是当前 ``motor_calibration.json`` 记录的本机
+    机械行程在总线角坐标下的直接换算。公式与 ``MotorMapping``
+    完全一致：``mid=(min+max)/2``，``q=(raw-mid)*360/(resolution-1)``。
+    ``homing_offset`` 已由舵机 EEPROM 作用到 Present_Position，不在此重复相加。
+    """
+    lo = int(range_min)
+    hi = int(range_max)
+    res = int(resolution)
+    if lo >= hi:
+        raise MotorLimitError(f"校准行程必须满足 range_min < range_max，实际 [{lo}, {hi}]")
+    if res <= 1:
+        raise MotorLimitError(f"位置编码分辨率必须大于 1，实际 {res}")
+    mid = (lo + hi) / 2.0
+    step = DEG_PER_COUNT_BASE / float(res - 1)
+    return ((lo - mid) * step, (hi - mid) * step)
+
+
+def calibrated_range_to_urdf_limits_deg(
+    range_min: int,
+    range_max: int,
+    resolution: int,
+    sign: int,
+    zero_offset_deg: float,
+) -> tuple[float, float]:
+    """官方校准 raw 行程端点 → URDF 关节角行程（deg）。
+
+    官方文件已给出实际 raw 可达端点，因此无需用 URDF limit
+    反推真机行程。但 profile 的 ``joints.measured_limits_deg`` 明确是
+    URDF 坐标，仍必须用 joints 阶段独立确定的 ``sign`` 和
+    ``zero_offset_deg`` 做最后一次坐标变换。
+    """
+    bus_limits = calibrated_range_to_bus_limits_deg(range_min, range_max, resolution)
+    urdf_limits = bus_deg_to_urdf_deg(bus_limits, sign, zero_offset_deg)
+    low, high = sorted(float(value) for value in np.asarray(urdf_limits, dtype=np.float64))
+    return low, high
 
 
 def raw_to_gripper_pct(raw, closed_raw, open_raw):
@@ -545,11 +589,10 @@ class MotorMapping:
 
         沿用 vendor 表的型号定义（STS_SMS_SERIES_ENCODINGS_TABLE /
         MODEL_ENCODING_TABLE），不在本文件另抄一份位定义。
-        需要核对的点：表里没有登记 Present_Current，所以本实现按无符号读它。
-        这与标定指南 2.1 末段"原始电流的符号由驱动按型号解码"并不矛盾——按
-        型号解码的结果就是"该型号该寄存器无方向位"。但这是从 vendor 表推出的，
-        不是从 STS3215 当前固件手册确认的，因此必须在 motor 标定阶段核对
-        （4.1 第 1 条要求读回型号与固件）；如需修正只改本方法即可，上层不变。
+        CAL-013 已补齐 STS/SMS 的 Present_Current=bit15：飞特官方
+        FTServo_Linux `SMS_STS::ReadCurrent()` 对地址69~70执行同一符号-幅值
+        解码。LeRobot 0.5.1 vendor 原表漏项；本地审计补丁与出处记录在
+        ``libs/so_arm_core/SOURCE.md``，上层仍只通过本表查询、不另抄位定义。
         """
         ax = self.axis(name_or_index)
         enc = MODEL_ENCODING_TABLE.get(ax.model, {})
@@ -1790,9 +1833,10 @@ class Sts3215MotorController:
     def _require_actuating_ready(self) -> None:
         """允许提交运动命令：必须已连接且力矩已使能。
 
-        力矩没开时写 Goal_Position 不会产生任何运动，静默"成功"返回是最坏结果
-        （上层会以为动作已提交，但机械臂根本不动），所以按"设备未就绪"抛
-        MotorStateError（技术文档 4.2）。
+        不能用“当前 Torque_Enable=0”证明 Goal_Position 写入无动作：2026-09-15
+        CAL-052 在本机六台 STS3215 上实测到一次广播 Goal_Position 后六路都由0变1。
+        因此生产接口必须先走显式力矩配置并维护控制器状态；状态为False时禁止把目标帧
+        当作无害预置发送，按“设备未就绪”抛 MotorStateError（技术文档4.2）。
         """
         self._require_ready()
         if not self._torque_enabled:
@@ -1893,8 +1937,11 @@ class CalibrationReader:
         self._pos_addr, self._pos_len = self.mapping.common_register("Present_Position")
         self._vel_addr, self._vel_len = self.mapping.common_register("Present_Velocity")
         self._cur_addr, self._cur_len = self.mapping.common_register("Present_Current")
+        self._torque_addr, self._torque_len = self.mapping.common_register("Torque_Enable")
         if self._pos_len != 2 or self._vel_len != 2 or self._cur_len != 2:
             raise ValueError("CalibrationReader 按 2 字节小端寄存器编写，vendor 表宽度不符")
+        if self._torque_len != 1:
+            raise ValueError("CalibrationReader 要求 Torque_Enable 为 1 字节寄存器")
         # 与 Sts3215MotorController 同一份块布局推导（vendor 表来源，不硬编码）。
         (self._fb_addr, self._fb_len, self._fb_off) = _feedback_block_layout(
             (self._pos_addr, self._pos_len),
@@ -1907,6 +1954,97 @@ class CalibrationReader:
         if not self._closed:
             self._closed = True
             self._transport.close()
+
+    def read_torque_enabled(self) -> list[int]:
+        """只读六台舵机的 Torque_Enable，顺序与 MOTOR_NAMES 一致。
+
+        零电流偏置采集必须使用真实寄存器状态作为证据，不能由
+        命令行元数据或软件内部状态推测。本方法只发 READ，不会改变力矩状态。
+        """
+        if self._closed:
+            raise MotorStateError("CalibrationReader 已关闭")
+        deadline = self._clock() + self._read_timeout_s
+        ids = [ax.servo_id for ax in self.mapping.axes]
+        block = self._protocol.bulk_read(ids, self._torque_addr, self._torque_len, deadline)
+        values = [int(block[ax.servo_id][0]) for ax in self.mapping.axes]
+        bad = [(ax.name, value) for ax, value in zip(self.mapping.axes, values)
+               if value not in (0, 1)]
+        if bad:
+            raise MotorStateError(f"Torque_Enable 读回不是 0/1：{bad}")
+        return values
+
+    def read_common_register(self, register: str) -> list[int]:
+        """只读六台同名寄存器，按 MOTOR_NAMES 顺序返回解码值。
+
+        用于标定前核对固件/工厂参数；寄存器地址与宽度仍只从
+        vendor 表取得，本入口没有 WRITE_DATA/SYNC_WRITE 能力。
+        """
+        if self._closed:
+            raise MotorStateError("CalibrationReader 已关闭")
+        address, length = self.mapping.common_register(register)
+        if length not in (1, 2):
+            raise ValueError(f"{register} 宽度 {length} 不在标定只读入口支持范围")
+        deadline = self._clock() + self._read_timeout_s
+        ids = [ax.servo_id for ax in self.mapping.axes]
+        blocks = self._protocol.bulk_read(ids, address, length, deadline)
+        return [
+            int(self.mapping.decode_signed(
+                ax, register,
+                int.from_bytes(blocks[ax.servo_id], byteorder="little", signed=False),
+            ))
+            for ax in self.mapping.axes
+        ]
+
+    def read_eeprom_snapshot(self) -> list[dict]:
+        """只读六台舵机地址 0..39 的 EEPROM，并按 vendor 表逐字段解码。
+
+        STS/SMS 控制表把 EEPROM 定义在 Torque_Enable（地址 40）之前。一次读取
+        完整40字节可同时保留未命名/保留字节，逐字段结果则只从当前型号的
+        ``MODEL_CONTROL_TABLE`` 生成；带符号字段复用 ``MotorMapping.decode_signed``。
+        本方法没有任何 WRITE_DATA/SYNC_WRITE 路径。
+        """
+        if self._closed:
+            raise MotorStateError("CalibrationReader 已关闭")
+        eeprom_start = 0
+        eeprom_length = self._torque_addr
+        if eeprom_length != 40:
+            raise ValueError(f"当前 vendor 表的 EEPROM 边界不是 40：{eeprom_length}")
+        deadline = self._clock() + self._read_timeout_s
+        ids = [ax.servo_id for ax in self.mapping.axes]
+        blocks = self._protocol.bulk_read(ids, eeprom_start, eeprom_length, deadline)
+        snapshots: list[dict] = []
+        for ax in self.mapping.axes:
+            raw_bytes = blocks[ax.servo_id]
+            table = MODEL_CONTROL_TABLE[ax.model]
+            registers: dict[str, dict[str, int]] = {}
+            entries = []
+            for name, spec in table.items():
+                if not isinstance(spec, tuple) or len(spec) != 2:
+                    continue
+                addr, length = int(spec[0]), int(spec[1])
+                if addr < eeprom_start or addr + length > eeprom_length:
+                    continue
+                entries.append((addr, name, length))
+            for addr, name, length in sorted(entries):
+                chunk = raw_bytes[addr - eeprom_start : addr - eeprom_start + length]
+                raw = int.from_bytes(chunk, byteorder="little", signed=False)
+                decoded = self.mapping.decode_signed(ax, name, raw)
+                registers[name] = {
+                    "address": addr,
+                    "length": length,
+                    "raw": raw,
+                    "decoded": int(decoded),
+                }
+            snapshots.append({
+                "name": ax.name,
+                "configured_id": int(ax.servo_id),
+                "model": ax.model,
+                "eeprom_start": eeprom_start,
+                "eeprom_length": eeprom_length,
+                "raw_hex": raw_bytes.hex(),
+                "registers": registers,
+            })
+        return snapshots
 
     def read_snapshot(self) -> dict:
         """一次有界事务读回 6 台的位置/速度/电流寄存器。

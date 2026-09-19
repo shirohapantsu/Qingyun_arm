@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-066",
+  "status": "CONFIRMED_FOR_CURRENT_DEMO",
+  "completed_at": "2026-09-16T12:04:50+08:00",
+  "parameter": "motion.following_error_dwell_s",
+  "method": "Set the soft following-error dwell strictly between one and two 30 Hz feedback intervals. Verify recovery after one isolated over-threshold frame and stopping on the third frame for a sustained error that remains below the hard threshold.",
+  "inputs": {
+    "CAL-002_fps": 30,
+    "tick_s": 0.03333333333333333,
+    "CAL-064_soft_following_error_deg": [5.0, 7.2, 6.7, 4.9, 4.9],
+    "CAL-065_hard_following_error_deg": [6.9, 9.1, 8.5, 6.7, 6.8],
+    "CAL-064_report": "CAL-064_following_error_tolerance_derived_20260916.json",
+    "CAL-064_report_sha256": "6b0f01d0aa5367fec7fe3a521eeabadb8b25797b55779c82d144d19145bd35ed",
+    "CAL-065_report": "CAL-065_hard_following_error_derived_20260916.json",
+    "CAL-065_report_sha256": "9219099c2de5803ccdc8f411e97604bd3d82e371bed9f353add33349148cf460"
+  },
+  "derivation": {
+    "rule": "1.5 / FPS",
+    "intervals": 1.5,
+    "before_s": 0.1,
+    "after_s": 0.05,
+    "reason_for_not_using_exactly_2_over_fps": "At the exact floating-point boundary, two accumulated tick increments can compare microscopically below 2/FPS and postpone detection to the fourth feedback frame.",
+    "control_semantics": "One isolated soft-threshold violation may recover; a sustained violation starts timing on frame 1 and stops on frame 3 after approximately 0.0667 s. Hard-threshold violations remain immediate."
+  },
+  "normal_physical_evidence": {
+    "source_family": "deduplicated passed CAL-058 and CAL-059 samples documented by CAL-064",
+    "unique_trajectories": 90,
+    "sample_rows": 4997,
+    "rows_above_CAL-064_soft_threshold": 0,
+    "effect_of_shorter_dwell_on_observed_normal_rows": "none",
+    "result": "PASS"
+  },
+  "discrete_behavior_verification": {
+    "isolated_over_soft_frame_then_recovery": "PASS; violation timer cleared without stop",
+    "sustained_over_soft_below_hard": "PASS; TRACKING_ERROR on feedback frame 3",
+    "virtual_elapsed_at_stop_s": 0.06666666666666667,
+    "hard_over_threshold_first_frame": "PASS; immediate stop with no dwell wait",
+    "focused_tests_passed": 3,
+    "focused_tests_failed": 0
+  },
+  "fit_correction": {
+    "obsolete_rule": "hard-coded 0.10 s",
+    "function": "scripts.calibrate._derive_following_error_dwell",
+    "regression_tests": [
+      "test_motion跟踪误差持续时间位于一至两个控制周期之间",
+      "test_普通跟踪误差孤立尖峰恢复而持续两周期停止",
+      "test_硬跟踪误差首帧立即停止不等dwell"
+    ]
+  },
+  "profile_sha256_before": "f8e3841a13d060bfa4d5ed3f28d4b4a74ebe2d09053502e9b9274800d1f6c4fc",
+  "profile_sha256_after": "f470e1c9e05a38bccac848af0619830526d8ab55fda3ae0ccc3a421cacd136e0",
+  "profile_written": true,
+  "hardware_accessed_for_this_derivation": false,
+  "eeprom_written": false,
+  "limitations": [
+    "The real-arm profile remains draft and therefore is intentionally rejected by the production real-mode loader until all required parameters and evidence are complete.",
+    "No physical jam, manual obstruction, collision, or end-to-end mechanical stop-latency test was performed.",
+    "This confirms the discrete software timing semantics for the current demo, not complete mechanical jam safety certification."
+  ],
+  "post_write_verification": {
+    "profile_json_valid": true,
+    "configured_value_s": 0.05,
+    "full_motion_group_regression": "deferred until CAL-063 through CAL-070 form a complete group, per operator instruction",
+    "result": "PASS"
+  },
+  "downstream": {
+    "CAL-067": "next calibration item: settling position tolerance",
+    "CAL-065": "hard following-error protection remains immediate and independent of this dwell"
+  }
+}

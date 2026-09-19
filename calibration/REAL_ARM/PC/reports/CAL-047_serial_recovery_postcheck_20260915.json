@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-047",
+  "date": "2026-09-15",
+  "status": "RECOVERY_FAILED_SAFE_TORQUE_OFF",
+  "profile_sha256": "52e2b621a303368f0774cf9ee439da852f2992480b0dfec1c21c55dad4106ba9",
+  "recovery_attempt": "CAL-047_serial_recovery_to_waypoint_attempt3_20260915.json",
+  "recovery_attempt_sha256": "f06c099e2862ca47797eb1e94dbaf7ec1327a56a5505c004445ebad5b8e99b69",
+  "failure": "serial_recovery_to_waypoint did not remain within the configured 2.5 degree endpoint tolerance for the required dwell inside the 3.0 second settle timeout",
+  "trajectory_nodes_were_sent": true,
+  "cleanup_torque_readback": [0, 0, 0, 0, 0, 0],
+  "post_cleanup_readonly_check": {
+    "samples": 15,
+    "raw_position_representative": [2133, 1245, 2379, 2956, 2044, 1528],
+    "raw_position_static_span": [0, 0, 0, 0, 0, 0],
+    "q_urdf_deg": [6.945054945054945, -87.98997802197803, 46.24093406593407, 83.15563736263736, 1.2307692307692308],
+    "torque_enabled_before": [0, 0, 0, 0, 0, 0],
+    "torque_enabled_after": [0, 0, 0, 0, 0, 0],
+    "ids": [1, 2, 3, 4, 5, 6],
+    "model_numbers": [777, 777, 777, 777, 777, 777],
+    "write_instructions_sent": 0
+  },
+  "target_waypoint_deg": [6.681318681318682, -50.451516483516485, 10.900274725274727, 62.05673626373627, 1.054945054945055],
+  "post_cleanup_abs_error_from_target_deg": [0.2637362637362637, 37.53846153846155, 35.34065934065934, 21.098901098901095, 0.17582417582417587],
+  "decision": "Do not treat the arm as positioned at CAL-047 and do not start CAL-058. No fourth motion attempt is authorized. Diagnose tracking/holding and capture in-loop endpoint feedback before another powered recovery.",
+  "eeprom_written": false
+}

@@ -1,0 +1,488 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-085",
+  "dependent_parameter_id": "CAL-093",
+  "test": "single_fixed_actual_feedback_hold_no_approach",
+  "status": "PASS_PENDING_OPERATOR_OBSERVATION",
+  "started_at": "2026-09-17T19:47:06.012525+08:00",
+  "approved_plan": {
+    "schema_version": 1,
+    "parameter_id": "CAL-085",
+    "dependent_parameter_id": "CAL-093",
+    "status": "APPROVED_ONE_DIRECT_FEEDBACK_HOLD",
+    "required_confirmation": "批准，CAL-085实测反馈短保持就绪",
+    "operator_confirmation": "批准，CAL-085实测反馈短保持就绪",
+    "reference_report": "CAL-085_floor1830_endpoint_confirmation_attempt1_20260917.json",
+    "reference_report_sha256": "85dfdc9405aa5cf8257fed26a1016e8ad96e8196c9ed7beb2e7223622d861c4b",
+    "reference_raw_samples_sha256": "c9008a22f8c37b849b2ceeb1153f38b74adaa0231d7a6da8464df4dfc106a361",
+    "raw_samples_hash_encoding": "json.dumps(samples,sort_keys=True,separators=(',',':')).encode()",
+    "profile_sha256": "fe6aaf95e8418975d6eb966fe20ad55a8743084f63c443474aa838c21beffb2f",
+    "motor_calibration_sha256": "ad315322ad4d19cc322c8f21d86d9667d9df9eca2de325bebbd72fa62deefff5",
+    "source_operator_observation": "已夹紧",
+    "operator_confirmed_grip": true,
+    "holding_stability_confirmed": false,
+    "feedback_hold_confirmed": false,
+    "unsupported_load_bearing_confirmed": false,
+    "compression_mm": null,
+    "no_abnormality_confirmation_inferred": false,
+    "servo_id": 6,
+    "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+    "expected_resolved_port": "/dev/ttyACM0",
+    "expected_usb_identity": {
+      "vid": "1a86",
+      "pid": "55d3",
+      "serial": "5B14114904"
+    },
+    "expected_start_raw": 1839,
+    "start_max_deviation_raw": 5,
+    "start_accepted_raw": [
+      1834,
+      1844
+    ],
+    "all_six_static_read_frames": 10,
+    "gripper_static_span_max_raw": 2,
+    "feedback_bounds_raw": [
+      1499,
+      2897
+    ],
+    "all_six_identity_eeprom_torque_off_checks_required": true,
+    "gripper_controller_settings_check_required": true,
+    "arm_static_span_is_diagnostic_only": true,
+    "arm_source_deviation_is_diagnostic_only": true,
+    "arm_raw_domain_is_diagnostic_only": true,
+    "operator_scope_clarification": "只需要关注六轴即可，其他轴是我调整的",
+    "hold_target_source": "Freeze the last fresh readonly integer gripper feedback ONCE. Repeat only that exact target; never historical1830command, a deeper target, or rebased subsequent feedback.",
+    "hold_target_bounds_raw": [
+      1834,
+      1844
+    ],
+    "sample_fps": 30,
+    "maximum_feedback_hold_s": 0.3,
+    "whole_powered_timeout_s": 0.3,
+    "powered_budget_start": "Immediately BEFORE first goal write, which may implicitly enable torque; includes startup/enable and all powered sampling. No separate preparation budget or dwell extension.",
+    "max_tracking_error_raw": 10,
+    "all_phase_abs_current_abort_ma": 20,
+    "max_tick_lateness_s": 0.02,
+    "transaction_timeout_ceiling_s": 0.25,
+    "transaction_budget_rule": "Bound each powered transaction by remaining powered budget and reserved torque-off cleanup budget; never use the ceiling when it exceeds the remaining budget.",
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "fixture_contact_band_mm": 20,
+    "fixture_independently_supported": true,
+    "fixture_nominal_width_mm": 42,
+    "width_is_approximate_not_new_measurement": true,
+    "proposed_cycles": 1,
+    "approved_cycles": 1,
+    "authorized_physical_trials": 1,
+    "remaining_authorized_physical_trials": 1,
+    "new_motion_commands": 0,
+    "cumulative_gripper_goals": 6768,
+    "arm_goals_authorized": 0,
+    "closing_approach_goals_authorized": 0,
+    "opening_preparation_goals_authorized": 0,
+    "eeprom_writes_authorized": false,
+    "profile_writes_authorized": false,
+    "candidate_contact_qualification_forced": false,
+    "production_grasp_authorized": false,
+    "operator_requirements": "Keep fixture independently supported at20mm contact band with catch below, hands out of pinch zones and12Vcut reachable. No fixture repositioning during powered phase, lifting or unsupported holding. If setup changed or grip already lost, stop before writes.",
+    "cleanup": "Immediately disable6then other axes on completion/any guard/failure; account for implicit torque enabling and partial SRAM preparation. Restore/readback every original SRAM field and verify all6off. No retry, deeper closure or compensating squeeze.",
+    "operator_observation_required": "Report maintained gripping/light touch/loosened during short hold, fixture motion/compression/abnormality, and after torque off separately.",
+    "limitations": [
+      "This isolates the actual-feedback holding primitive using operator-confirmed gripping initial state; it does not bypass production candidate/draft protection or declare the unqualified10mA candidate successful.",
+      "Actual feedback target is more open than previous1830command and may release compression/gripping; no automatic compensation.",
+      "0.3s is maximum powered budget, not proof of full0.3s holding or CAL-093 acceptance. Record measured duration and actual samples.",
+      "20mA is a diagnostic stop bound, not a fruit damage limit. Profile220/450 and unintegrated candidate10 unchanged.",
+      "Physical grip does not prove stability, safe force, measured compression or unsupported load bearing; matched empty control/repetition remain necessary.",
+      "CAL-085~088 remain UNVERIFIED, CAL-093~095 remain dependent, profile draft/verification null; no group/full tests yet."
+    ]
+  },
+  "operator_confirmation": "批准，CAL-085实测反馈短保持就绪",
+  "profile_sha256": "fe6aaf95e8418975d6eb966fe20ad55a8743084f63c443474aa838c21beffb2f",
+  "source_report_sha256": "85dfdc9405aa5cf8257fed26a1016e8ad96e8196c9ed7beb2e7223622d861c4b",
+  "source_raw_samples_sha256": "c9008a22f8c37b849b2ceeb1153f38b74adaa0231d7a6da8464df4dfc106a361",
+  "joint_servo_motion_commands_sent": 0,
+  "gripper_motion_commands_sent": 9,
+  "closing_goal_updates_sent": 0,
+  "opening_preparation_goal_updates_sent": 0,
+  "feedback_hold_goal_updates_sent": 9,
+  "eeprom_written": false,
+  "profile_written": false,
+  "candidate_contact_qualified": false,
+  "candidate_contact_qualification_forced": false,
+  "feedback_hold_completed": true,
+  "samples": [
+    {
+      "monotonic_ns": 198354814880586,
+      "position_raw": 1839,
+      "gripper_pct": 24.320457796852647,
+      "velocity_register_raw": 0,
+      "velocity_pct_s": 0.0,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0,
+      "phase": "fixed_actual_feedback_hold",
+      "command_raw": 1839,
+      "tracking_error_raw": 0
+    },
+    {
+      "monotonic_ns": 198354848465998,
+      "position_raw": 1839,
+      "gripper_pct": 24.320457796852647,
+      "velocity_register_raw": 0,
+      "velocity_pct_s": 0.0,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0,
+      "phase": "fixed_actual_feedback_hold",
+      "command_raw": 1839,
+      "tracking_error_raw": 0
+    },
+    {
+      "monotonic_ns": 198354881597552,
+      "position_raw": 1839,
+      "gripper_pct": 24.320457796852647,
+      "velocity_register_raw": 0,
+      "velocity_pct_s": 0.0,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0,
+      "phase": "fixed_actual_feedback_hold",
+      "command_raw": 1839,
+      "tracking_error_raw": 0
+    },
+    {
+      "monotonic_ns": 198354914672478,
+      "position_raw": 1839,
+      "gripper_pct": 24.320457796852647,
+      "velocity_register_raw": 0,
+      "velocity_pct_s": 0.0,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0,
+      "phase": "fixed_actual_feedback_hold",
+      "command_raw": 1839,
+      "tracking_error_raw": 0
+    },
+    {
+      "monotonic_ns": 198354947872353,
+      "position_raw": 1839,
+      "gripper_pct": 24.320457796852647,
+      "velocity_register_raw": 0,
+      "velocity_pct_s": 0.0,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0,
+      "phase": "fixed_actual_feedback_hold",
+      "command_raw": 1839,
+      "tracking_error_raw": 0
+    },
+    {
+      "monotonic_ns": 198354981450251,
+      "position_raw": 1839,
+      "gripper_pct": 24.320457796852647,
+      "velocity_register_raw": 0,
+      "velocity_pct_s": 0.0,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0,
+      "phase": "fixed_actual_feedback_hold",
+      "command_raw": 1839,
+      "tracking_error_raw": 0
+    },
+    {
+      "monotonic_ns": 198355014599710,
+      "position_raw": 1839,
+      "gripper_pct": 24.320457796852647,
+      "velocity_register_raw": 0,
+      "velocity_pct_s": 0.0,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0,
+      "phase": "fixed_actual_feedback_hold",
+      "command_raw": 1839,
+      "tracking_error_raw": 0
+    },
+    {
+      "monotonic_ns": 198355048221872,
+      "position_raw": 1839,
+      "gripper_pct": 24.320457796852647,
+      "velocity_register_raw": 0,
+      "velocity_pct_s": 0.0,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0,
+      "phase": "fixed_actual_feedback_hold",
+      "command_raw": 1839,
+      "tracking_error_raw": 0
+    },
+    {
+      "monotonic_ns": 198355081293232,
+      "position_raw": 1839,
+      "gripper_pct": 24.320457796852647,
+      "velocity_register_raw": 0,
+      "velocity_pct_s": 0.0,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0,
+      "phase": "fixed_actual_feedback_hold",
+      "command_raw": 1839,
+      "tracking_error_raw": 0
+    }
+  ],
+  "environment": {
+    "power_v": 12,
+    "ambient_temperature_c": null,
+    "base_mount": "fixed to wooden board",
+    "load": "independently supported plastic fixture,20mm contact band"
+  },
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "readonly_preflight": {
+    "ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "models": [
+      777,
+      777,
+      777,
+      777,
+      777,
+      777
+    ],
+    "torques": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "readonly_eeprom": {
+    "shoulder_pan": {
+      "range_min": 718,
+      "range_max": 3424,
+      "homing_offset": -438
+    },
+    "shoulder_lift": {
+      "range_min": 865,
+      "range_max": 3333,
+      "homing_offset": -1961
+    },
+    "elbow_flex": {
+      "range_min": 796,
+      "range_max": 3095,
+      "homing_offset": 1791
+    },
+    "wrist_flex": {
+      "range_min": 729,
+      "range_max": 3192,
+      "homing_offset": -1795
+    },
+    "wrist_roll": {
+      "range_min": 0,
+      "range_max": 4095,
+      "homing_offset": 1079
+    },
+    "gripper": {
+      "range_min": 1458,
+      "range_max": 2980,
+      "homing_offset": -1600
+    }
+  },
+  "readonly_gripper_controller_settings": {
+    "P_Coefficient": 16,
+    "D_Coefficient": 32,
+    "I_Coefficient": 0,
+    "Minimum_Startup_Force": 16,
+    "CW_Dead_Zone": 1,
+    "CCW_Dead_Zone": 1
+  },
+  "fresh_readonly_baseline": {
+    "raw_position_by_sample": [
+      [
+        843,
+        862,
+        3071,
+        2390,
+        2043,
+        1839
+      ],
+      [
+        843,
+        862,
+        3071,
+        2390,
+        2043,
+        1839
+      ],
+      [
+        843,
+        862,
+        3071,
+        2390,
+        2043,
+        1839
+      ],
+      [
+        843,
+        862,
+        3071,
+        2390,
+        2043,
+        1839
+      ],
+      [
+        843,
+        862,
+        3071,
+        2390,
+        2043,
+        1839
+      ],
+      [
+        843,
+        862,
+        3071,
+        2390,
+        2043,
+        1839
+      ],
+      [
+        843,
+        862,
+        3071,
+        2390,
+        2043,
+        1839
+      ],
+      [
+        843,
+        862,
+        3071,
+        2390,
+        2043,
+        1839
+      ],
+      [
+        843,
+        862,
+        3071,
+        2390,
+        2043,
+        1839
+      ],
+      [
+        843,
+        862,
+        3071,
+        2390,
+        2043,
+        1839
+      ]
+    ],
+    "raw_position_static_span": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_after": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "arm_positions_outside_calibration_domain_diagnostic": [
+    {
+      "servo_id": 2,
+      "positions_raw": [
+        862,
+        862,
+        862,
+        862,
+        862,
+        862,
+        862,
+        862,
+        862,
+        862
+      ],
+      "range_raw": [
+        865,
+        3333
+      ]
+    }
+  ],
+  "original_sram_settings": {
+    "Acceleration": 0,
+    "Goal_Time": 0,
+    "Goal_Velocity": 0,
+    "Torque_Limit": 500
+  },
+  "test_sram_settings": {
+    "Acceleration": 5,
+    "Goal_Time": 0,
+    "Goal_Velocity": 0,
+    "Torque_Limit": 500
+  },
+  "fresh_readonly_hold_reference": {
+    "monotonic_ns": 198354812827790,
+    "position_raw": 1839,
+    "gripper_pct": 24.320457796852647,
+    "velocity_register_raw": 0,
+    "velocity_pct_s": 0.0,
+    "current_register_raw": 0,
+    "current_ma": 0.0,
+    "moving": 0
+  },
+  "hold_target_raw": 1839,
+  "powered_started_monotonic_ns": 198354812872105,
+  "powered_duration_s": 0.26850515700061806,
+  "result": {
+    "hold_target_raw": 1839,
+    "final_feedback_raw": 1839,
+    "final_velocity_pct_s": 0.0,
+    "peak_abs_current_ma": 0.0,
+    "max_tracking_error_raw": 0,
+    "sample_count": 9,
+    "physical_holding_observation_pending": true,
+    "stable_grip_confirmed": false,
+    "unsupported_load_bearing_confirmed": false
+  },
+  "torque_enabled_after": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "sram_settings_after": {
+    "Acceleration": 0,
+    "Goal_Time": 0,
+    "Goal_Velocity": 0,
+    "Torque_Limit": 500
+  },
+  "gripper_position_after_torque_off_raw": 1839,
+  "finished_at": "2026-09-17T19:47:07.234595+08:00"
+}

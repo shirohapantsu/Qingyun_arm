@@ -233,6 +233,10 @@ def test_fit产出可加载的候选配置(pipeline):
     assert sidecar.is_file()
     audit = json.loads(sidecar.read_text(encoding="utf-8"))
     assert set(audit) >= set(STAGES)
+    motor_audit = json.loads(
+        (pipeline["dir"] / "c_motor.audit.json").read_text(encoding="utf-8"))
+    assert "motor.velocity_deg_s_per_raw" not in motor_audit["motor"]["updated_fields"], \
+        "只核对方向的 fitter 不得把原值回抄冒充比例拟合结果"
 
 
 def test_fit不修改输入配置(pipeline):
@@ -619,17 +623,111 @@ def test_capture_hardware_motor_stage(tmp_path, monkeypatch):
     monkeypatch.setattr(MC, "SerialTransport", lambda port, baud: bus)
     out = tmp_path / "hw_motor.jsonl"
     rc = mod.main(["capture", "--stage", "motor", "--profile", str(prof),
-                   "--output", str(out), "--hardware", "--repeats", "2"])
+                   "--output", str(out), "--hardware", "--repeats", "2",
+                   "--power", "12V", "--ambient-temperature-c", "26.8",
+                   "--base-mount", "work-area-fixed"])
     assert rc == 0
     records = [json.loads(line) for line in out.read_text(encoding="utf-8").splitlines()]
     assert records[0]["payload"]["source"] == "hardware"
     assert records[0]["payload"]["port"] == "/dev/ttyHW-TEST"
+    assert records[0]["payload"]["power"] == "12V"
+    assert records[0]["payload"]["ambient_temperature_c"] == 26.8
+    assert records[0]["payload"]["base_mount"] == "work-area-fixed"
     assert len(records) == 1 + 2
     assert records[1]["payload"]["raw_position"] == [2000 + 5 * i for i in range(6)]
+    assert records[1]["payload"]["torque_enabled"] == 0
+    assert records[1]["payload"]["torque_enabled_by_motor"] == [0] * 6
     # 采集路径绝不提交运动：没有任何 SYNC_WRITE / WRITE_DATA 帧。
     assert bus.sync_write_count == 0
     assert not any(f[4] in (MC.StsProtocol.INST_SYNC_WRITE,
                             MC.StsProtocol.INST_WRITE_DATA) for f in bus.tx_log)
+
+
+def test_capture_hardware_motor_zero偏闸要求六台全部卸力(tmp_path, monkeypatch):
+    mod, prof = _draft_package(tmp_path)
+    bus = _seed_bus()
+    bus.registers[4][40] = 1
+    monkeypatch.setattr(MC, "SerialTransport", lambda port, baud: bus)
+    out = tmp_path / "hw_motor_zero.jsonl"
+    rc = mod.main(["capture", "--stage", "motor", "--profile", str(prof),
+                   "--output", str(out), "--hardware", "--repeats", "2",
+                   "--require-torque-disabled", "--load", "unloaded"])
+    assert rc == 2
+    assert not out.exists()
+    assert bus.sync_write_count == 0
+    assert not any(f[4] in (MC.StsProtocol.INST_SYNC_WRITE,
+                            MC.StsProtocol.INST_WRITE_DATA) for f in bus.tx_log)
+
+
+def test_fit_motor从空载卸力样本拟合六通道零偏(tmp_path, monkeypatch):
+    mod, prof = _draft_package(tmp_path)
+    bus = _seed_bus()
+    for sid in range(1, 7):
+        bus.set_u16(sid, 69, 7 + sid)
+    monkeypatch.setattr(MC, "SerialTransport", lambda port, baud: bus)
+    raw = tmp_path / "motor_zero.jsonl"
+    candidate = tmp_path / "candidate.json"
+    assert mod.main(["capture", "--stage", "motor", "--profile", str(prof),
+                     "--output", str(raw), "--hardware", "--repeats", "30",
+                     "--require-torque-disabled", "--load", "unloaded"]) == 0
+    assert mod.main(["fit", "--stage", "motor", "--profile", str(prof),
+                     "--input", str(raw), "--output", str(candidate)]) == 0
+    got = json.loads(candidate.read_text(encoding="utf-8"))
+    assert got["motor"]["current_zero_raw"] == [8.0, 9.0, 10.0, 11.0, 12.0, 13.0]
+    audit = json.loads(candidate.with_suffix(".audit.json").read_text(encoding="utf-8"))
+    residuals = audit["motor"]["residuals"]
+    assert residuals["current_zero_sample_count"] == 30
+    assert residuals["current_zero_mad_raw"] == [0.0] * 6
+
+
+def test_fit_motor电流比例逐通道解码符号并扣除零偏(tmp_path, monkeypatch):
+    mod, prof = _draft_package(tmp_path)
+    monkeypatch.setitem(mod.args_profile_dir, "current", str(tmp_path))
+    base = json.loads(prof.read_text(encoding="utf-8"))
+    base["motor"]["current_zero_raw"] = [2.0, -2.0, 1.0, -1.0, 0.0, 3.0]
+    deltas = [-12, 12, -8, 8, -20, 5]
+    decoded = [base["motor"]["current_zero_raw"][i] + deltas[i] for i in range(6)]
+    encoded = [int(v) if v >= 0 else 0x8000 | abs(int(v)) for v in decoded]
+    references = [abs(delta) * 6.5 for delta in deltas]
+    records = [
+        mod.Record("motor", "r1", "meta", 0, {
+            "record_type": "metadata", "source": "hardware",
+        }),
+        mod.Record("motor", "r1", "sample", 1, {
+            "record_type": "sample", "raw_current": encoded,
+            "reference_current_ma": references,
+        }),
+    ]
+
+    updates, _ = mod._fit_motor(base, records)
+
+    assert updates["motor.current_ma_per_raw"] == pytest.approx([6.5] * 6)
+
+
+def test_fit_motor夹爪端点不足五轮只记录且不回填(tmp_path):
+    mod, prof = _draft_package(tmp_path)
+    base = json.loads(prof.read_text(encoding="utf-8"))
+    records = [
+        mod.Record("motor", "r1", "meta", 0, {
+            "record_type": "metadata", "source": "hardware",
+        }),
+    ]
+    for repeat, (closed, opened) in enumerate(((1495, 2897), (1499, 2938)), start=1):
+        for label, value in (("gripper_closed_end", closed),
+                             ("gripper_open_end", opened)):
+            records.append(mod.Record("motor", "r1", f"{label}-{repeat}", repeat, {
+                "record_type": "sample",
+                "motion_label": label,
+                "raw_position": [2000, 2000, 2000, 2000, 2000, value],
+            }))
+
+    updates, residuals = mod._fit_motor(base, records)
+
+    assert "motor.gripper_closed_raw" not in updates
+    assert "motor.gripper_open_raw" not in updates
+    assert residuals["gripper_endpoint_repeat_count"] == [2, 2]
+    assert residuals["gripper_end_hysteresis_counts"] == [4, 41]
+    assert residuals["gripper_endpoint_status"] == "insufficient_repeats_no_update"
 
 
 def test_capture_hardware_joints_stage给出q_bus(tmp_path, monkeypatch):
@@ -697,8 +795,8 @@ def test_capture_hardware_joints的外部测量键能进记录并被fit消费(tm
                  "sweep_direction": "forward" if deg >= 0 else "backward",
                  "q_reference_deg": q_ref(j, deg),
                  "fixture_id": "G1", "load_label": "unloaded"}, pos)
-    # 2) 端点重复测量 → measured_limits_deg / margin_deg。关节 0 故意给 1.8° 的
-    #    重复散布，用来验证指南 5.5 的 margin = max(draft, 散布 + 0.5) 真会变大。
+    # 2) measured_limits_deg 由 motor_calibration.json 派生。端点重复观测只核对
+    #    文件是否仍匹配实机，并估计 margin。关节 0 故意给 1.8° 散布。
     for j in range(5):
         spread = 1.8 if j == 0 else 0.4
         for side, base in (("lower", -95.0), ("upper", 88.0)):
@@ -746,9 +844,15 @@ def test_capture_hardware_joints的外部测量键能进记录并被fit消费(tm
     assert fitted["joints"]["sign"] == sign_true, "方向真值未被恢复"
     assert fitted["joints"]["zero_offset_deg"] == pytest.approx(
         offset_true, abs=0.06), "零位偏置未被恢复（编码步长 0.0879°/计数）"
-    for j in range(5):
-        lo, hi = fitted["joints"]["measured_limits_deg"][j]
-        assert (lo, hi) == (-95.0 - (1.8 if j == 0 else 0.4), 88.0 + (1.8 if j == 0 else 0.4))
+    motor_calib = json.loads((prof.parent / "motor_calibration.json").read_text(encoding="utf-8"))
+    resolutions = fitted["motor"]["position_resolution"]
+    for j, name in enumerate(MC.JOINT_NAMES):
+        entry = motor_calib[name]
+        expected = MC.calibrated_range_to_urdf_limits_deg(
+            entry["range_min"], entry["range_max"], resolutions[j],
+            fitted["joints"]["sign"][j], fitted["joints"]["zero_offset_deg"][j],
+        )
+        assert fitted["joints"]["measured_limits_deg"][j] == pytest.approx(expected)
     assert fitted["joints"]["margin_deg"] == pytest.approx([2.3, 2.0, 2.0, 2.0, 2.0])
     assert fitted["joints"]["application_limits_deg"][2] == [-92.0, 92.0]
     audit = json.loads((tmp_path / "cand.audit.json").read_text(encoding="utf-8"))
@@ -756,6 +860,36 @@ def test_capture_hardware_joints的外部测量键能进记录并被fit消费(tm
     assert audit["joints"]["updated_fields"] == sorted([
         "joints.sign", "joints.zero_offset_deg", "joints.measured_limits_deg",
         "joints.margin_deg", "joints.application_limits_deg"])
+
+    # endpoints 整组可以不采：机械行程仍必须由官方校准文件生成，
+    # 只是无法用重复端点散布把 draft margin 往上放大。
+    no_endpoints = tmp_path / "hw_joints_no_endpoints.jsonl"
+    no_endpoint_rows = [
+        row for row in records
+        if row.get("payload", {}).get("approach_direction") != "endpoints"
+    ]
+    no_endpoints.write_text(
+        "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in no_endpoint_rows),
+        encoding="utf-8",
+    )
+    cand_no_endpoints = tmp_path / "cand_no_endpoints.json"
+    assert mod.main(["fit", "--stage", "joints", "--profile", str(prof),
+                     "--input", str(no_endpoints), "--output", str(cand_no_endpoints)]) == 0
+    fitted_no_endpoints = json.loads(cand_no_endpoints.read_text(encoding="utf-8"))
+    assert np.allclose(
+        fitted_no_endpoints["joints"]["measured_limits_deg"],
+        fitted["joints"]["measured_limits_deg"],
+    )
+    assert fitted_no_endpoints["joints"]["margin_deg"] == [2.0] * 5
+
+    # profile 已绑定哈希时，joints 不能悄悄改用另一份校准文件派生行程。
+    bad_hash_profile = tmp_path / "profile_bad_motor_calibration_hash.json"
+    bad_hash_data = json.loads(prof.read_text(encoding="utf-8"))
+    bad_hash_data["model"]["motor_calibration_sha256"] = "0" * 64
+    bad_hash_profile.write_text(json.dumps(bad_hash_data), encoding="utf-8")
+    assert mod.main(["fit", "--stage", "joints", "--profile", str(bad_hash_profile),
+                     "--input", str(no_endpoints),
+                     "--output", str(tmp_path / "must_not_exist.json")]) == 2
 
 
 class _RowSteppingBus(FakeBus):
@@ -818,11 +952,24 @@ def _grasp_records(mod, extra_summary: dict) -> list:
 
     rec({"record_type": "empty_placeholder"})   # 占位行不参与 sample 过滤
     rec({"record_type": "sample", "cycle_phase": "empty_close", "gripper_pct": 2.5})
-    rec({"record_type": "sample", "contact_label": "first_contact", "actual_gap_m": 0.026})
+    rec({"record_type": "sample", "contact_label": "first_contact", "actual_gap_m": 0.026, "gripper_pct": 42.0})
     summary = {"record_type": "trial_summary", "slip_drift_pct": 3.0}
     summary.update(extra_summary)
     rec(summary)
     return recs
+
+
+@pytest.mark.parametrize("close_s,open_s", [(4.7, 4.3), (6.0, 6.0)])
+def test_grasp_fit保留已有超时而非覆盖为常数(calib_mod, close_s, open_s):
+    from tests.support import raw_profile
+
+    base = raw_profile()
+    base["gripper"]["close_timeout_s"] = close_s
+    base["gripper"]["open_timeout_s"] = open_s
+    upd, audit = calib_mod._fit_grasp(base, _grasp_records(calib_mod, {}))
+    assert upd["gripper.close_timeout_s"] == close_s
+    assert upd["gripper.open_timeout_s"] == open_s
+    assert audit["gripper_timeout_source"].startswith("preserved_base_not_fitted")
 
 
 def test_object_shift_bound必须是米量级的实测位移(calib_mod):
@@ -856,3 +1003,259 @@ def test_gap换算共享实现禁止外插(calib_mod):
         calib_mod.gripper_pct_to_gap_simple(120.0, rows)
     with pytest.raises(calib_mod.CalibError):
         calib_mod._pct_for_gap(0.20, rows)
+
+
+def test_motion加速度按独立轨迹和tick平方换算(calib_mod):
+    """CAL-059 回归：轨迹边界不参与差分，单位必须是 deg/s^2。"""
+    rows = []
+    for trajectory, offset in (("a", 0.0), ("b", 100.0)):
+        # fps=10；二阶差分 0.1 deg / tick^2 = 10 deg/s^2。
+        # 尾部重复点模拟到位驻留，不应改变峰值。
+        for command0 in (0.0, 0.1, 0.3, 0.6, 0.6, 0.6):
+            rows.append({
+                "trajectory_id": trajectory,
+                "segment": trajectory,
+                "direction": 1,
+                "command_deg": [offset + command0, 0.0, 0.0, 0.0, 0.0],
+            })
+    peak, groups = calib_mod._peak_command_acceleration(rows, 10)
+    assert groups == 2
+    assert peak == pytest.approx([10.0, 0.0, 0.0, 0.0, 0.0])
+
+    # 如果错误地拼接两条轨迹，100 deg 边界跳变会产生近万 deg/s^2；
+    # 这里同时钉住“×0.85后取50下界，而不是额外+50”。
+    from tests.support import raw_profile
+    base = raw_profile()
+    base["timing"]["fps"] = 10
+    records = []
+    for index, payload in enumerate(rows):
+        payload = dict(payload)
+        payload.update({
+            "record_type": "sample",
+            "passed": True,
+                "speed_deg_s": [1.0] * 5,
+                "current_ma": [10.0] * 5,
+                "feedback_deg": payload["command_deg"],
+                "time_ns": (index + 1) * 100_000_000,
+            })
+        records.append(calib_mod.Record("motion", "run", f"s{index}", index, payload))
+    updates, residuals = calib_mod._fit_motion(base, records)
+    assert updates["motion.max_acceleration_deg_s2"] == [50.0] * 5
+    assert residuals["peak_command_acceleration_deg_s2"] == pytest.approx(
+        [10.0, 0.0, 0.0, 0.0, 0.0]
+    )
+
+
+def test_motion单tick步长向下量化不得反超速度上限(calib_mod):
+    """CAL-060 回归：48.56/30 不能四舍五入成1.619。"""
+    velocity = [48.56, 48.56, 44.82, 44.82, 48.56]
+    step = calib_mod._derive_command_step_limits(velocity, 30)
+    assert step == [1.618, 1.618, 1.494, 1.494, 1.618]
+    assert np.all(np.asarray(step) * 30 <= np.asarray(velocity) + 1e-12)
+
+
+def test_motion起点容差只取各轨迹首帧并不低于到位容差(calib_mod):
+    """CAL-063 回归：运动中的跟踪滞后不得混入起点容差。"""
+    rows = []
+    starts = ([0.4, 1.7, 2.6, 1.0, 0.6], [0.5, 1.6, 2.5, 0.9, 0.5])
+    for trajectory, start_error in enumerate(starts):
+        for sample_index, error in enumerate((start_error, [9.0] * 5)):
+            rows.append({
+                "trajectory_id": f"t{trajectory}",
+                "segment": f"s{trajectory}",
+                "direction": 1,
+                "command_deg": [0.0] * 5,
+                "feedback_deg": [-float(v) for v in error],
+                "sample_index": sample_index,
+            })
+    candidate, observed, groups = calib_mod._derive_start_position_tolerance(
+        rows, [2.5] * 5, [4096] * 6
+    )
+    assert groups == 2
+    assert observed == pytest.approx([0.5, 1.7, 2.6, 1.0, 0.6])
+    # 3 counts = 0.2637deg；同时J1/J2/J4/J5受到2.5deg到位容差下界。
+    assert candidate == [2.5, 2.5, 2.9, 2.5, 2.5]
+
+
+def test_motion普通跟踪误差用通过样本最大值加编码余量(calib_mod):
+    """CAL-064 回归：阈值不再用无物理依据的 P99×2+3。"""
+    rows = []
+    for error in ([1.0, 2.0, 3.0, 4.0, 5.0], [1.2, 2.2, 3.2, 4.2, 5.2]):
+        rows.append({
+            "command_deg": [0.0] * 5,
+            "feedback_deg": [-float(v) for v in error],
+        })
+    candidate, observed_max, observed_p99 = calib_mod._derive_following_error_tolerance(
+        rows, [4096] * 6
+    )
+    assert observed_max == pytest.approx([1.2, 2.2, 3.2, 4.2, 5.2])
+    assert np.all(observed_p99 <= observed_max)
+    # 3 counts=0.2637deg，加余量后向上量化到0.1deg。
+    assert candidate == [1.5, 2.5, 3.5, 4.5, 5.5]
+
+
+def test_motion硬跟踪阈值覆盖一个最大命令tick与编码余量(calib_mod):
+    """CAL-065 回归：取代缺少控制语义的 soft×2.2。"""
+    soft = [5.0, 7.2, 6.7, 4.9, 4.9]
+    step = [1.618, 1.618, 1.494, 1.494, 1.618]
+    hard = calib_mod._derive_hard_following_error_tolerance(
+        soft, step, [4096] * 6
+    )
+    assert hard == [6.9, 9.1, 8.5, 6.7, 6.8]
+    assert np.all(np.asarray(hard) > np.asarray(soft))
+
+
+def test_motion跟踪误差持续时间位于一至两个控制周期之间(calib_mod):
+    """CAL-066 回归：dwell 跟随 FPS，不再写死0.10s。"""
+    assert calib_mod._derive_following_error_dwell(30) == pytest.approx(1.5 / 30.0)
+    with pytest.raises(calib_mod.CalibError):
+        calib_mod._derive_following_error_dwell(0)
+    with pytest.raises(calib_mod.CalibError):
+        calib_mod._derive_following_error_dwell(30, 2.0)
+
+
+def test_motion到位位置容差只使用轨迹末端连续低速窗口(calib_mod):
+    """CAL-067：运动滞后和终点后的高速帧不能污染稳定到位误差。"""
+    target = [10.0, 20.0, 30.0, 40.0, 50.0]
+    common = {
+        "load_label": "loaded",
+        "trajectory_id": "t1",
+        "segment": "t1",
+        "direction": 1,
+    }
+    rows = [
+        {**common, "command_deg": [0.0] * 5, "feedback_deg": [-8.0] * 5,
+         "speed_deg_s": [20.0] * 5, "time_ns": 1},
+        {**common, "command_deg": target, "feedback_deg": [0.0] * 5,
+         "speed_deg_s": [12.0] * 5, "time_ns": 50_000_000},
+        {**common, "command_deg": target,
+         "feedback_deg": [9.5, 19.0, 28.5, 38.0, 47.5],
+         "speed_deg_s": [4.0] * 5, "time_ns": 100_000_000},
+        {**common, "command_deg": target,
+         "feedback_deg": [9.6, 19.1, 28.6, 38.1, 47.6],
+         "speed_deg_s": [0.0] * 5, "time_ns": 250_000_000},
+    ]
+    candidate, maximum, _p99, groups, samples = (
+        calib_mod._derive_settle_position_tolerance(
+            rows, [8.0] * 5, [4096] * 6, 0.15
+        )
+    )
+    assert candidate == [0.8, 1.3, 1.8, 2.3, 2.8]
+    assert maximum.tolist() == pytest.approx([0.5, 1.0, 1.5, 2.0, 2.5])
+    assert (groups, samples) == (1, 2)
+
+
+def test_motion到位速度容差使用末端dwell窗口与三个计数余量(calib_mod):
+    common = {
+        "load_label": "loaded", "trajectory_id": "t1", "segment": "t1",
+        "direction": 1, "command_deg": [10.0] * 5,
+    }
+    rows = [
+        {**common, "speed_deg_s": [4.39453125] * 5, "time_ns": 100_000_000},
+        {**common, "speed_deg_s": [0.0] * 5, "time_ns": 250_000_000},
+    ]
+    candidate, maximum, p99, groups, samples = (
+        calib_mod._derive_settle_velocity_tolerance(
+            rows, [0.087890625] * 6, 0.15, velocity_correction_factor=0.02
+        )
+    )
+    assert candidate == [0.4] * 5
+    assert maximum.tolist() == pytest.approx([0.087890625] * 5)
+    assert p99.tolist() == pytest.approx([0.08701171875] * 5)
+    assert (groups, samples) == (1, 2)
+
+
+def test_motion到位驻留时间要求位置速度同时连续满足(calib_mod):
+    common = {
+        "load_label": "loaded", "trajectory_id": "t1", "segment": "t1",
+        "direction": 1, "command_deg": [10.0] * 5,
+    }
+    rows = [
+        {**common, "feedback_deg": [8.0] * 5, "speed_deg_s": [0.0] * 5,
+         "time_ns": 50_000_000},
+        {**common, "feedback_deg": [9.8] * 5, "speed_deg_s": [0.1] * 5,
+         "time_ns": 100_000_000},
+        {**common, "feedback_deg": [9.9] * 5, "speed_deg_s": [0.0] * 5,
+         "time_ns": 260_000_000},
+    ]
+    result = calib_mod._validate_settle_dwell(
+        rows, [0.5] * 5, [0.4] * 5, 0.15
+    )
+    assert result == pytest.approx((0.16, 0.16, 0.16, 1, 2))
+    with pytest.raises(calib_mod.CalibError):
+        calib_mod._validate_settle_dwell(rows, [0.5] * 5, [0.4] * 5, 0.17)
+
+
+def test_motion到位超时由末端完成耗时加固定余量派生(calib_mod):
+    rows = []
+    for trajectory, duration_ns in (("a", 320_000_000), ("b", 240_000_000)):
+        common = {
+            "load_label": "loaded", "trajectory_id": trajectory,
+            "segment": trajectory, "direction": 1,
+        }
+        rows.extend([
+            {**common, "command_deg": [0.0] * 5, "time_ns": 1},
+            {**common, "command_deg": [10.0] * 5, "time_ns": 100_000_000},
+            {**common, "command_deg": [10.0] * 5, "time_ns": 100_000_000 + duration_ns},
+        ])
+    candidate, minimum, median, maximum, groups = calib_mod._derive_settle_timeout(rows)
+    assert candidate == 0.9
+    assert (minimum, median, maximum) == pytest.approx((0.24, 0.28, 0.32))
+    assert groups == 2
+
+
+def test_首次接触区间使用开度参考坐标而非跨带尺测(calib_mod):
+    table = [{"gripper_pct": pct, "gap_m": gap} for pct, gap in
+             [(0, 0.0096), (25, 0.0405), (50, 0.0712), (75, 0.0985), (100, 0.1207)]]
+    rows = [{"contact_label": "first_contact", "gripper_pct": pct,
+             "actual_gap_m": actual, "pose_held_through_capture_confirmed": True}
+            for pct, actual in [(10.872675250357654, 0.018), (25.393419170243206, 0.0404)]]
+    candidate, evidence = calib_mod._derive_contact_gap_range(rows, table)
+    assert candidate == [0.022, 0.042]
+    assert evidence[0]["actual_gap_m"] == 0.018
+    assert evidence[0]["reference_gap_m"] == pytest.approx(0.02303862660944206)
+
+
+def test_首次接触缺开度或未保持摆位不得拟合(calib_mod):
+    from tests.support import raw_profile
+    table = raw_profile()["gripper"]["gap_table"]
+    for row in [{"actual_gap_m": 0.018}, {"gripper_pct": 20, "pose_held_through_capture_confirmed": False}]:
+        with pytest.raises(calib_mod.CalibError):
+            calib_mod._derive_contact_gap_range([{"contact_label": "first_contact", **row}], table)
+
+
+def test_首次接触拒绝陈旧参考值和表外余量(calib_mod):
+    from tests.support import raw_profile
+    table = raw_profile()["gripper"]["gap_table"]
+    for row in [{"gripper_pct": 20, "reference_gap_m": 0.050}, {"gripper_pct": 0}]:
+        with pytest.raises(calib_mod.CalibError):
+            calib_mod._derive_contact_gap_range([{"contact_label": "first_contact", **row}], table)
+
+
+def test_接触间隙量化不得缩小两端余量(calib_mod):
+    from tests.support import raw_profile
+    table = raw_profile()["gripper"]["gap_table"]
+    gaps = [0.026000001, 0.026000099]
+    rows = [{"contact_label": "first_contact", "gripper_pct": calib_mod._pct_for_gap(g, table)} for g in gaps]
+    candidate, _ = calib_mod._derive_contact_gap_range(rows, table)
+    assert candidate[0] <= min(gaps) - 0.001
+    assert candidate[1] >= max(gaps) + 0.001
+
+
+def test_grasp预张开度覆盖偏航误差包络并向上量化(calib_mod):
+    gap_table = [
+        {"gripper_pct": 0.0, "gap_m": 0.0096},
+        {"gripper_pct": 25.0, "gap_m": 0.0405},
+        {"gripper_pct": 50.0, "gap_m": 0.0712},
+        {"gripper_pct": 75.0, "gap_m": 0.0985},
+        {"gripper_pct": 100.0, "gap_m": 0.1207},
+    ]
+    pct, width, margin, required_gap, candidate_gap = calib_mod._derive_preopen_pct(
+        [0.070, 0.045, 0.045], 90.0, 5.0, gap_table
+    )
+    assert width == pytest.approx(0.05092966340646462)
+    assert margin == pytest.approx(0.005092966340646462)
+    assert required_gap == pytest.approx(0.05602262974711108)
+    assert pct == 37.65
+    assert candidate_gap == pytest.approx(0.0560342)
+    assert candidate_gap >= required_gap

@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-027",
+  "completed_date": "2026-09-14",
+  "source": "urdf_derived_cad_nominal",
+  "status": "confirmed_for_demo_nominal_only",
+  "inputs": {
+    "urdf_path": "libs/so_arm_core/so101_new_calib.urdf",
+    "urdf_sha256": "3a65d2d35e68a8d2f0c2cc176d19b884506543c93ba72980145b80abe276022c",
+    "joint": "gripper",
+    "joint_type": "revolute",
+    "lower_rad": -0.174533,
+    "upper_rad": 1.74533,
+    "calibrated_closed_raw": 1499,
+    "calibrated_open_raw": 2897,
+    "gap_table_evidence": "calibration/REAL_ARM/PC/reports/CAL-026_gap_table_demo_20260914.json"
+  },
+  "formula": "angle_deg(p)=degrees(lower_rad + p/100*(upper_rad-lower_rad))",
+  "derived_angle_deg": [
+    -10.000004285756797,
+    17.500007500074396,
+    45.000019285905594,
+    72.50003107173677,
+    100.00004285756798
+  ],
+  "profile_angle_deg": [
+    -10.0,
+    17.5,
+    45.0,
+    72.5,
+    100.0
+  ],
+  "gripper_pct": [
+    0.0,
+    25.0,
+    50.0,
+    75.0,
+    100.0
+  ],
+  "nominal_goal_raw": [
+    1499,
+    1849,
+    2198,
+    2548,
+    2897
+  ],
+  "validation": {
+    "maximum_absolute_rounding_error_deg": 0.00004285756798,
+    "strictly_increasing": true,
+    "covers_full_urdf_joint_limit": true,
+    "profile_change_required": false
+  },
+  "profile": {
+    "path": "calibration/REAL_ARM/PC/profile.json",
+    "sha256": "251b5a03d6a4282d225642b3deff8112edbc3af641909f5f28b64bd9777a4150"
+  },
+  "limitations": [
+    "This is a CAD-nominal mapping, not a physical angle measurement.",
+    "Physical jaw angle error from assembly, backlash and printed parts remains assigned to CAL-033, CAL-109 and CAL-111.",
+    "External angle verification is required before production or precision use."
+  ]
+}

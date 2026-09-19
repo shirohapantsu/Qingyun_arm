@@ -41,10 +41,15 @@ from qingyun.grabbing.kinematics_ext import (
 
 # 桌面法向朝上，桌面以上为可用空间。
 _TABLE_NORMAL = np.array([0.0, 0.0, 1.0])
-# 技术文档 1.2 工作条件："基座与桌面固定"。挂在 base_link 上的胶囊体本身就是
-# 贴在桌面上的环境件，对它们再套一层误差膨胀必然判成穿透，所以只对桌面半空间
-# 检查豁免；它们的自碰撞与固定障碍检查照做。
+# 技术文档 1.2 工作条件："基座与桌面固定"。base_link 与 shoulder_pan 外壳共同
+# 构成螺栓固定的底座总成；后者虽然在 URDF 中属于 shoulder_link，但其父关节只绕
+# 桌面法向旋转，任何关节角都不会改变外壳高度。当前 CAD 的肩座底面距安装面不足
+# tool误差+平度+净距预算，对它重复要求环境净距会令所有姿态恒定误报碰桌。因此这
+# 两个 link 只豁免桌面半空间检查；仍参与固定障碍、目标与自碰撞检查，upper_arm及
+# 之后的可俯仰部件绝不豁免。这里按绑定 URDF 的 link 名显式列出，避免误把整条
+# shoulder 子树放行。
 BASE_LINK = "base_link"
+TABLE_CONTACT_LINKS = frozenset({BASE_LINK, "shoulder_link"})
 # 技术文档 5.3：接触阶段只豁免"指垫—目标"这一处规定接触。指垫连同其指座、
 # 工具头是一个整体抓取组件，抓取时必然进入目标膨胀包络；而手腕及以上的连杆
 # 在任何阶段都不允许压向目标。豁免范围因此限定为 wrist_roll 之后的夹爪子树
@@ -330,8 +335,10 @@ class CollisionChecker:
         # 五个关节 frame 也一起取：算"点到关节轴垂距"要用关节轴的位置与方向。
         self._links_needed = sorted({cap.link for cap in self.capsules} | set(JOINT_NAMES))
         self._joint_frames = list(JOINT_NAMES)
-        # 见 BASE_LINK 注释：只对桌面检查豁免的基座胶囊体。
-        self._table_exempt = {cap.id for cap in self.capsules if cap.link == BASE_LINK}
+        # 见 TABLE_CONTACT_LINKS 注释：只对桌面检查豁免的固定底座总成胶囊体。
+        self._table_exempt = {
+            cap.id for cap in self.capsules if cap.link in TABLE_CONTACT_LINKS
+        }
         # 见 GRIPPER_CONTACT_LINKS 注释：接触阶段唯一允许与目标接触的组件。
         self._object_contact_exempt = {cap.id for cap in self.capsules
                                        if cap.link in GRIPPER_CONTACT_LINKS}

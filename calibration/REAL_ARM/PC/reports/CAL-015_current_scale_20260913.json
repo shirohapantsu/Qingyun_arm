@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-015",
+  "status": "CONFIRMED",
+  "completed_at": "2026-09-13T12:10:48+08:00",
+  "parameter": "motor.current_ma_per_raw",
+  "motor_identity": {
+    "models": ["sts3215", "sts3215", "sts3215", "sts3215", "sts3215", "sts3215"],
+    "firmware": ["3.10", "3.10", "3.10", "3.10", "3.10", "3.10"],
+    "identity_evidence": "Six-motor hardware register readback already recorded by CAL-008/CAL-009."
+  },
+  "authority": {
+    "manufacturer": "Feetech",
+    "model": "STS3215",
+    "source_url": "https://www.feetechrc.com/20210430-56680.html",
+    "source_statement_paraphrase": "The manufacturer defines current feedback as 1 raw unit = 6.5 mA.",
+    "encoding_source_url": "https://gitee.com/ftservo/FTServo_Linux/blob/main/src/SMS_STS.cpp",
+    "encoding": "Present_Current is a 16-bit sign-magnitude value with sign bit 15."
+  },
+  "before": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+  "after": [6.5, 6.5, 6.5, 6.5, 6.5, 6.5],
+  "unit": "mA/raw",
+  "conversion": "current_ma = (decode_sign_magnitude(raw_current, 15) - current_zero_raw[channel]) * current_ma_per_raw[channel]",
+  "zero_offset_dependency": {
+    "parameter_id": "CAL-014",
+    "value": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "status": "VERIFIED"
+  },
+  "eeprom_plausibility_check": {
+    "protection_current_raw": [310, 310, 310, 310, 310, 250],
+    "converted_ma": [2015.0, 2015.0, 2015.0, 2015.0, 2015.0, 1625.0],
+    "source_snapshot": "../raw/cal012_eeprom_after_writeback_20260913.json",
+    "note": "This is a dimensional plausibility cross-check, not an independent calibration measurement."
+  },
+  "implementation": {
+    "profile_sha256": "7fb7864737353252a6e7178c09561d531b4c10d35430e5c30198b67ee4de2067",
+    "calibrate_script_sha256": "9043935488579cb41c6251228abee8f29bd2418a468c94d987fba720b5c2f742",
+    "motion_params_sha256": "6dde54c33aaa59754719536a696e00526e5f8bc6b7fcfbf697df227648a891b1",
+    "vendor_table_sha256": "97de986f147b098c4f9450ec1967c66dd063d40ae1e2522961bf23450f8d4dcf"
+  },
+  "checks": {
+    "all_six_channels_use_confirmed_model": true,
+    "scale_is_positive_for_all_channels": true,
+    "fit_decodes_sign_before_subtracting_per_channel_zero": true,
+    "validation_uses_per_channel_scale_and_zero": true,
+    "whole_arm_supply_current_used_as_servo_reference": false,
+    "hardware_motion_performed": false,
+    "eeprom_written": false
+  },
+  "limitations": [
+    "No isolated per-servo inline current-meter cross-check was performed; manufacturer-defined engineering units are authoritative.",
+    "This parameter does not establish motor-current-to-grip-force or motor-current-to-joint-torque mappings.",
+    "Changing servo model or protocol invalidates this confirmation."
+  ]
+}

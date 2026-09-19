@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "parameter_ids": [
+    "CAL-089",
+    "CAL-090"
+  ],
+  "status": "CONDITIONAL_DEMO_FIT_OPERATOR_OBSERVATION_PENDING",
+  "profile_sha256": "1ea15d62d288bc02f56ccabe09593f60d68ad3fd6f5f37632589995dc7c18bb4",
+  "terminal_representatives_raw": [
+    1502,
+    1502,
+    1502
+  ],
+  "terminal_representatives_pct": [
+    0.2145922746781116,
+    0.2145922746781116,
+    0.2145922746781116
+  ],
+  "independent_successful_cycles": 3,
+  "cycle_representative_std_pct": 0.0,
+  "candidate_empty_closed_pct": 0.21,
+  "candidate_empty_tol_pct": 1.0,
+  "candidate_empty_boundary_pct": 1.21,
+  "lowest_contact_gate_pct": 10.032362459546924,
+  "separation_margin_pct": 8.822362459546923,
+  "candidate_empty_boundary_raw": 1515.9158,
+  "all_terminal_burst_max_pct": 0.2861230329041488,
+  "conditional_contact_candidate_ma": 10,
+  "window_samples": 3,
+  "contact_dwell_s": 0.1,
+  "new_empty_trace_replays": [
+    {
+      "report": "CAL-089_090_empty_close_repeat1_attempt1_20260917.json",
+      "replay": {
+        "included_frames": 667,
+        "peak_filtered_mean_ma": 6.5,
+        "longest_qualifying_run_s": 0.0,
+        "hit_count": 0,
+        "first_hit": null
+      },
+      "source_sha256": "9bd269c16d4a84446afac7fcc49c5a76cdb80076885b5dd5afc8b561f0ae0765"
+    },
+    {
+      "report": "CAL-089_090_empty_close_repeat2_attempt2_20260917.json",
+      "replay": {
+        "included_frames": 160,
+        "peak_filtered_mean_ma": 6.5,
+        "longest_qualifying_run_s": 0.0,
+        "hit_count": 0,
+        "first_hit": null
+      },
+      "source_sha256": "3eaba5ff6b2cbdb57483ae776637998350d621fa4367b2da9d8d1dfb117c0f5d"
+    },
+    {
+      "report": "CAL-089_090_empty_close_repeat3_attempt1_20260917.json",
+      "replay": {
+        "included_frames": 160,
+        "peak_filtered_mean_ma": 6.5,
+        "longest_qualifying_run_s": 0.0,
+        "hit_count": 0,
+        "first_hit": null
+      },
+      "source_sha256": "e16422db4913399124aaa80f0f838d98394809891d050ab389892b360151976c"
+    }
+  ],
+  "enhanced_fixture_replay_with_new_empty_boundary": {
+    "included_frames": 160,
+    "peak_filtered_mean_ma": 13.0,
+    "longest_qualifying_run_s": 0.6686141380050685,
+    "hit_count": 20,
+    "first_hit": {
+      "phase": "fixture_closing",
+      "position_raw": 1820,
+      "command_raw": 1808,
+      "mean_ma": 10.833333333333334,
+      "continuous_above_s": 0.10005191000527702,
+      "delay_from_first_in_gate_raw_current_above_threshold_s": 0.1334154850046616
+    }
+  },
+  "operator_observation_pending_repeats": [
+    2,
+    3
+  ],
+  "formal20cycles_complete": false,
+  "mixed_supported_arm_poses_operator_confirmed": true,
+  "profile_written": false,
+  "limitations": "Three per-cycle medians not27independent repeats; observed std0 is not proof of true variance0.1pct_s and deliberately changed supported arm2pose mixed for demo only; no15pct_s/fulltravel timeout/force/production verification. Historical failed repeat2attempt1excluded; current profile contact220/hard450 unchanged."
+}

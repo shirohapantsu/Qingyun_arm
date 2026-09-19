@@ -412,6 +412,20 @@ def test_raw到deg到raw在整数上不漂移(mapping):
             assert abs(back - int(raw)) <= 1, (name, raw, deg, back)
 
 
+def test_官方校准端点可直接派生总线与URDF行程():
+    bus = MC.calibrated_range_to_bus_limits_deg(718, 3424, 4096)
+    assert bus == pytest.approx((-118.94505494505495, 118.94505494505495))
+    # 坐标反向后要重新排成 [lower, upper]，零位则只做平移。
+    urdf = MC.calibrated_range_to_urdf_limits_deg(718, 3424, 4096, -1, 5.0)
+    assert urdf == pytest.approx((-113.94505494505495, 123.94505494505495))
+
+
+@pytest.mark.parametrize("lo,hi,res", [(1, 1, 4096), (2, 1, 4096), (0, 4095, 1)])
+def test_官方校准行程派生拒绝退化输入(lo, hi, res):
+    with pytest.raises(MotorLimitError):
+        MC.calibrated_range_to_bus_limits_deg(lo, hi, res)
+
+
 def test_homing_offset不参与换算(params):
     """4.1 第 3 条：不要在本项目里再加一次官方 homing_offset。
 
@@ -450,6 +464,11 @@ def test_电流换算带零偏与比例(mapping, params):
         scale = params.motor.current_ma_per_raw[i]
         assert mapping.raw_current_to_ma(name, int(zero)) == pytest.approx(0.0)
         assert mapping.raw_current_to_ma(name, int(zero) + 10) == pytest.approx(10 * scale)
+        assert mapping.sign_bit(name, "Present_Current") == 15
+        # 飞特 SMS/STS 的电流为 bit15 符号-幅值，不是 16 位补码。
+        assert mapping.raw_current_to_ma(name, 0x8000 | 10) == pytest.approx(
+            (-10 - zero) * scale
+        )
 
 
 def test_关节速度乘sign夹爪速度用百分比(mapping, params):
@@ -1129,6 +1148,35 @@ def test_CalibrationReader快照键与只读行为(params):
     assert bus.read_request_count == 6
     assert bus.sync_write_count == 0
     assert not any(f[4] in (VENDOR_INST_WRITE, VENDOR_INST_SYNC_WRITE) for f in bus.tx_log)
+    bus.registers[3][40] = 1
+    assert reader.read_torque_enabled() == [0, 0, 1, 0, 0, 0]
+    assert bus.read_request_count == 12
+    assert bus.sync_write_count == 0
+    assert not any(f[4] in (VENDOR_INST_WRITE, VENDOR_INST_SYNC_WRITE) for f in bus.tx_log)
+    for sid in range(1, 7):
+        bus.registers[sid][5] = sid
+        bus.set_u16(sid, 31, MC.encode_sign_magnitude(-10 * sid, 11))
+    eeprom = reader.read_eeprom_snapshot()
+    assert [row["registers"]["ID"]["raw"] for row in eeprom] == list(range(1, 7))
+    assert [row["registers"]["Model_Number"]["raw"] for row in eeprom] == [777] * 6
+    assert [row["registers"]["Homing_Offset"]["decoded"] for row in eeprom] == [
+        -10, -20, -30, -40, -50, -60]
+    assert all(len(bytes.fromhex(row["raw_hex"])) == 40 for row in eeprom)
+    assert bus.read_request_count == 18
+    assert bus.sync_write_count == 0
+    assert not any(f[4] in (VENDOR_INST_WRITE, VENDOR_INST_SYNC_WRITE) for f in bus.tx_log)
+    for sid in range(1, 7):
+        bus.registers[sid][82] = 40 + sid
+    assert reader.read_common_register("Velocity_Unit_factor") == [41, 42, 43, 44, 45, 46]
+    assert bus.read_request_count == 24
+    assert bus.sync_write_count == 0
+    assert not any(f[4] in (VENDOR_INST_WRITE, VENDOR_INST_SYNC_WRITE) for f in bus.tx_log)
     reader.close()
     with pytest.raises(MotorStateError):
         reader.read_snapshot()
+    with pytest.raises(MotorStateError):
+        reader.read_torque_enabled()
+    with pytest.raises(MotorStateError):
+        reader.read_eeprom_snapshot()
+    with pytest.raises(MotorStateError):
+        reader.read_common_register("Velocity_Unit_factor")

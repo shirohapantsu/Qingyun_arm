@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-031",
+  "completed_date": "2026-09-14",
+  "source": "operator_qualitative_confirmation_plus_conservative_existing_bound",
+  "status": "confirmed_for_demo_not_precision_verified",
+  "workspace_surface": "The robot base and object operation area share the same wooden-board top surface.",
+  "operator_observation": {
+    "description": "The wooden board is straight and the gap can be approximated as zero.",
+    "nominal_observed_gap_mm": 0.0,
+    "measurement_resolution_mm": null,
+    "nine_point_height_measurement_completed": false
+  },
+  "configured_bound": {
+    "field": "workspace.table_flatness_m",
+    "value_m": 0.001,
+    "value_mm": 1.0,
+    "reason_not_zero": "The field is used as a collision inflation bound; an unquantified approximately-zero observation does not justify a strict zero bound."
+  },
+  "runtime_use": "table collision inflation = workspace.table_flatness_m + collision.clearance_m",
+  "profile": {
+    "path": "calibration/REAL_ARM/PC/profile.json",
+    "sha256": "f179b7b46505678d34592073e248557cf2ece7c23fd75160585e09f3c252220f",
+    "changed": false
+  },
+  "formal_follow_up": "Measure at least nine workspace points or use a verified straightedge and feeler gauges, then include instrument uncertainty."
+}

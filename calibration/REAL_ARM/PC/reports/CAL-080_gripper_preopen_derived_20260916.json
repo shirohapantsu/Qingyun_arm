@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-080",
+  "status": "CONFIRMED_FOR_CURRENT_DEMO_GEOMETRY",
+  "completed_at": "2026-09-16T13:11:20+08:00",
+  "parameter": "gripper.preopen_pct",
+  "method": "Compute the maximum close-axis projection over yaw_offset plus or minus the target yaw error bound, add max(10 percent of width, 3 mm), invert the measured CAL-026 gap table, and quantize upward to 0.01 percent.",
+  "inputs": {
+    "sample_count": 17,
+    "object_envelope_m": [0.07, 0.045, 0.045],
+    "yaw_offset_deg": 90.0,
+    "target_yaw_error_bound_deg": 5.0,
+    "evaluated_yaw_band_deg": [85.0, 95.0],
+    "CAL-026_report": "CAL-026_gap_table_demo_20260914.json",
+    "CAL-026_report_sha256": "33be9ca06d27e1e8591c6280cdc7c7440f672abb31e7ae4f35b750ac3fb4ce65",
+    "CAL-039_report": "CAL-039_object_envelope_demo_20260915.json",
+    "CAL-039_report_sha256": "05579f3f96a268178fe48c6e628622cd130f3716216a93dd70af852c5397a71b",
+    "gap_table": [
+      {"gripper_pct": 0.0, "gap_m": 0.0096},
+      {"gripper_pct": 25.0, "gap_m": 0.0405},
+      {"gripper_pct": 50.0, "gap_m": 0.0712},
+      {"gripper_pct": 75.0, "gap_m": 0.0985},
+      {"gripper_pct": 100.0, "gap_m": 0.1207}
+    ]
+  },
+  "derivation": {
+    "nominal_close_axis_width_m": 0.045,
+    "yaw_band_max_close_axis_width_m": 0.050929663406464626,
+    "margin_rule": "max(0.10 * yaw_band_max_width, 0.003 m)",
+    "margin_m": 0.005092966340646463,
+    "required_gap_m": 0.056022629747111086,
+    "exact_interpolated_pct": 37.64057796996017,
+    "quantization": "ceil to 0.01 percent",
+    "candidate_pct": 37.65,
+    "candidate_interpolated_gap_m": 0.0560342,
+    "candidate_gap_minus_required_m": 0.000011570252888914,
+    "candidate_gap_minus_yaw_band_width_m": 0.005104536593535374
+  },
+  "fit_correction": {
+    "obsolete_behavior": "Use only nominal yaw and round percentage to nearest 0.01 percent.",
+    "corrected_behavior": "Maximize width over the full yaw-error band and round percentage upward.",
+    "functions": [
+      "scripts.calibrate._max_close_axis_width_with_yaw_error",
+      "scripts.calibrate._derive_preopen_pct"
+    ],
+    "regression_test": "test_grasp预张开度覆盖偏航误差包络并向上量化",
+    "focused_tests_passed": 3,
+    "focused_tests_failed": 0
+  },
+  "offline_route_verification": {
+    "gripper_pct": 37.65,
+    "home_to_waypoint_nodes": 32,
+    "waypoint_to_home_nodes": 32,
+    "total_nodes": 64,
+    "joint_limits": "PASS",
+    "joint_and_tcp_dynamics": "PASS",
+    "capsule_collision_check": "PASS",
+    "result": "PASS"
+  },
+  "profile_sha256_before": "4781d6bac5b4d8ee7f381b35a07c469d85fd85258c7c0095ef6e4cee2727143d",
+  "profile_sha256_after": "3888ae865ab126f3626cd2deab5fd48681b761cc15f2d11a745603c7e005d9b5",
+  "profile_written": true,
+  "hardware_accessed_for_this_derivation": false,
+  "eeprom_written": false,
+  "limitations": [
+    "CAL-039 has no supplied dimensional measurement resolution and combines axiswise maxima from 17 demo samples.",
+    "CAL-026 used one measurement per opening and omitted reverse-direction repeats for the demo.",
+    "No physical approach, neighboring-object, table-clearance, release, contact, or grasp trial was performed for this item.",
+    "Complete grasp execution remains prohibited until CAL-084 and downstream contact protections are calibrated."
+  ],
+  "downstream": {
+    "CAL-081": "deferred because its TCP, obstacle, and physical release prerequisites remain deferred",
+    "CAL-082": "next executable item: gripper opening speed"
+  }
+}

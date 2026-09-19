@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-016",
+  "status": "VERIFIED",
+  "completed_at": "2026-09-13T12:27:44+08:00",
+  "parameter": "motor.velocity_deg_s_per_raw",
+  "hardware": {
+    "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+    "resolved_port": "/dev/ttyACM0",
+    "usb_identity": {
+      "vid": "1a86",
+      "pid": "55d3",
+      "serial": "5B14114904"
+    },
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_in_workspace",
+    "ids": [1, 2, 3, 4, 5, 6],
+    "model_numbers": [777, 777, 777, 777, 777, 777],
+    "firmware": ["3.10", "3.10", "3.10", "3.10", "3.10", "3.10"],
+    "torque_enabled_by_motor": [0, 0, 0, 0, 0, 0]
+  },
+  "authority": {
+    "manufacturer": "Feetech",
+    "protocol_manual_url": "https://www.feetechrc.com/Data/feetechrc/upload/file/20220618/%E5%85%88%E7%9C%8B%E8%BF%99%E9%87%8C-%E5%85%A5%E6%89%8B%E6%95%99%E7%A8%8B2-1.pdf",
+    "protocol_definition": "The default velocity unit is 50 encoder steps per second per raw unit; a separately configured mode can use one step per second.",
+    "sdk_url": "https://gitee.com/ftservo/FTServo_Linux/blob/main/src/SMS_STS.cpp",
+    "sdk_definition": "Present_Velocity is decoded as a 16-bit sign-magnitude value using bit 15.",
+    "position_resolution_count_per_revolution": 4096
+  },
+  "hardware_readback": {
+    "angular_resolution_raw": [1, 1, 1, 1, 1, 1],
+    "velocity_unit_factor_steps_per_second_per_raw": [50, 50, 50, 50, 50, 50]
+  },
+  "calculation": {
+    "formula": "velocity_deg_s_per_raw = velocity_unit_factor_steps_s * 360 deg / 4096 count",
+    "per_channel": "50 * 360 / 4096",
+    "exact_result": 4.39453125,
+    "manufacturer_rounded_cross_check": "0.732 rpm/raw * 6 = 4.392 deg/s/raw; the small difference is the manual's rounded rpm display."
+  },
+  "before": [3.0, 3.0, 3.0, 3.0, 3.0, 3.0],
+  "after": [4.39453125, 4.39453125, 4.39453125, 4.39453125, 4.39453125, 4.39453125],
+  "unit": "(deg/s)/raw",
+  "evidence": {
+    "raw_readback": "../raw/cal016_velocity_unit_20260913.json",
+    "raw_readback_sha256": "830fb3e92e0ebccb6d66921a18bc1826b10e0825a21af6aebe7108e7cb9337e3",
+    "read_tool": "../../../../scripts/read_servo_velocity_unit.py",
+    "read_tool_sha256": "5d95f6a5452249671332bb0d91c653dfd6fc71b339b5c38cef51d63d4135d8f9"
+  },
+  "implementation": {
+    "profile_sha256": "ead5f64852b04a4c811b142d3d012083ab350316d1daad2b44b2ba4047a21dbe",
+    "calibrate_script_sha256": "a32ffa4267ab6f2226fee34972e1dde4fd00495e1e1f254fb36bcdf535e570ca",
+    "motor_control_sha256": "0601c86846ad86af0d9baa64a6e0b736b98831e6f42fe49e209b399b3fb9b782"
+  },
+  "checks": {
+    "stable_port_identity_checked_before_access": true,
+    "port_unoccupied_before_access": true,
+    "all_six_identity_fields_match": true,
+    "all_six_torque_disabled": true,
+    "all_six_velocity_unit_factors_equal_50": true,
+    "scale_positive_for_all_channels": true,
+    "present_velocity_sign_bit_is_15": true,
+    "write_instructions_sent": 0,
+    "motion_instructions_sent": 0,
+    "eeprom_written": false
+  },
+  "limitations": [
+    "A low-speed bidirectional position-difference cross-check remains useful after CAL-018/CAL-019 establish joint sign and geometric zero, but it is not needed to derive the configured engineering-unit scale.",
+    "Changing firmware, servo model, Angular_Resolution, or Velocity_Unit_factor invalidates this result."
+  ]
+}

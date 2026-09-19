@@ -1,0 +1,2113 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-085",
+  "status": "DEMO_CANDIDATE_SUPPORTED_PHYSICAL_GRIP_UNVERIFIED",
+  "test_object": {
+    "material": "plastic imitation fruit",
+    "operator_approximate_width_mm": 42,
+    "measurement_exact": false,
+    "actual_contact_band_mm": 20
+  },
+  "scope": "preliminary fixture current experiment only; no equivalence to real fruit behavior assumed",
+  "preflight": {
+    "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+    "usb_identity": {
+      "vid": "1a86",
+      "pid": "55d3",
+      "serial": "5B14114904"
+    },
+    "ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "models": [
+      777,
+      777,
+      777,
+      777,
+      777,
+      777
+    ],
+    "torque_before": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_after": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "profile_sha256": "1ea15d62d288bc02f56ccabe09593f60d68ad3fd6f5f37632589995dc7c18bb4",
+  "manual_first_contact_raw": 1855,
+  "manual_first_contact_capture": {
+    "captured_at": "2026-09-16T17:58:50.120537+08:00",
+    "operator_confirmation": "CAL-085塑料假果基准就绪",
+    "gripper_pct": 25.46494992846924,
+    "reference_gap_m": 0.04107095851216023,
+    "reference_coordinate": "CAL-026 gap table at 20mm behind hard fingertip; not an exact object-width measurement",
+    "raw_position_by_sample": [
+      [
+        843,
+        866,
+        2990,
+        2457,
+        2043,
+        1855
+      ],
+      [
+        843,
+        866,
+        2989,
+        2457,
+        2043,
+        1855
+      ],
+      [
+        843,
+        866,
+        2990,
+        2457,
+        2043,
+        1855
+      ],
+      [
+        843,
+        866,
+        2990,
+        2457,
+        2043,
+        1855
+      ],
+      [
+        843,
+        866,
+        2990,
+        2457,
+        2043,
+        1855
+      ],
+      [
+        843,
+        866,
+        2990,
+        2457,
+        2043,
+        1855
+      ],
+      [
+        843,
+        866,
+        2990,
+        2457,
+        2043,
+        1855
+      ],
+      [
+        843,
+        866,
+        2990,
+        2457,
+        2043,
+        1855
+      ],
+      [
+        843,
+        866,
+        2990,
+        2457,
+        2043,
+        1855
+      ],
+      [
+        843,
+        866,
+        2990,
+        2457,
+        2043,
+        1855
+      ]
+    ],
+    "raw_position_representative": [
+      843,
+      866,
+      2990,
+      2457,
+      2043,
+      1855
+    ],
+    "raw_position_static_span": [
+      0,
+      0,
+      1,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_before": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_after": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "proposed_empty_trial": {
+    "status": "EXECUTED_CONFIRMED_NO_ABNORMALITY",
+    "servo_id": 6,
+    "initial_raw_required": 1855,
+    "initial_tolerance_raw": 5,
+    "path_raw": [
+      1855,
+      1897,
+      1848
+    ],
+    "incremental_command_speed_pct_s": 1,
+    "sample_fps": 30,
+    "final_hold_s": 0.2,
+    "trial_timeout_s": 10,
+    "software_current_abort_ma": 65,
+    "abort_cap_scope": "conservative preliminary empty-test stop only; not calibrated contact, hard-current, or fruit-damage threshold; software cannot guarantee protection during communication failure",
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "arm_joint_goal_commands": 0,
+    "cleanup": "disable and read back all six axes; restore and read back original SRAM settings",
+    "operator_requirements": "remove fixture while torque is off, support arm without fingers in jaw or link pinch zones, keep gripper near baseline and whole small path unobstructed, hands clear, power cut immediately accessible",
+    "purpose": "powered empty friction/startup baseline only; define loaded experiment after examining this result"
+  },
+  "powered_current_trials": [
+    {
+      "role": "empty_baseline",
+      "repeat": 1,
+      "report": "CAL-085_empty_current_repeat1_20260916.json",
+      "operator_confirmation": "批准，CAL-085空爪初测就绪",
+      "status": "CONFIRMED_NO_ABNORMALITY",
+      "operator_observation": "无异常",
+      "powered_duration_s": 6.81292368999857,
+      "initial_position_raw": 1852,
+      "final_position_raw": 1851,
+      "opening_peak_abs_current_ma": 39,
+      "closing_peak_abs_current_ma": 6.5,
+      "closing_median_abs_current_ma": 0,
+      "gripper_motion_commands_sent": 198,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "sram_settings_after": {
+        "Acceleration": 5,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "limitations": "one 1%/s empty trial only, not a matched baseline for the 15%/s runtime closing rate; no loaded samples or contact threshold fit"
+    },
+    {
+      "role": "supported_plastic_fixture_low_speed_diagnostic",
+      "repeat": 1,
+      "report": "CAL-085_fixture_current_repeat1_20260916.json",
+      "operator_confirmation": "批准，CAL-085假果接触初测就绪",
+      "status": "CAPTURE_VALID_CONTACT_NOT_ESTABLISHED",
+      "operator_observation": "测量时未能夹住假果，重新测量",
+      "accepted_for_contact_threshold_fit": false,
+      "fresh_baseline_raw": 1854,
+      "actual_command_path_raw": [
+        1854,
+        1896,
+        1847
+      ],
+      "powered_duration_s": 6.602122234005947,
+      "opening_peak_abs_current_ma": 6.5,
+      "closing_peak_abs_current_ma": 6.5,
+      "closing_median_abs_current_ma": 0,
+      "last_command_raw": 1847,
+      "last_position_raw": 1854,
+      "termination_reason": "COMMAND_BUDGET_EXHAUSTED_WITHOUT_CANDIDATE_CURRENT",
+      "gripper_motion_commands_sent": 198,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "sram_settings_after": {
+        "Acceleration": 5,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "eeprom_matches_authoritative_motor_calibration": true,
+      "confirmed_physical_contact": false,
+      "contact_threshold_fitted": false,
+      "limitations": "fixture and empty closing currents overlap at 0..6.5mA; final feedback remained at manual first-contact baseline, not the commanded endpoint; no inference of contact, deadband, compression, or threshold validity without additional evidence"
+    },
+    {
+      "role": "supported_plastic_fixture_low_speed_diagnostic",
+      "repeat": 2,
+      "report": "CAL-085_fixture_current_repeat2_20260916.json",
+      "operator_confirmation": "批准，CAL-085假果接触重测就绪",
+      "status": "CONFIRMED_LIGHT_CONTACT_NO_GRIP",
+      "fresh_baseline_raw": 1854,
+      "actual_command_path_raw": [
+        1854,
+        1896,
+        1847
+      ],
+      "powered_duration_s": 6.602469995006686,
+      "opening_peak_abs_current_ma": 6.5,
+      "closing_peak_abs_current_ma": 6.5,
+      "closing_median_abs_current_ma": 0,
+      "last_command_raw": 1847,
+      "last_position_raw": 1854,
+      "termination_reason": "COMMAND_BUDGET_EXHAUSTED_WITHOUT_CANDIDATE_CURRENT",
+      "gripper_motion_commands_sent": 198,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "sram_settings_after": {
+        "Acceleration": 5,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "eeprom_matches_authoritative_motor_calibration": true,
+      "confirmed_physical_contact": true,
+      "contact_threshold_fitted": false,
+      "limitations": "operator confirms physical light re-contact only, not force grip; closing current overlaps empty 0..6.5mA so a usable current threshold remains unidentified",
+      "operator_observation": "无异常，重新接触但未夹住",
+      "confirmed_force_grip": false,
+      "accepted_for_contact_threshold_fit": false
+    },
+    {
+      "role": "expanded_empty_range_control",
+      "repeat": 1,
+      "report": "CAL-085_empty_expanded_control_repeat1_20260916.json",
+      "operator_confirmation": "批准，CAL-085扩展空爪对照就绪",
+      "status": "CONFIRMED_NO_ABNORMALITY",
+      "actual_command_path_raw": [
+        1854,
+        1896,
+        1840
+      ],
+      "powered_duration_s": 7.312474767997628,
+      "initial_position_raw": 1850,
+      "final_position_raw": 1845,
+      "opening_peak_abs_current_ma": 6.5,
+      "closing_peak_abs_current_ma": 6.5,
+      "closing_median_abs_current_ma": 0,
+      "gripper_motion_commands_sent": 213,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "sram_settings_after": {
+        "Acceleration": 5,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "readonly_gripper_controller_settings": {
+        "P_Coefficient": 16,
+        "D_Coefficient": 32,
+        "I_Coefficient": 0,
+        "Minimum_Startup_Force": 16,
+        "CW_Dead_Zone": 1,
+        "CCW_Dead_Zone": 1
+      },
+      "eeprom_matches_authoritative_motor_calibration": true,
+      "contact_threshold_fitted": false,
+      "limitations": "empty-only 1%/s expanded control; no corresponding expanded loaded trial or 15%/s runtime validation",
+      "operator_observation": "无异常"
+    },
+    {
+      "role": "updated_baseline_empty_range_control",
+      "repeat": 1,
+      "report": "CAL-085_empty_updated_baseline_control_repeat1_20260916.json",
+      "operator_confirmation": "批准，CAL-085新基准空爪对照就绪",
+      "status": "PASS_PENDING_OPERATOR_OBSERVATION",
+      "actual_command_path_raw": [
+        1843,
+        1885,
+        1829
+      ],
+      "powered_duration_s": 7.313567710007192,
+      "initial_position_raw": 1842,
+      "final_position_raw": 1833,
+      "opening_peak_abs_current_ma": 6.5,
+      "closing_peak_abs_current_ma": 13,
+      "closing_median_abs_current_ma": 0,
+      "gripper_motion_commands_sent": 213,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "sram_settings_after": {
+        "Acceleration": 5,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "readonly_gripper_controller_settings": {
+        "P_Coefficient": 16,
+        "D_Coefficient": 32,
+        "I_Coefficient": 0,
+        "Minimum_Startup_Force": 16,
+        "CW_Dead_Zone": 1,
+        "CCW_Dead_Zone": 1
+      },
+      "eeprom_matches_authoritative_motor_calibration": true,
+      "contact_threshold_fitted": false,
+      "limitations": "one1%/s new-baseline empty control; no matching new-baseline powered fixture samples or15%/s runtime acceptance"
+    },
+    {
+      "role": "updated_baseline_empty_range_control",
+      "repeat": 2,
+      "report": "CAL-085_empty_updated_baseline_control_repeat2_reposition_attempt1_20260916.json",
+      "operator_confirmation": "批准，CAL-085空爪归位并重测就绪",
+      "status": "CONFIRMED_NO_ABNORMALITY",
+      "serial_preposition_from_raw": 1833,
+      "serial_preposition_target_raw": 1843,
+      "control_start_readback_raw": 1839,
+      "actual_command_path_raw": [
+        1843,
+        1885,
+        1829
+      ],
+      "powered_duration_s": 8.259558881996782,
+      "final_position_raw": 1833,
+      "opening_peak_abs_current_ma": 6.5,
+      "closing_peak_abs_current_ma": 6.5,
+      "closing_median_abs_current_ma": 0,
+      "gripper_motion_commands_sent": 235,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "sram_settings_after": {
+        "Acceleration": 5,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "readonly_gripper_controller_settings": {
+        "P_Coefficient": 16,
+        "D_Coefficient": 32,
+        "I_Coefficient": 0,
+        "Minimum_Startup_Force": 16,
+        "CW_Dead_Zone": 1,
+        "CCW_Dead_Zone": 1
+      },
+      "eeprom_matches_authoritative_motor_calibration": true,
+      "contact_threshold_fitted": false,
+      "limitations": "preposition samples separate from actual empty closing control; diagnostic1%/s only, still no matching updated-baseline powered fixture samples",
+      "operator_observation": "无异常"
+    },
+    {
+      "role": "complete_contact_domain_empty_control",
+      "repeat": 1,
+      "attempt": 2,
+      "report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+      "operator_confirmation": "批准，CAL-085接触范围空爪基线就绪",
+      "status": "CONFIRMED_NO_ABNORMALITY",
+      "actual_command_path_raw": [
+        1837,
+        1908,
+        1625
+      ],
+      "command_coverage_raw": [
+        1625,
+        1908
+      ],
+      "powered_duration_s": 25.617349011998158,
+      "initial_position_raw": 1835,
+      "final_position_raw": 1629,
+      "opening_peak_abs_current_ma": 6.5,
+      "closing_peak_abs_current_ma": 6.5,
+      "closing_median_abs_current_ma": 0,
+      "gripper_motion_commands_sent": 762,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_sram_settings": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "test_sram_settings": {
+        "Acceleration": 5,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "sram_settings_after": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "readonly_gripper_controller_settings": {
+        "P_Coefficient": 16,
+        "D_Coefficient": 32,
+        "I_Coefficient": 0,
+        "Minimum_Startup_Force": 16,
+        "CW_Dead_Zone": 1,
+        "CCW_Dead_Zone": 1
+      },
+      "eeprom_matches_authoritative_motor_calibration": true,
+      "contact_threshold_fitted": false,
+      "environment_note": "12V/fixed mounting kept by operator readiness; today's temperature unmeasured, recordednull not historical26.8C",
+      "limitations": "one empty-only1%/s diagnostic sweep, covers current demo contact coordinates and trial offsets; not grip/contact threshold or15%/s/fruit-safety acceptance",
+      "operator_observation": "无异常"
+    },
+    {
+      "role": "updated_baseline_fixture_contact_diagnostic",
+      "repeat": 1,
+      "attempt": 2,
+      "report": "CAL-085_fixture_updated_baseline_contact_repeat1_attempt2_20260917.json",
+      "operator_confirmation": "批准，CAL-085新基准假果接触初测就绪",
+      "operator_continue_authorization": "继续初测",
+      "status": "CAPTURED_NOT_ACCEPTED_ARM_PREFLIGHT_DRIFT_AWAITING_OPERATOR",
+      "actual_command_path_raw": [
+        1841,
+        1883,
+        1827
+      ],
+      "fresh_baseline_raw": 1841,
+      "raw_position_static_span": [
+        2,
+        1,
+        79,
+        1,
+        2,
+        0
+      ],
+      "powered_duration_s": 7.102838958002394,
+      "termination_reason": "COMMAND_BUDGET_EXHAUSTED_WITHOUT_CANDIDATE_CURRENT",
+      "opening_peak_abs_current_ma": 6.5,
+      "closing_peak_abs_current_ma": 13,
+      "closing_median_abs_current_ma": 0,
+      "closing_current_histogram_ma": {
+        "0.0": 75,
+        "6.5": 45,
+        "13.0": 1
+      },
+      "paired_empty_subrange": {
+        "source_report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+        "command_range_raw": [
+          1827,
+          1883
+        ],
+        "samples": 123,
+        "peak_abs_current_ma": 6.5,
+        "current_histogram_ma": {
+          "6.5": 42,
+          "0.0": 81
+        },
+        "max_abs_tracking_error_raw": 7
+      },
+      "max_closing_tracking_error_raw": 10,
+      "final_position_raw": 1837,
+      "gripper_motion_commands_sent": 213,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_sram_settings": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "test_sram_settings": {
+        "Acceleration": 5,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "sram_settings_after": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "readonly_gripper_controller_settings": {
+        "P_Coefficient": 16,
+        "D_Coefficient": 32,
+        "I_Coefficient": 0,
+        "Minimum_Startup_Force": 16,
+        "CW_Dead_Zone": 1,
+        "CCW_Dead_Zone": 1
+      },
+      "eeprom_matches_authoritative_motor_calibration": true,
+      "accepted_for_profile_fit": false,
+      "contact_threshold_fitted": false,
+      "confirmed_physical_contact": false,
+      "limitations": "Elbow drift79raw in preflight; independently supported stable contact not established. Only one13mA frame, main distribution overlaps empty; no pressure/fruit safety/15% speed acceptance."
+    },
+    {
+      "role": "updated_baseline_fixture_contact_diagnostic",
+      "repeat": 1,
+      "attempt": 3,
+      "report": "CAL-085_fixture_updated_baseline_contact_repeat1_attempt3_20260917.json",
+      "operator_confirmation": "批准，CAL-085新基准假果接触初测就绪",
+      "operator_retest_authorization": "重测本项目",
+      "status": "CONFIRMED_NO_ABNORMALITY_CONTACT_THRESHOLD_UNIDENTIFIED",
+      "actual_command_path_raw": [
+        1836,
+        1878,
+        1822
+      ],
+      "fresh_baseline_raw": 1836,
+      "raw_position_static_span": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "powered_duration_s": 7.1023662380175665,
+      "termination_reason": "COMMAND_BUDGET_EXHAUSTED_WITHOUT_CANDIDATE_CURRENT",
+      "opening_peak_abs_current_ma": 6.5,
+      "closing_peak_abs_current_ma": 13,
+      "closing_median_abs_current_ma": 0,
+      "closing_current_histogram_ma": {
+        "0.0": 75,
+        "6.5": 44,
+        "13.0": 2
+      },
+      "paired_empty_subrange": {
+        "source_report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+        "command_range_raw": [
+          1822,
+          1878
+        ],
+        "samples": 122,
+        "peak_abs_current_ma": 6.5,
+        "max_abs_tracking_error_raw": 7,
+        "current_histogram_ma": {
+          "6.5": 41,
+          "0.0": 81
+        }
+      },
+      "max_closing_tracking_error_raw": 10,
+      "last_sample_tracking_error_raw": -9,
+      "final_position_raw": 1831,
+      "gripper_motion_commands_sent": 213,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_sram_settings": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "test_sram_settings": {
+        "Acceleration": 5,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "sram_settings_after": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "readonly_gripper_controller_settings": {
+        "P_Coefficient": 16,
+        "D_Coefficient": 32,
+        "I_Coefficient": 0,
+        "Minimum_Startup_Force": 16,
+        "CW_Dead_Zone": 1,
+        "CCW_Dead_Zone": 1
+      },
+      "eeprom_matches_authoritative_motor_calibration": true,
+      "accepted_for_profile_fit": false,
+      "contact_threshold_fitted": false,
+      "confirmed_physical_contact": false,
+      "limitations": "Allsix preflight spans0; physical contact/compression/slip observation pending. Only two nonconsecutive13mA frames, major distribution overlaps empty and historical empty reached13mA; no stable threshold or pressure/fruit-safety/15% speed acceptance.",
+      "operator_observation": "无异常"
+    },
+    {
+      "role": "fixed_reference_increased_closure_fixture_diagnostic",
+      "repeat": 1,
+      "attempt": 1,
+      "report": "CAL-085_fixture_increased_closure_attempt1_20260917.json",
+      "operator_confirmation": "无异常，可以增加闭合程度再次尝试",
+      "status": "OPERATOR_CONFIRMED_GRIP_CURRENT_THRESHOLD_UNIDENTIFIED",
+      "fixed_contact_reference_raw": 1836,
+      "fresh_position_is_not_new_contact_reference": true,
+      "fresh_gripper_position_raw": 1830,
+      "raw_position_static_span": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "arm_deviation_from_reference_raw": [
+        1,
+        0,
+        0,
+        5,
+        2
+      ],
+      "actual_command_path_raw": [
+        1830,
+        1878,
+        1815
+      ],
+      "extra_closure_from_previous_target_raw": 7,
+      "closure_budget_from_fixed_reference_raw": 21,
+      "powered_duration_s": 8.035406082024565,
+      "termination_reason": "COMMAND_BUDGET_EXHAUSTED_WITHOUT_CANDIDATE_CURRENT",
+      "opening_peak_abs_current_ma": 6.5,
+      "closing_peak_abs_current_ma": 13,
+      "closing_median_abs_current_ma": 0,
+      "closing_current_histogram_ma": {
+        "0.0": 81,
+        "6.5": 54,
+        "13.0": 1
+      },
+      "paired_empty_subrange": {
+        "source_report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+        "command_range_raw": [
+          1815,
+          1878
+        ],
+        "samples": 137,
+        "peak_abs_current_ma": 6.5,
+        "max_abs_tracking_error_raw": 7,
+        "current_histogram_ma": {
+          "6.5": 49,
+          "0.0": 88
+        }
+      },
+      "max_closing_tracking_error_raw": 10,
+      "final_position_raw": 1825,
+      "gripper_motion_commands_sent": 241,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_sram_settings": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "test_sram_settings": {
+        "Acceleration": 5,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "sram_settings_after": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "readonly_gripper_controller_settings": {
+        "P_Coefficient": 16,
+        "D_Coefficient": 32,
+        "I_Coefficient": 0,
+        "Minimum_Startup_Force": 16,
+        "CW_Dead_Zone": 1,
+        "CCW_Dead_Zone": 1
+      },
+      "eeprom_matches_authoritative_motor_calibration": true,
+      "accepted_for_profile_fit": false,
+      "contact_threshold_fitted": false,
+      "confirmed_physical_contact": true,
+      "limitations": "Operator confirms grip, but no sustained current separation from empty; one13mA frame, three-frame mean peak8.6667mA. Grip is not current-threshold, compression, lifting-force or real-fruit-safety validation.",
+      "operator_observation": "确定已夹紧，由于软垫较薄，可以考虑比实验结果略高一点",
+      "operator_confirmed_grip": true,
+      "confirmation_basis": "Operator confirmation of latest trial, not automatic current or lift test",
+      "filtered_current_review": {
+        "window_samples": 3,
+        "raw_peak_current_ma": 13,
+        "three_sample_mean_peak_ma": 8.666666666666666,
+        "samples_above_13_ma": 0,
+        "samples_above_19_5_ma": 0,
+        "contact_dwell_s": 0.1,
+        "criterion": "filtered mean strictly > contact_current_ma continuously for dwell; gap and above-empty gates also required"
+      }
+    },
+    {
+      "role": "sustained_empty_current_control",
+      "repeat": 1,
+      "attempt": 1,
+      "report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+      "operator_confirmation": "批准，CAL-085持续电流空爪短保持就绪",
+      "status": "CONFIRMED_NO_ABNORMALITY",
+      "actual_command_path_raw": [
+        1824,
+        1878,
+        1815
+      ],
+      "fixed_operational_reference_raw": 1836,
+      "fresh_position_is_not_new_contact_reference": true,
+      "raw_position_static_span": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "arm_deviation_from_reference_raw": [
+        2,
+        0,
+        0,
+        5,
+        2
+      ],
+      "powered_duration_s": 8.70456745501724,
+      "maximum_final_hold_s": 0.3,
+      "final_hold_observed_duration_s": 0.26831828101421706,
+      "final_hold_frames": 9,
+      "termination_reason": "EMPTY_SHORT_HOLD_COMPLETE_IMMEDIATE_UNLOAD",
+      "opening_peak_abs_current_ma": 6.5,
+      "closing_peak_abs_current_ma": 6.5,
+      "closing_median_abs_current_ma": 0,
+      "hold_peak_abs_current_ma": 6.5,
+      "hold_median_abs_current_ma": 0,
+      "current_histograms_by_phase": {
+        "opening": {
+          "0.0": 65,
+          "6.5": 51
+        },
+        "empty_closing": {
+          "0.0": 98,
+          "6.5": 38
+        },
+        "final_hold": {
+          "6.5": 4,
+          "0.0": 5
+        }
+      },
+      "three_sample_mean_peak_ma": 6.5,
+      "final_position_raw": 1819,
+      "final_position_tolerance_raw": 5,
+      "final_tracking_error_raw": -4,
+      "gripper_motion_commands_sent": 253,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_sram_settings": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "test_sram_settings": {
+        "Acceleration": 5,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "sram_settings_after": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "readonly_gripper_controller_settings": {
+        "P_Coefficient": 16,
+        "D_Coefficient": 32,
+        "I_Coefficient": 0,
+        "Minimum_Startup_Force": 16,
+        "CW_Dead_Zone": 1,
+        "CCW_Dead_Zone": 1
+      },
+      "eeprom_matches_authoritative_motor_calibration": true,
+      "accepted_for_threshold_fit": false,
+      "contact_threshold_fitted": false,
+      "limitations": "One empty-only short hold, await operator observation before pairing; not yet matching powered fixture hold/current/force/fruit-safety acceptance.",
+      "operator_observation": "无异常"
+    },
+    {
+      "role": "sustained_fixture_current_diagnostic_relaxed_placement",
+      "repeat": 1,
+      "attempt": 1,
+      "report": "CAL-085_fixture_sustained_current_relaxed_attempt1_20260917.json",
+      "operator_confirmation": "放宽容差完成标定",
+      "status": "CAPTURED_PENDING_OPERATOR_OBSERVATION_NO_VALID_THRESHOLD",
+      "actual_command_path_raw": [
+        1821,
+        1878,
+        1815
+      ],
+      "fixed_operational_reference_raw": 1836,
+      "fresh_position_is_not_new_contact_reference": true,
+      "raw_position_static_span": [
+        0,
+        0,
+        0,
+        2,
+        0,
+        0
+      ],
+      "arm_deviation_from_reference_raw": [
+        3,
+        0,
+        0,
+        5,
+        0
+      ],
+      "powered_duration_s": 8.9379357759899,
+      "maximum_fixture_hold_s": 0.3,
+      "fixture_hold_observed_duration_s": 0.2686745310202241,
+      "fixture_hold_frames": 9,
+      "termination_reason": "FIXTURE_SHORT_HOLD_COMPLETE_IMMEDIATE_UNLOAD",
+      "opening_peak_abs_current_ma": 6.5,
+      "closing_peak_abs_current_ma": 13,
+      "closing_median_abs_current_ma": 0,
+      "hold_peak_abs_current_ma": 13,
+      "hold_median_abs_current_ma": 6.5,
+      "closing_current_counts": {
+        "0.0": 87,
+        "6.5": 48,
+        "13.0": 1
+      },
+      "hold_current_counts": {
+        "6.5": 8,
+        "13.0": 1
+      },
+      "filtered_current_mean_peak_ma": 8.666666666666666,
+      "final_position_raw": 1825,
+      "max_tracking_error_raw": 10,
+      "gripper_motion_commands_sent": 260,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_sram_settings": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "test_sram_settings": {
+        "Acceleration": 5,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "sram_settings_after": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "readonly_gripper_controller_settings": {
+        "P_Coefficient": 16,
+        "D_Coefficient": 32,
+        "I_Coefficient": 0,
+        "Minimum_Startup_Force": 16,
+        "CW_Dead_Zone": 1,
+        "CCW_Dead_Zone": 1
+      },
+      "eeprom_matches_authoritative_motor_calibration": true,
+      "accepted_for_profile_fit": false,
+      "contact_threshold_fitted": false,
+      "latest_operator_grip_confirmation_pending": true,
+      "threshold_replay_report": "CAL-085_sustained_current_threshold_replay_20260917.json",
+      "limitations": "Latest physical grip/abnormality observation pending; original-confirmed grip at same1825 endpoint retained. Reduced placement consistency accepted, unchanged powered guards. Current threshold unidentifiable underexisting3-frame/.1s with recorded false-positive empty event; cannot mark verified to satisfy completion request."
+    },
+    {
+      "role": "bounded_stronger_fixture_current_diagnostic",
+      "repeat": 1,
+      "attempt": 1,
+      "report": "CAL-085_fixture_stronger_contact_attempt1_20260917.json",
+      "operator_confirmation": "可以大胆增大夹持力度，假果不易损坏",
+      "status": "MATCHED_EMPTY_CONTROL_CONFIRMED_ENHANCED_TRIAL_NO_ABNORMALITY_PHYSICAL_GRIP_UNVERIFIED",
+      "actual_command_path_raw": [
+        1825,
+        1871,
+        1801
+      ],
+      "fixed_operational_reference_raw": 1836,
+      "fresh_position_is_not_new_contact_reference": true,
+      "raw_position_static_span": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "arm_deviation_from_reference_raw": [
+        2,
+        0,
+        0,
+        5,
+        0
+      ],
+      "powered_duration_s": 8.638518456980819,
+      "fixture_hold_observed_duration_s": 0.26912184301181696,
+      "fixture_hold_frames": 9,
+      "termination_reason": "FIXTURE_SHORT_HOLD_COMPLETE_IMMEDIATE_UNLOAD",
+      "opening_peak_abs_current_ma": 6.5,
+      "closing_peak_abs_current_ma": 13,
+      "closing_median_abs_current_ma": 0,
+      "hold_peak_abs_current_ma": 13,
+      "hold_median_abs_current_ma": 13,
+      "hold_current_counts": {
+        "13.0": 9
+      },
+      "closing_max_tracking_error_raw": 15,
+      "hold_position_raw_range": [
+        1815,
+        1816
+      ],
+      "final_position_raw": 1815,
+      "gripper_motion_commands_sent": 251,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_sram_settings": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "test_sram_settings": {
+        "Acceleration": 5,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "sram_settings_after": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "readonly_gripper_controller_settings": {
+        "P_Coefficient": 16,
+        "D_Coefficient": 32,
+        "I_Coefficient": 0,
+        "Minimum_Startup_Force": 16,
+        "CW_Dead_Zone": 1,
+        "CCW_Dead_Zone": 1
+      },
+      "eeprom_matches_authoritative_motor_calibration": true,
+      "matched_static_hold_control": true,
+      "candidate_contact_current_ma": 10,
+      "candidate10_first_replay_hit": {
+        "phase": "fixture_closing",
+        "position_raw": 1820,
+        "command_raw": 1808,
+        "mean_ma": 10.833333333333334,
+        "continuous_above_s": 0.10005191000527702
+      },
+      "candidate10_continuous_run_s": 0.6686141380050685,
+      "threshold_replay_report": "CAL-085_stronger_contact_matched_threshold_replay_20260917.json",
+      "accepted_for_profile_fit": false,
+      "contact_threshold_fitted": false,
+      "latest_operator_grip_confirmation_pending": true,
+      "limitations": "Explicit stronger fake-only scope, phase closing/hold error≤25 currentcandidate39 hardabort65 output500unchanged; actualpeak13 stable9holdframes, promising10mA but newtarget1801 staticempty and physicalgrip observation pending, no pressure/15%/realfruit validation.",
+      "operator_observation": "无异常",
+      "operator_grip_observation_note": "Two no-abnormality replies preserved; explicit stable-grip/no-slip confirmation for enhanced trial remains unprovided. Earlier lower-force explicit grip evidence is separate.",
+      "matched_empty_report": "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json",
+      "operator_followup_observation": "无异常",
+      "operator_followup_context": "Reply to latest request asking whether enhanced fixture was actually gripped and did not slip; preserve words without treating no-abnormality as explicit grip/no-slip measurement."
+    },
+    {
+      "role": "stronger_contact_matched_empty_short_hold_control",
+      "repeat": 1,
+      "attempt": 1,
+      "report": "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json",
+      "operator_confirmation": "批准，CAL-085增强夹持匹配空爪短保持就绪",
+      "status": "CONFIRMED_NO_ABNORMALITY_MATCHED_CONTROL_PASSED",
+      "actual_command_path_raw": [
+        1812,
+        1871,
+        1801
+      ],
+      "fixed_operational_reference_raw": 1836,
+      "raw_position_static_span": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "arm_deviation_from_reference_raw": [
+        2,
+        0,
+        0,
+        4,
+        1
+      ],
+      "powered_duration_s": 9.570884482993279,
+      "final_hold_observed_duration_s": 0.26884341798722744,
+      "hold_frames": 9,
+      "hold_current_counts": {
+        "0.0": 4,
+        "6.5": 5
+      },
+      "final_position_raw": 1806,
+      "final_position_error_raw": 5,
+      "peak_abs_current_ma": 6.5,
+      "max_tracking_error_raw": 7,
+      "gripper_motion_commands_sent": 279,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_sram_settings": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "test_sram_settings": {
+        "Acceleration": 5,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "sram_settings_after": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "readonly_gripper_controller_settings": {
+        "P_Coefficient": 16,
+        "D_Coefficient": 32,
+        "I_Coefficient": 0,
+        "Minimum_Startup_Force": 16,
+        "CW_Dead_Zone": 1,
+        "CCW_Dead_Zone": 1
+      },
+      "eeprom_matches_authoritative_motor_calibration": true,
+      "candidate_contact_current_ma": 10,
+      "candidate10_empty_false_positive_count": 0,
+      "matched_replay_report": "CAL-085_stronger_contact_matched_threshold_replay_20260917.json",
+      "operator_observation": "无异常",
+      "accepted_for_profile_fit": false,
+      "contact_threshold_fitted": false
+    }
+  ],
+  "proposed_fixture_trial": {
+    "status": "EXECUTED_CONTACT_NOT_ESTABLISHED",
+    "servo_id": 6,
+    "fresh_baseline_required": "read-only ten-frame capture with all six torques disabled; supported fixture at uncompressed first contact",
+    "fresh_baseline_max_deviation_from_1855_raw": 5,
+    "fresh_gripper_static_span_max_raw": 2,
+    "path_offsets_from_fresh_baseline_raw": [
+      0,
+      42,
+      -7
+    ],
+    "illustrative_path_if_baseline_1855": [
+      1855,
+      1897,
+      1848
+    ],
+    "incremental_command_speed_pct_s": 1,
+    "sample_fps": 30,
+    "additional_commanded_closure_budget_raw": 7,
+    "additional_commanded_closure_budget_pct": 0.5007153075822603,
+    "budget_scope": "command offset only; not a measured physical compression or fruit-damage bound",
+    "closing_candidate_current_stop_ma": 26,
+    "candidate_stop_scope": "diagnostic stop at first absolute closing sample >=26mA; chosen above the one empty closing peak of 6.5mA; not a fitted contact threshold and may trigger before actual contact",
+    "all_phase_software_current_abort_ma": 65,
+    "trial_timeout_s": 10,
+    "final_hold_s": 0,
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "arm_joint_goal_commands": 0,
+    "termination": "stop issuing goals and disable all six torques immediately on candidate current, final target, bound/tracking/timing/communication error; no force-maintaining dwell or extra recovery motion",
+    "operator_requirements": "plastic fixture supported independently and uncompressed at actual 20mm contact band; arm independently supported; hands outside all pinch zones; small opening path clear; immediately accessible 12V power cut",
+    "limitations": "one low-speed diagnostic fixture trial only; no lift, no full grasp, no real-fruit equivalence or 15%/s runtime-threshold acceptance"
+  },
+  "remeasurement_request": {
+    "operator_request": "测量时未能夹住假果，重新测量",
+    "status": "READONLY_RESEATED_BASELINE_CAPTURED_AWAITING_MOTION_CONFIRMATION",
+    "required_confirmation": "CAL-085假果重新基准就绪",
+    "next_action": "read-only capture of newly seated uncompressed first-contact baseline; do not reuse the old baseline without checking",
+    "operator_requirements": "independently support approximately 42mm plastic fixture at actual 20mm band so it cannot roll or shift as jaws open; independently support arm; no fingers in jaw or link pinch zones",
+    "motion_scope": "remeasurement requested, but no increased closure budget, force-holding dwell, higher output/current, or full grasp authorized; new motion path to be checked against fresh baseline before execution"
+  },
+  "reseated_readonly_baseline": {
+    "report": "CAL-085_fixture_reseated_baseline_repeat2_20260916.json",
+    "captured_at": "2026-09-16T18:15:25.036025+08:00",
+    "operator_confirmation": "CAL-085假果重新基准就绪",
+    "gripper_raw": 1854,
+    "gripper_pct": 25.393419170243206,
+    "reference_gap_m": 0.04098311874105866,
+    "static_span_by_axis_raw": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_before": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_after": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "eeprom_matches_authoritative_motor_calibration": true,
+    "write_instructions_sent": 0,
+    "motion_instructions_sent": 0
+  },
+  "proposed_fixture_repeat2": {
+    "status": "EXECUTED_CONFIRMED_LIGHT_CONTACT_NO_GRIP",
+    "required_confirmation": "批准，CAL-085假果接触重测就绪",
+    "path_raw_if_baseline_unchanged": [
+      1854,
+      1896,
+      1847
+    ],
+    "plan_basis": "same bounded low-speed fixture plan; no increased closure, output, current limit or holding dwell",
+    "expected_preflight_baseline_raw": 1854,
+    "incremental_command_speed_pct_s": 1,
+    "closing_candidate_current_stop_ma": 26,
+    "all_phase_software_current_abort_ma": 65,
+    "trial_timeout_s": 10,
+    "final_hold_s": 0,
+    "limitation": "does not guarantee gripping or separable current; intended to recheck independently supported fixture contact only"
+  },
+  "next_step": "Latest stronger fixture no-abnormality recorded. Await explicit newtarget1801 matched empty short-hold readiness/approval after removingfixture; fixed source and settings unchanged. Compare true runtime3frame/.1s/gap criteria; only after valid matched control and appropriate physical confirmation decide candidate10mA integration, no promotion or full tests now.",
+  "operator_authorizations": [
+    "批准，CAL-085空爪初测就绪",
+    "批准，CAL-085假果接触初测就绪",
+    "批准，CAL-085假果接触重测就绪",
+    "批准，CAL-085扩展空爪对照就绪",
+    "批准，CAL-085假果扩展接触初测就绪",
+    "批准，CAL-085新基准空爪对照就绪",
+    "重新测量",
+    "批准，CAL-085空爪归位并重测就绪",
+    "放大误差允许范围，继续标定",
+    "批准，CAL-085接触范围空爪基线就绪",
+    {
+      "confirmation": "批准，CAL-085新基准假果接触初测就绪",
+      "report": "CAL-085_fixture_updated_baseline_contact_repeat1_20260917.json",
+      "result": "Read-only preflight stopped at1821 outside1843±15; no powered motion. Not authorization to expand tolerance or reset physical baseline."
+    },
+    {
+      "confirmation": "继续初测",
+      "report": "CAL-085_fixture_updated_baseline_contact_repeat1_attempt2_20260917.json",
+      "result": "Executed previously approved6-only fixture trial with fresh1841 baseline; stopped at14raw budget and unloaded. Arm preflight drift discovered in post-review; no threshold fit or further motion authorized."
+    },
+    {
+      "confirmation": "重测本项目",
+      "report": "CAL-085_fixture_updated_baseline_contact_repeat1_attempt3_20260917.json",
+      "result": "One6-only retest under original approved path/protections plus conservative all-arm preflight gate; allsix spans0. Budget stop/unload confirmed, awaiting observation."
+    },
+    {
+      "confirmation": "无异常，可以增加闭合程度再次尝试",
+      "scope": "One fixed-reference6-only extension, previous contact reference1836 retained, previous closed target1822 extended by7raw to1815, opening target1878 unchanged; all powered current/tracking/time limits unchanged. No auto retry or arm goals."
+    },
+    {
+      "confirmation": "批准，CAL-085持续电流空爪短保持就绪",
+      "report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+      "result": "One empty-only fixed target1815 nine-frame short hold executed, explicit immediate unload; fulljoint static gate passed; no fixture hold authorized."
+    },
+    {
+      "confirmation": "批准，CAL-085假果持续电流短保持就绪",
+      "scope": "One fixed1878/1815 goal plastic-fixture short hold max0.3s9frames, same supported actual20mm band, original1836 reference, fresh1836±5 consistent placement and alljoint static gate.26/65mA,10raw,10s protections unchanged, no deeper/arm/recovery goals."
+    },
+    {
+      "confirmation": "放宽容差完成标定",
+      "scope": "One same fixed-target short-hold retry with initial placement±20 and arm reference-pose≤10 only, no higher current/output/tracking limits or deeper goal, do not mark threshold verified absent distinguishable sustained current."
+    },
+    {
+      "confirmation": "可以大胆增大夹持力度，假果不易损坏",
+      "scope": "One bounded higher-pressure plastic-fixture-only experiment: fixed1836 reference, open1871, close1801, closing/hold25raw tracking,39mA candidate stop, whole65mA abort/output500/10s/short.3s unchanged. No production changes or real-fruit extrapolation; newtarget static match pending."
+    }
+  ],
+  "gripper_motion_instructions_sent": 3448,
+  "joint_motion_instructions_sent": 0,
+  "profile_written": false,
+  "eeprom_written": false,
+  "proposed_expanded_empty_control": {
+    "status": "EXECUTED_CONFIRMED_NO_ABNORMALITY",
+    "required_confirmation": "批准，CAL-085扩展空爪对照就绪",
+    "servo_id": 6,
+    "expected_initial_baseline_raw": 1854,
+    "initial_tolerance_raw": 5,
+    "path_raw": [
+      1854,
+      1896,
+      1840
+    ],
+    "incremental_command_speed_pct_s": 1,
+    "sample_fps": 30,
+    "additional_commanded_closure_budget_from_contact_raw": 14,
+    "additional_commanded_closure_budget_pct": 1.0014306151645207,
+    "software_current_abort_ma": 65,
+    "max_tracking_error_raw": 10,
+    "trial_timeout_s": 10,
+    "final_hold_s": 0.2,
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "purpose": "empty-only matched control for a slightly expanded command range; no loaded trial, higher output/current, complete grasp, or relaxation of tracking stop authorized",
+    "operator_requirements": "remove fixture while torque is off, keep gripper near baseline, independently support arm, hands clear of every pinch zone, entire small gripper path unobstructed and 12V power cut immediately accessible",
+    "cleanup": "disable/read back all six torques, restore/read back original SRAM"
+  },
+  "proposed_expanded_fixture_trial": {
+    "status": "STOPPED_BEFORE_MOTION_BASELINE_CHANGED",
+    "required_confirmation": "批准，CAL-085假果扩展接触初测就绪",
+    "servo_id": 6,
+    "fresh_baseline_required": "read-only ten-frame uncompressed first-contact capture with all torques disabled",
+    "expected_baseline_raw": 1854,
+    "fresh_baseline_max_deviation_raw": 5,
+    "fresh_gripper_static_span_max_raw": 2,
+    "path_offsets_from_fresh_baseline_raw": [
+      0,
+      42,
+      -14
+    ],
+    "illustrative_path_if_baseline_1854": [
+      1854,
+      1896,
+      1840
+    ],
+    "incremental_command_speed_pct_s": 1,
+    "sample_fps": 30,
+    "additional_commanded_closure_budget_raw": 14,
+    "additional_commanded_closure_budget_pct": 1.0014306151645207,
+    "closing_candidate_current_stop_ma": 26,
+    "all_phase_software_current_abort_ma": 65,
+    "max_tracking_error_raw": 10,
+    "trial_timeout_s": 10,
+    "final_hold_s": 0,
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "arm_joint_goal_commands": 0,
+    "termination": "immediately stop goals and disable torque on candidate current, budget exhaustion, feedback bounds, >10raw tracking error, timing or communication failure; no dwell, lift, recovery motion or complete grasp",
+    "operator_requirements": "plastic fixture supported at actual 20mm band, initially just touching without pad compression, restrained from rolling/shifting during opening without hand in jaw; arm independently supported; all pinch zones clear and immediate 12V power cut available",
+    "limitations": "extra commanded closure increased from 7 to14raw; not a proven physical-compression or damage-safe bound; diagnostic26mA is not a calibrated contact threshold, cap65mA software-only; same low-speed/current/output as expanded empty control, not 15%/s or real-fruit validation"
+  },
+  "readonly_preflight_attempts": [
+    {
+      "report": "CAL-085_fixture_expanded_contact_repeat1_20260916.json",
+      "operator_confirmation": "批准，CAL-085假果扩展接触初测就绪",
+      "status": "STOPPED_BEFORE_MOTION_BASELINE_CHANGED",
+      "fresh_baseline_raw": 1843,
+      "expected_baseline_raw": 1854,
+      "deviation_raw": -11,
+      "permitted_deviation_raw": 5,
+      "static_span_by_axis_raw": [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "gripper_motion_commands_sent": 0,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "eeprom_matches_authoritative_motor_calibration": true,
+      "controller_matches_expanded_empty_control": true,
+      "contact_threshold_fitted": false
+    },
+    {
+      "report": "CAL-085_empty_updated_baseline_control_repeat2_20260916.json",
+      "role": "updated_baseline_empty_control_repeat2",
+      "operator_confirmation": "重新测量",
+      "status": "STOPPED_BEFORE_MOTION_START_NOT_RESET",
+      "initial_position_raw": 1833,
+      "required_start_raw": 1843,
+      "permitted_initial_deviation_raw": 5,
+      "gripper_motion_commands_sent": 0,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "contact_threshold_fitted": false
+    },
+    {
+      "report": "CAL-085_fixture_updated_baseline_contact_repeat1_20260916.json",
+      "operator_confirmation": "批准，CAL-085新基准假果接触初测就绪",
+      "status": "STOPPED_BEFORE_MOTION_BASELINE_CHANGED",
+      "fresh_baseline_raw": 1834,
+      "reference_raw": 1843,
+      "permitted_deviation_at_attempt_raw": 5,
+      "gripper_motion_commands_sent": 0,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "note": "Before this serial-read capture, local schema validation stopped because arm_joint_goal_commands=0 was omitted; added explicit field consistent with original only-servo6 scope; no motion in either step"
+    },
+    {
+      "report": "CAL-085_empty_complete_contact_domain_repeat1_20260917.json",
+      "operator_confirmation": "批准，CAL-085接触范围空爪基线就绪",
+      "status": "STOPPED_BEFORE_MOTION_SRAM_ACCELERATION_ZERO",
+      "original_sram_settings": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "gripper_motion_commands_sent": 0,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "role": "updated_baseline_fixture_preflight",
+      "repeat": 1,
+      "report": "CAL-085_fixture_updated_baseline_contact_repeat1_20260917.json",
+      "operator_confirmation": "批准，CAL-085新基准假果接触初测就绪",
+      "status": "STOPPED_BEFORE_MOTION_BASELINE_OUTSIDE_APPROVED_PLACEMENT_TOLERANCE",
+      "captured_at": "2026-09-17T12:47:14.368594+08:00",
+      "gripper_raw": 1821,
+      "reference_raw": 1843,
+      "deviation_raw": -22,
+      "approved_placement_tolerance_raw": 15,
+      "raw_position_static_span": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "gripper_motion_commands_sent": 0,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "eeprom_matches_authoritative_motor_calibration": true,
+      "profile_written": false,
+      "eeprom_written": false,
+      "contact_threshold_fitted": false
+    },
+    {
+      "role": "updated_baseline_fixture_recheck",
+      "report": "CAL-085_fixture_baseline_recheck_20260917.json",
+      "operator_request": "再次检查",
+      "status": "READONLY_PLACEMENT_GATE_PASS_NO_MOTION",
+      "gripper_raw": 1841,
+      "deviation_raw": -2,
+      "raw_position_static_span": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "eeprom_matches_authoritative_motor_calibration": true,
+      "motion_instructions_sent": 0,
+      "register_write_instructions_sent": 0
+    },
+    {
+      "role": "sustained_fixture_current_preflight",
+      "repeat": 1,
+      "attempt": 1,
+      "report": "CAL-085_fixture_sustained_current_attempt1_20260917.json",
+      "operator_confirmation": "批准，CAL-085假果持续电流短保持就绪",
+      "status": "STOPPED_BEFORE_MOTION_PLACEMENT_INCONSISTENT",
+      "gripper_raw": 1820,
+      "reference_initial_raw": 1836,
+      "deviation_raw": -16,
+      "approved_initial_position_tolerance_raw": 5,
+      "raw_position_static_span": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "post_review_arm_deviation_from_paired_empty_raw": [
+        2,
+        2,
+        0,
+        7,
+        2
+      ],
+      "arm_reference_max_deviation_raw": 5,
+      "gripper_motion_commands_sent": 0,
+      "joint_servo_motion_commands_sent": 0,
+      "register_write_instructions_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "eeprom_matches_authoritative_motor_calibration": true,
+      "profile_written": false,
+      "eeprom_written": false,
+      "contact_threshold_fitted": false
+    }
+  ],
+  "confirmed_updated_contact_baseline": {
+    "gripper_raw": 1843,
+    "source_report": "CAL-085_fixture_expanded_contact_repeat1_20260916.json",
+    "operator_confirmation": "现在假果独立支撑、接触带距指尖20mm，软垫确实刚接触且未压缩",
+    "actual_contact_band_mm": 20,
+    "uncompressed_first_contact_confirmed": true,
+    "fixture_independently_supported_confirmed": true,
+    "raw_static_span": 0,
+    "scope": "manual contact baseline only, no powered loaded trial occurred in source report",
+    "replaces_baseline_reference_raw": 1854,
+    "baseline_deviation_gate_raw_unchanged": 5
+  },
+  "proposed_updated_baseline_empty_control": {
+    "status": "EXECUTED_PASS_PENDING_OPERATOR_OBSERVATION",
+    "required_confirmation": "批准，CAL-085新基准空爪对照就绪",
+    "servo_id": 6,
+    "expected_initial_baseline_raw": 1843,
+    "initial_tolerance_raw": 5,
+    "path_raw": [
+      1843,
+      1885,
+      1829
+    ],
+    "incremental_command_speed_pct_s": 1,
+    "sample_fps": 30,
+    "additional_commanded_closure_budget_from_contact_raw": 14,
+    "additional_commanded_closure_budget_pct": 1.0014306151645207,
+    "software_current_abort_ma": 65,
+    "max_tracking_error_raw": 10,
+    "trial_timeout_s": 10,
+    "final_hold_s": 0.2,
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "purpose": "empty-only matched current control for newly confirmed first-contact baseline1843; old control endpoint1840 did not cover target1829",
+    "operator_requirements": "remove fixture while torque is off, keep gripper near1843, independently support arm, entire jaw path unobstructed, fingers outside every pinch zone, immediate12V power cut available",
+    "cleanup": "disable/read back six torques, restore/read back original SRAM",
+    "limitations": "new baseline reference, not wider relative budget or relaxed deviation/tracking/current gate; no updated-baseline loaded motion authorized"
+  },
+  "proposed_updated_baseline_empty_reposition_repeat": {
+    "status": "EXECUTED_CONFIRMED_NO_ABNORMALITY",
+    "required_confirmation": "批准，CAL-085空爪归位并重测就绪",
+    "servo_id": 6,
+    "expected_initial_raw": 1833,
+    "initial_tolerance_raw": 5,
+    "preposition": "incremental opening from freshly read initial raw to1843 at1%/s, verify within5raw before starting unchanged control",
+    "control_path_raw": [
+      1843,
+      1885,
+      1829
+    ],
+    "incremental_command_speed_pct_s": 1,
+    "sample_fps": 30,
+    "software_current_abort_ma": 65,
+    "max_tracking_error_raw": 10,
+    "total_powered_timeout_s": 10,
+    "final_hold_s": 0.2,
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "operator_requirements": "empty gripper, independently supported arm, hands outside all pinch zones, entire jaw path clear and immediate12V power cut available",
+    "cleanup": "disable/read back all6torques and restore/read back original SRAM",
+    "scope": "explicit additional start-reset stage, does not loosen5raw control-start check, no increased closing range/output/current, no loaded grasp or EEPROM write"
+  },
+  "proposed_updated_baseline_fixture_trial": {
+    "status": "RETEST_CAPTURED_STABLE_PREFLIGHT_AWAITING_OPERATOR_OBSERVATION",
+    "required_confirmation": "批准，CAL-085新基准假果接触初测就绪",
+    "servo_id": 6,
+    "expected_baseline_raw": 1843,
+    "fresh_baseline_max_deviation_raw": 15,
+    "fresh_gripper_static_span_max_raw": 2,
+    "fresh_baseline_required": "read-only ten-frame uncompressed first contact, supported20mm band; all six torques disabled",
+    "path_offsets_from_fresh_baseline_raw": [
+      0,
+      42,
+      -14
+    ],
+    "illustrative_path_if_baseline1843": [
+      1843,
+      1885,
+      1829
+    ],
+    "incremental_command_speed_pct_s": 1,
+    "sample_fps": 30,
+    "additional_commanded_closure_budget_raw": 14,
+    "closing_candidate_current_stop_ma": 26,
+    "all_phase_software_current_abort_ma": 65,
+    "max_tracking_error_raw": 10,
+    "trial_timeout_s": 10,
+    "final_hold_s": 0,
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "arm_joint_goal_commands": 0,
+    "paired_control_report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+    "prior_same_range_empty_peak_ma": 13,
+    "latest_same_range_empty_peak_ma": 6.5,
+    "operator_requirements": "independently supported arm and plastic fixture at20mm actual contact band, same fixture orientation as confirmed1843 baseline, pads just touching uncompressed; fixture cannot shift/roll on opening, all fingers outside pinch zones and immediately accessible12V power cut",
+    "scope": "one diagnostic plastic-fixture trial only, stop goals and unload immediately at26mA or budget/error, no dwell/lift/extra recovery motion, no1..5joint goals/EEPROM writes; no guarantee of grip or threshold separation",
+    "limitations": "manual placement deviation1843±15 authorized, not10raw powered tracking relaxation; fresh supported uncompressed contact and complete empty coverage required;14raw command budget not a physical compression/damage bound, no15%/s/real-fruit acceptance",
+    "paired_empty_command_coverage_raw": [
+      1625,
+      1908
+    ],
+    "retained_historical_short_range_peak_ma": 13
+  },
+  "placement_tolerance_changes": [
+    {
+      "operator_request": "放大误差允许范围，继续标定",
+      "old_raw": 5,
+      "new_raw": 15,
+      "scope": "manual first-contact reference deviation only",
+      "reference_raw": 1843,
+      "tracking_abort_raw_unchanged": 10,
+      "current_caps_ma_unchanged": [
+        26,
+        65
+      ],
+      "commanded_closure_budget_raw_unchanged": 14,
+      "powered_speed_pct_s_unchanged": 1,
+      "readonly_report": "CAL-085_placement_tolerance_resume_readonly_20260917.json",
+      "fresh_raw": 1837,
+      "placement_gate_passed": true
+    },
+    {
+      "operator_request": "放宽容差完成标定",
+      "scope": "Sustained fixture demo placement-consistency gates only",
+      "initial_position_tolerance_raw": {
+        "from": 5,
+        "to": 20
+      },
+      "arm_reference_pose_tolerance_raw": {
+        "from": 5,
+        "to": 10
+      },
+      "unchanged": {
+        "powered_tracking_error_raw": 10,
+        "alljoint_static_span_raw": 2,
+        "closing_hold_candidate_current_ma": 26,
+        "all_phase_abort_current_ma": 65,
+        "fixed_close_goal_raw": 1815,
+        "maximum_hold_s": 0.3,
+        "trial_timeout_s": 10
+      },
+      "status": "APPROVED_BEFORE_BOUNDED_RETRY"
+    }
+  ],
+  "proposed_complete_contact_domain_empty_control": {
+    "status": "EXECUTED_CONFIRMED_NO_ABNORMALITY",
+    "required_confirmation": "批准，CAL-085接触范围空爪基线就绪",
+    "servo_id": 6,
+    "expected_initial_raw": 1837,
+    "initial_tolerance_raw": 5,
+    "path_raw": [
+      1837,
+      1908,
+      1625
+    ],
+    "incremental_command_speed_pct_s": 1,
+    "sample_fps": 30,
+    "final_hold_s": 0.2,
+    "total_powered_timeout_s": 30,
+    "software_current_abort_ma": 65,
+    "max_tracking_error_raw": 10,
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "derivation": {
+      "contact_gap_range_m": [
+        0.022,
+        0.042
+      ],
+      "contact_pct_range": [
+        10.032362459546924,
+        26.221498371335507
+      ],
+      "contact_raw_boundaries_exact": [
+        1639.252427184466,
+        1865.5765472312703
+      ],
+      "outward_contact_raw_envelope": [
+        1639,
+        1866
+      ],
+      "opening_offset_raw": 42,
+      "closing_budget_raw": 14,
+      "resulting_empty_command_coverage": [
+        1625,
+        1908
+      ]
+    },
+    "reason": "single empty-only baseline over complete current demo contact coordinate envelope, so shifted first-contact references can use covered same-speed data instead of repeated tiny controls",
+    "scope": "onlyCAL-085 current baseline, not full software/hardware regression; expands empty command range and timeout30s by separate approval, no loaded movement, output/current/tracking increase or EEPROM writes",
+    "operator_requirements": "remove fixture while torque off, keep gripper near1837, independently support arm, full jaw sweep clear, hands outside every pinch zone, immediate12V power cut; confirm12V/fixed mounting unchanged",
+    "environment_note": "26.8C was historical baseline; today's ambient temperature not reconfirmed, must be recorded as unknown or supplied rather than claimed as new measurement",
+    "cleanup": "disable/read back all6torques and restore/read back original SRAM"
+  },
+  "proposed_increased_closure_fixture_trial": {
+    "status": "EXECUTED_OPERATOR_CONFIRMED_GRIP_THRESHOLD_UNIDENTIFIED",
+    "required_confirmation": "无异常，可以增加闭合程度再次尝试",
+    "servo_id": 6,
+    "reference_trial_report": "CAL-085_fixture_updated_baseline_contact_repeat1_attempt3_20260917.json",
+    "fixed_contact_reference_raw": 1836,
+    "fixed_open_target_raw": 1878,
+    "fixed_close_target_raw": 1815,
+    "expected_baseline_raw": 1831,
+    "fresh_baseline_max_deviation_raw": 5,
+    "fresh_gripper_static_span_max_raw": 2,
+    "arm_static_span_max_raw": 2,
+    "arm_reference_max_deviation_raw": 5,
+    "path_offsets_from_reference_raw": [
+      0,
+      42,
+      -21
+    ],
+    "additional_commanded_closure_budget_raw": 21,
+    "extra_closure_from_previous_target_raw": 7,
+    "incremental_command_speed_pct_s": 1,
+    "sample_fps": 30,
+    "closing_candidate_current_stop_ma": 26,
+    "all_phase_software_current_abort_ma": 65,
+    "max_tracking_error_raw": 10,
+    "trial_timeout_s": 10,
+    "final_hold_s": 0,
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "arm_joint_goal_commands": 0,
+    "paired_control_report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+    "paired_empty_command_coverage_raw": [
+      1625,
+      1908
+    ],
+    "operator_requirements": "Same independently supported arm/plastic fixture, actual20mm band, no fixture rolling/repositioning, hands out of all pinch zones and immediately accessible12V cut. Fixed source is operational baseline, not verified contact/compression measurement.",
+    "limitations": "21raw is total command extension from original1836, not from unloaded1831; extra7raw only. Existing10raw tracking may stop before deeper endpoint; do not relax it to reach26mA. No force/safety/15%/real-fruit claim."
+  },
+  "confirmed_grip_observation": {
+    "source_report": "CAL-085_fixture_increased_closure_attempt1_20260917.json",
+    "operator_text": "确定已夹紧，由于软垫较薄，可以考虑比实验结果略高一点",
+    "gripper_actual_endpoint_raw": 1825,
+    "command_endpoint_raw": 1815,
+    "fixed_operational_reference_raw": 1836,
+    "raw_current_peak_ma": 13,
+    "accepted_for_threshold_fit": false
+  },
+  "contact_current_review": {
+    "status": "DEMO_CANDIDATE_10MA_PENDING_MATCHED_CONTROL_AND_OPERATOR",
+    "candidate_contact_current_ma": 10,
+    "window_samples": 3,
+    "contact_dwell_s": 0.1,
+    "fixture_hold_mean_current_ma": 13,
+    "fixture_continuous_above_candidate_s": 0.6686141380050685,
+    "historical_empty_false_positive_count_at10": 0,
+    "historical_empty_max_filtered_current_ma": 8.666666666666666,
+    "new_target_static_empty_control_pending": true,
+    "threshold_replay_report": "CAL-085_stronger_contact_threshold_replay_20260917.json",
+    "profile_threshold_value_unchanged_ma": 220,
+    "profile_written": false
+  },
+  "proposed_sustained_empty_control": {
+    "status": "EXECUTED_CONFIRMED_NO_ABNORMALITY",
+    "required_confirmation": "批准，CAL-085持续电流空爪短保持就绪",
+    "servo_id": 6,
+    "reference_trial_report": "CAL-085_fixture_increased_closure_attempt1_20260917.json",
+    "expected_initial_position_raw": 1825,
+    "initial_position_max_deviation_raw": 5,
+    "gripper_static_span_max_raw": 2,
+    "arm_static_span_max_raw": 2,
+    "arm_reference_max_deviation_raw": 5,
+    "fixed_operational_reference_raw": 1836,
+    "fixed_open_target_raw": 1878,
+    "fixed_close_target_raw": 1815,
+    "illustrative_command_path_raw": [
+      1825,
+      1878,
+      1815
+    ],
+    "closure_budget_from_fixed_reference_raw": 21,
+    "extra_closure_from_last_command_endpoint_raw": 0,
+    "incremental_command_speed_pct_s": 1,
+    "sample_fps": 30,
+    "maximum_final_hold_s": 0.3,
+    "final_hold_frames": 9,
+    "final_position_tolerance_raw": 5,
+    "closing_and_hold_candidate_current_stop_ma": 26,
+    "all_phase_software_current_abort_ma": 65,
+    "max_tracking_error_raw": 10,
+    "trial_timeout_s": 10,
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "arm_joint_goal_commands": 0,
+    "report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+    "environment": {
+      "power_v": 12,
+      "ambient_temperature_c": null,
+      "base_mount": "fixed to wooden board; verify operator conditions unchanged"
+    },
+    "operator_requirements": "Remove plastic fixture and all objects from gripper path; independently support arm in same source pose, do not set a new raw contact reference; fingers clear of all pinch zones, immediately accessible12V cut. Check current static pose/source deviations before any writes.",
+    "scope": "One empty-only low-speed path using unchanged fixed targets and9-frame final hold, then immediate unloading, no recovery/arm goals/EEPROM/profile writes; repeat separately only if needed and approved",
+    "limitations": "Prior broad empty report covers moving range1625..1908 but not stationary hold1815/.3s; acquire matched hold control before fixture hold.26/65mA are diagnostic bounds not fitted safety thresholds. Do not increase output/tracking/current limits or change production draft loader."
+  },
+  "proposed_sustained_fixture_current_trial": {
+    "status": "STOPPED_BEFORE_MOTION_AWAITING_PHYSICAL_PLACEMENT_REVIEW",
+    "parameter_id": "CAL-085",
+    "required_confirmation": "批准，CAL-085假果持续电流短保持就绪",
+    "servo_id": 6,
+    "reference_grip_report": "CAL-085_fixture_increased_closure_attempt1_20260917.json",
+    "paired_control_report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+    "fixed_operational_reference_raw": 1836,
+    "fixed_open_target_raw": 1878,
+    "fixed_close_target_raw": 1815,
+    "expected_initial_position_raw": 1836,
+    "initial_position_max_deviation_raw": 5,
+    "fresh_initial_requirement": "Same approximately42mm plastic fixture independently supported at actual20mm band, same orientation and source pose, pads just touching uncompressed; raw gate is placement-consistency check not a substitute for physical contact confirmation",
+    "gripper_static_span_max_raw": 2,
+    "arm_static_span_max_raw": 2,
+    "arm_reference_max_deviation_raw": 5,
+    "illustrative_command_path_raw": [
+      1836,
+      1878,
+      1815
+    ],
+    "closure_budget_from_fixed_reference_raw": 21,
+    "extra_closure_from_last_command_endpoint_raw": 0,
+    "maximum_final_hold_s": 0.3,
+    "final_hold_frames": 9,
+    "sample_fps": 30,
+    "incremental_command_speed_pct_s": 1,
+    "closing_and_hold_candidate_current_stop_ma": 26,
+    "all_phase_software_current_abort_ma": 65,
+    "max_tracking_error_raw": 10,
+    "trial_timeout_s": 10,
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "arm_joint_goal_commands": 0,
+    "operator_requirements": "Manually open enough for placement then gently close to uncompressed first contact; independently support arm/fixture without rolling, keep hands out of all pinch zones, immediately accessible12V cut. Power/fixed mount unchanged. Do not force raw1836 by compressing fixture; outside allowed pose/stability/raw gate stop before writes.",
+    "report": "CAL-085_fixture_sustained_current_attempt1_20260917.json",
+    "not_authorized_yet": false,
+    "limitations": "Tight5raw fresh placement gate is for fixed-target comparison, not relaxation of powered10raw tracking or redefining contact reference. Stationary1815 target can still cause additional physical compression, thus separately approve0.3s hold.26/65mA are diagnostic bounds, no calibrated force/pressure/fruit safety/15% speed result; unload immediately on candidate/budget/error, no extra recovery goals."
+  },
+  "proposed_relaxed_sustained_fixture_current_trial": {
+    "status": "EXECUTED_SHORT_HOLD_COMPLETE_THRESHOLD_UNIDENTIFIABLE",
+    "parameter_id": "CAL-085",
+    "required_confirmation": "放宽容差完成标定",
+    "servo_id": 6,
+    "reference_grip_report": "CAL-085_fixture_increased_closure_attempt1_20260917.json",
+    "paired_control_report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+    "fixed_operational_reference_raw": 1836,
+    "fixed_open_target_raw": 1878,
+    "fixed_close_target_raw": 1815,
+    "expected_initial_position_raw": 1836,
+    "initial_position_max_deviation_raw": 20,
+    "fresh_initial_requirement": "Same approximately42mm plastic fixture independently supported at actual20mm band, same orientation and source pose, pads just touching uncompressed; raw gate is placement-consistency check not a substitute for physical contact confirmation",
+    "gripper_static_span_max_raw": 2,
+    "arm_static_span_max_raw": 2,
+    "arm_reference_max_deviation_raw": 10,
+    "illustrative_command_path_raw": [
+      1836,
+      1878,
+      1815
+    ],
+    "closure_budget_from_fixed_reference_raw": 21,
+    "extra_closure_from_last_command_endpoint_raw": 0,
+    "maximum_final_hold_s": 0.3,
+    "final_hold_frames": 9,
+    "sample_fps": 30,
+    "incremental_command_speed_pct_s": 1,
+    "closing_and_hold_candidate_current_stop_ma": 26,
+    "all_phase_software_current_abort_ma": 65,
+    "max_tracking_error_raw": 10,
+    "trial_timeout_s": 10,
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "arm_joint_goal_commands": 0,
+    "operator_requirements": "Manually open enough for placement then gently close to uncompressed first contact; independently support arm/fixture without rolling, keep hands out of all pinch zones, immediately accessible12V cut. Power/fixed mount unchanged. Do not force raw1836 by compressing fixture; outside allowed pose/stability/raw gate stop before writes.",
+    "report": "CAL-085_fixture_sustained_current_relaxed_attempt1_20260917.json",
+    "not_authorized_yet": false,
+    "limitations": "Static initial-placement gate1836±20 and arm source-pose deviation≤10raw authorized for demo, reduced geometric comparability acknowledged. Powered tracking≤10raw, alljoint span≤2raw,26/65mA,10s, fixed1815 target, output500 and max0.3s9frame hold unchanged. No claim of force/pressure/real-fruit safety or threshold validity solely from relaxed gates; do not rebase current position."
+  },
+  "proposed_stronger_fixture_current_trial": {
+    "status": "EXECUTED_OPERATOR_NO_ABNORMALITY_MATCHED_CONTROL_PENDING",
+    "parameter_id": "CAL-085",
+    "required_confirmation": "可以大胆增大夹持力度，假果不易损坏",
+    "servo_id": 6,
+    "reference_grip_report": "CAL-085_fixture_increased_closure_attempt1_20260917.json",
+    "paired_control_report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+    "fixed_operational_reference_raw": 1836,
+    "fixed_open_target_raw": 1871,
+    "fixed_close_target_raw": 1801,
+    "expected_initial_position_raw": 1836,
+    "initial_position_max_deviation_raw": 20,
+    "fresh_initial_requirement": "Same approximately42mm plastic fixture independently supported at actual20mm band, same orientation and source pose, pads just touching uncompressed; raw gate is placement-consistency check not a substitute for physical contact confirmation",
+    "gripper_static_span_max_raw": 2,
+    "arm_static_span_max_raw": 2,
+    "arm_reference_max_deviation_raw": 10,
+    "illustrative_command_path_raw": [
+      1836,
+      1871,
+      1801
+    ],
+    "closure_budget_from_fixed_reference_raw": 35,
+    "extra_closure_from_last_command_endpoint_raw": 14,
+    "maximum_final_hold_s": 0.3,
+    "final_hold_frames": 9,
+    "sample_fps": 30,
+    "incremental_command_speed_pct_s": 1,
+    "closing_and_hold_candidate_current_stop_ma": 39,
+    "all_phase_software_current_abort_ma": 65,
+    "max_tracking_error_raw": 25,
+    "trial_timeout_s": 10,
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "arm_joint_goal_commands": 0,
+    "operator_requirements": "Plastic fixture only, same independently supported20mm band and orientation, arm supported in source pose, hands completely outside all pinch zones, immediately accessible12V cut. No arm-joint powered goals. User explicitly accepts higher fixture pressure; servo/human/fruit safety is not inferred from fixture robustness.",
+    "report": "CAL-085_fixture_stronger_contact_attempt1_20260917.json",
+    "not_authorized_yet": false,
+    "limitations": "Bolder force test explicitly authorized: closing/hold tracking≤25raw, raw current candidate-stop39mA, wholephase abort>65mA, unchanged output500/acc5/1% speed/10s and9frames max0.3s. Fixed1836 operational reference retained; newclose1801 extra14raw, no cumulative zero. Opening1871 saves timing, opening tracking stays10. Prior static control1815 is not exact matched hold1801; broad moving empty covers allcommandtargets, obtain matched newtarget control before numeric final integration if needed. No current→force or real-fruit safety claim.",
+    "opening_max_tracking_error_raw": 10,
+    "initial_hold_max_tracking_error_raw": 10,
+    "matched_static_hold_control": false
+  },
+  "proposed_stronger_empty_control": {
+    "status": "EXECUTED_CONFIRMED_NO_ABNORMALITY",
+    "required_confirmation": "批准，CAL-085增强夹持匹配空爪短保持就绪",
+    "servo_id": 6,
+    "reference_trial_report": "CAL-085_fixture_stronger_contact_attempt1_20260917.json",
+    "expected_initial_position_raw": 1815,
+    "initial_position_max_deviation_raw": 5,
+    "gripper_static_span_max_raw": 2,
+    "arm_static_span_max_raw": 2,
+    "arm_reference_max_deviation_raw": 10,
+    "fixed_operational_reference_raw": 1836,
+    "fixed_open_target_raw": 1871,
+    "fixed_close_target_raw": 1801,
+    "illustrative_command_path_raw": [
+      1815,
+      1871,
+      1801
+    ],
+    "closure_budget_from_fixed_reference_raw": 35,
+    "extra_closure_from_last_command_endpoint_raw": 0,
+    "incremental_command_speed_pct_s": 1,
+    "sample_fps": 30,
+    "maximum_final_hold_s": 0.3,
+    "final_hold_frames": 9,
+    "final_position_tolerance_raw": 5,
+    "closing_and_hold_candidate_current_stop_ma": 39,
+    "all_phase_software_current_abort_ma": 65,
+    "max_tracking_error_raw": 10,
+    "trial_timeout_s": 10,
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "arm_joint_goal_commands": 0,
+    "report": "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json",
+    "operator_requirements": "Remove plastic fixture and all objects from gripper path; independently support arm in same stronger-trial source pose, no touching pinch zones, immediately accessible12V cut. Keep12V/base fixed mounting unchanged; do not treat new unloaded raw1815 as a new physical contact zero.",
+    "scope": "One empty-only fixed1871/1801 motion and nine-frame max0.3s hold then immediate unloading; no deeper goals/arm goals/recovery/EEPROM/profile writes. Empty tracking10raw remains stricter than fixture-only authorized25raw.",
+    "limitations": "10mA remains demo candidate pending matched control/current physical grip observation.39/65mA are diagnostic bounds, not calibrated fruit safety; don't relax tracking or final tolerance if empty control fails.",
+    "operator_confirmation": "批准，CAL-085增强夹持匹配空爪短保持就绪"
+  },
+  "remaining_physical_grip_confirmation": {
+    "status": "UNVERIFIED",
+    "reason": "Operator repeatedly reports no abnormality, but no explicit enhanced-trial grip/no-slip result. Avoid repeated identical requests; retain missing evidence explicitly.",
+    "requires_new_motion": false,
+    "candidate_contact_current_ma": 10,
+    "profile_contact_current_ma_unchanged": 220,
+    "production_verification_unchanged": true
+  }
+}
