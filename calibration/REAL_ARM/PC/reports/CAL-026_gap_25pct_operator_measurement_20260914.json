@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-026",
+  "captured_date": "2026-09-14",
+  "source": "operator_manual_measurement",
+  "status": "accepted_demo_single_measurement",
+  "measurement": {
+    "nominal_gripper_pct": 25.0,
+    "gap_mm": 40.5,
+    "measurement_plane_mm_behind_hard_fingertip": 20.0,
+    "surfaces": "uncompressed_inner_pad_surfaces",
+    "repeat_count": 1
+  },
+  "positioning": {
+    "servo_id": 6,
+    "servo_name": "gripper",
+    "calibrated_closed_raw": 1499,
+    "calibrated_open_raw": 2897,
+    "goal_position_raw": 1849,
+    "present_position_raw": 1845,
+    "goal_error_raw": -4,
+    "actual_fraction_from_endpoints_pct": 24.7496,
+    "maximum_observed_current_ma": 13.0,
+    "torque_disabled_before_measurement": true
+  },
+  "evidence": {
+    "positioning": "calibration/REAL_ARM/PC/raw/cal026_gripper_25pct_positioning_attempt4_20260914.json",
+    "torque_verification": "calibration/REAL_ARM/PC/raw/cal012_eeprom_post_gripper1849_verify_20260914.json",
+    "motor_calibration_sha256": "ad315322ad4d19cc322c8f21d86d9667d9df9eca2de325bebbd72fa62deefff5",
+    "profile_sha256_at_positioning": "cfd4830f99fabd90a9b2f889b22cbf39f5bdb90ae6fca78d49c0c6d527247bbd"
+  },
+  "supersedes_operator_value_mm": 41.5,
+  "operator_correction": "The operator immediately corrected 41.5 mm to 40.5 mm before it was written to calibration artifacts.",
+  "related_operator_correction": {
+    "nominal_gripper_pct": 0.0,
+    "originally_reported_gap_mm": 0.96,
+    "corrected_gap_mm": 9.6,
+    "eeprom_state_at_measurement": "operator_confirmed_correct",
+    "disposition": "accepted_after_decimal-point-correction"
+  },
+  "profile_updated": false,
+  "reason_profile_not_updated": "The demo gap table is written only after 0/25/50/75/100 percent points are complete and strictly monotonic."
+}

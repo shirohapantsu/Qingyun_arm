@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-012",
+  "status": "VERIFIED",
+  "completed_at": "2026-09-13T11:46:33.955636+08:00",
+  "authority": {
+    "path": "../motor_calibration.json",
+    "sha256": "ad315322ad4d19cc322c8f21d86d9667d9df9eca2de325bebbd72fa62deefff5",
+    "decision": "The operator designated the current workspace calibration file as authoritative for conflicts."
+  },
+  "hardware": {
+    "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+    "resolved_port": "/dev/ttyACM0",
+    "usb_identity": {
+      "vid": "1a86",
+      "pid": "55d3",
+      "serial": "5B14114904"
+    },
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_in_workspace"
+  },
+  "evidence": {
+    "before_snapshot": "../raw/cal012_eeprom_before_writeback_20260913.json",
+    "before_snapshot_sha256": "9f13a9b7e7c967f441a3bc6340a4eb6cc2cbcc9bfe9ce5be0a1407ed68ac86ae",
+    "dry_run_report": "CAL-012_writeback_dry_run_20260913.json",
+    "dry_run_report_sha256": "e133089fe3fca94997c3e9153717361c056065f4adefc0315bdbc0ae566e2188",
+    "write_report": "CAL-012_writeback_20260913.json",
+    "write_report_sha256": "1afca153f4fa4ea51434dc2c90e780c5e297a94068c5006bf43c749b16e4ad41",
+    "lock_recovery_report": "CAL-012_lock_restore_20260913.json",
+    "lock_recovery_report_sha256": "21019e66e68b56b5750b522e34bb353be30d9694fb059569e488d7161b4be419",
+    "after_snapshot": "../raw/cal012_eeprom_after_writeback_20260913.json",
+    "after_snapshot_sha256": "882ad31a07325d74b4617ee047e7d6bd03811ee55691fd6e8698767f662095a1",
+    "sync_tool": "../../../../scripts/sync_motor_calibration_eeprom.py",
+    "sync_tool_sha256": "8a333c05b5203b599c10386c9c076126cb9428776aed9cf0219637778f9c64e8"
+  },
+  "before": {
+    "homing_offset": [-391, -1949, 1787, -1804, 1111, -1676],
+    "ranges": [[675, 3393], [834, 3309], [751, 3089], [744, 3183], [0, 4095], [1543, 3057]],
+    "torque_enabled": [0, 0, 0, 0, 0, 0],
+    "lock": [1, 1, 1, 1, 1, 1]
+  },
+  "after": {
+    "homing_offset": [-438, -1961, 1791, -1795, 1079, -1600],
+    "ranges": [[718, 3424], [865, 3333], [796, 3095], [729, 3192], [0, 4095], [1458, 2980]],
+    "torque_enabled": [0, 0, 0, 0, 0, 0],
+    "lock": [1, 1, 1, 1, 1, 1]
+  },
+  "write_summary": {
+    "planned_different_fields": 16,
+    "written_fields": 16,
+    "immediate_exact_readbacks": 16,
+    "skipped_already_equal_fields": 2,
+    "allowed_eeprom_byte_addresses": [9, 10, 11, 12, 31, 32],
+    "changed_byte_addresses_by_motor": {
+      "shoulder_pan": [9, 11, 31],
+      "shoulder_lift": [9, 11, 12, 31],
+      "elbow_flex": [9, 10, 11, 31],
+      "wrist_flex": [9, 11, 31],
+      "wrist_roll": [31],
+      "gripper": [9, 10, 11, 31]
+    }
+  },
+  "recovery_event": {
+    "occurred": true,
+    "description": "The first lock-restore pass left shoulder_lift Lock at 0 while all 16 calibration writes had already passed immediate readback and torque remained disabled.",
+    "action": "A lock-only mode first proved all calibration fields matched the authority, then restored only the remaining write-protection state.",
+    "result": "All six Lock registers read back 1; no calibration field was rewritten during recovery."
+  },
+  "lerobot_0_5_1_consistency": {
+    "mapping": "range_min/range_max/homing_offset map directly to Min_Position_Limit/Max_Position_Limit/Homing_Offset.",
+    "exact_field_match": true
+  },
+  "checks": {
+    "stable_port_identity_checked_before_each_access": true,
+    "port_unoccupied_before_each_access": true,
+    "all_six_identity_fields_match": true,
+    "torque_disabled_before_during_and_after": true,
+    "all_target_fields_match_authority": true,
+    "all_non_target_eeprom_bytes_unchanged": true,
+    "all_write_protection_locks_restored": true,
+    "motor_calibration_file_unchanged": true
+  }
+}

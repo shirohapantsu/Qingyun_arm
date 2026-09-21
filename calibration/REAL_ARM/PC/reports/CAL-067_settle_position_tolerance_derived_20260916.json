@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-067",
+  "status": "CONFIRMED_FOR_CURRENT_DEMO",
+  "completed_at": "2026-09-16T12:12:45+08:00",
+  "parameter": "motion.settle_position_tol_deg",
+  "method": "For each passed trajectory, walk backward from the final feedback frame and retain the shortest final-target command window that covers the current 0.15 s settling dwell. Correct the historical stored velocity by 0.02 and verify all five speeds are within the current 8 deg/s settling-speed threshold. Add three encoder counts to each axis maximum position error and round upward to 0.1 degree.",
+  "inputs": {
+    "current_settle_velocity_tolerance_deg_s": [8.0, 8.0, 8.0, 8.0, 8.0],
+    "historical_stored_velocity_correction_factor": 0.02,
+    "historical_stored_velocity_issue": "CAL-058 and CAL-059 JSONL were captured before CAL-016 removed the erroneous address-82 factor of 50 from Present_Velocity conversion.",
+    "position_resolution_counts_per_revolution": [4096, 4096, 4096, 4096, 4096],
+    "three_count_margin_deg": [0.263671875, 0.263671875, 0.263671875, 0.263671875, 0.263671875],
+    "current_settle_dwell_s": 0.15,
+    "sources": [
+      {"file": "../raw/cal058_joint_velocity_unloaded_20260915.jsonl", "sha256": "edcddd37541a0da3f8ffb85b2d674d004abd4ee924633b1ca49b1af943c8e933"},
+      {"file": "../raw/cal058_joint_velocity_92p4g_attempt2_20260915.jsonl", "sha256": "1ddbfa92a1a97f1bc72c5bd7db1b1ddf2492e77b4673f5263c8b2b26d5645965"},
+      {"file": "../raw/cal058_joint_velocity_92p4g_attempt3_20260915.jsonl", "sha256": "9a7c65506741ca3daf3b3ee84a055d7717dda6ad392477bcdbd44cdc5d775e29"},
+      {"file": "../raw/cal059_joint_acceleration_92p4g_attempt2_20260915.jsonl", "sha256": "049a16b0e76bd507cd29c64f454b83b3ca976b98c69c50b78cbf04b8dae4ca31"}
+    ]
+  },
+  "evidence_selection": {
+    "deduplicated_passed_trajectories": 90,
+    "deduplicated_passed_source_rows": 4997,
+    "terminal_stable_rows": 1080,
+    "window_rule": "shortest terminal final-command suffix spanning at least 0.15 s; corrected speed must be at most 8 deg/s on all axes",
+    "stable_rows_per_trajectory_min": 12,
+    "stable_rows_per_trajectory_median": 12.0,
+    "stable_rows_per_trajectory_max": 12,
+    "window_span_s_min": 0.155891341,
+    "window_span_s_median": 0.1590390855,
+    "window_span_s_max": 0.164641688,
+    "windows_shorter_than_current_0p15_s_dwell": 0,
+    "loaded_overlap_policy": "The later successful CAL-058 attempt3 trajectory replaces the same named attempt2 trajectory."
+  },
+  "observed": {
+    "position_error_p99_deg": [0.549450549450551, 1.758241758241759, 2.637362637362637, 1.0109890109890074, 0.6373626373626351],
+    "position_error_max_deg": [0.7252747252747263, 1.758241758241759, 2.637362637362637, 1.098901098901095, 0.7252747252747245]
+  },
+  "derivation": {
+    "rule": "ceil((terminal_stable_error_max + 3 counts) * 10) / 10",
+    "before_deg": [2.5, 2.5, 2.5, 2.5, 2.5],
+    "after_deg": [1.0, 2.1, 3.0, 1.4, 1.0],
+    "all_terminal_stable_rows_within_candidate": true,
+    "CAL-063_start_tolerance_deg": [2.5, 2.5, 3.0, 2.5, 2.5],
+    "CAL-063_remains_not_less_than_settle_per_axis": true
+  },
+  "fit_correction": {
+    "obsolete_rule": "P99 position error over all motion frames plus 1 degree",
+    "obsolete_rule_issue": "It mixes dynamic following lag into a static settling predicate.",
+    "function": "scripts.calibrate._derive_settle_position_tolerance",
+    "regression_test": "test_motion到位位置容差只使用轨迹末端连续低速窗口",
+    "calibration_module_tests_passed": 55,
+    "calibration_module_tests_failed": 0
+  },
+  "profile_sha256_before": "f470e1c9e05a38bccac848af0619830526d8ab55fda3ae0ccc3a421cacd136e0",
+  "profile_sha256_after": "c16e4f86a071983a01661fc4ed00539780df7ddd49ae6e8cd5afe813b310fb65",
+  "profile_written": true,
+  "hardware_accessed_for_this_derivation": false,
+  "eeprom_written": false,
+  "limitations": [
+    "The stable-window selection currently uses the CAL-068 candidate of 8 deg/s; if CAL-068 changes, CAL-067 must be replayed with the new velocity threshold.",
+    "The evidence covers the current demo trajectories, environment, and maximum 92.4 g demo payload, not the full mechanical workspace."
+  ],
+  "post_write_verification": {
+    "profile_json_valid": true,
+    "terminal_stable_rows_replayed": 1080,
+    "rows_failing_new_position_tolerance": 0,
+    "windows_covering_current_settle_dwell": 90,
+    "full_motion_group_regression": "deferred until CAL-063 through CAL-070 form a complete group, per operator instruction",
+    "result": "PASS"
+  },
+  "downstream": {
+    "CAL-068": "calibrate settling-speed tolerance and then replay this stable-window selection",
+    "CAL-069": "calibrate required continuous settling duration",
+    "CAL-070": "calibrate total settling timeout"
+  }
+}

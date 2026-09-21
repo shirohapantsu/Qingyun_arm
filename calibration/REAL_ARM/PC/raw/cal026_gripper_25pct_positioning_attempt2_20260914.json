@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-026",
+  "operation": "position_gripper_for_manual_gap_measurement",
+  "started_at": "2026-09-14T14:31:15.529203+08:00",
+  "success": false,
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256": "cfd4830f99fabd90a9b2f889b22cbf39f5bdb90ae6fca78d49c0c6d527247bbd",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_workcell"
+  },
+  "target_raw": 1849,
+  "calibrated_safe_endpoints_raw": [
+    1499,
+    2897
+  ],
+  "official_gripper_range_raw": [
+    1458,
+    2980
+  ],
+  "temporary_sram_settings": {
+    "Acceleration": 5,
+    "Goal_Time": 0,
+    "Goal_Velocity": 5,
+    "Torque_Limit": 200
+  },
+  "eeprom_written": false,
+  "joint_servo_motion_commands_sent": 0,
+  "gripper_motion_commands_sent": 1,
+  "samples": [],
+  "response_status_level_by_motor": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "model_numbers": [
+    777,
+    777,
+    777,
+    777,
+    777,
+    777
+  ],
+  "torque_enabled_before": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "start_raw": 2048,
+  "original_sram_settings": {
+    "Acceleration": 5,
+    "Goal_Time": 0,
+    "Goal_Velocity": 0,
+    "Torque_Limit": 500
+  },
+  "gripper_torque_enable_readback": 1,
+  "error": "MotorCommunicationError: 舵机 6 从地址 56 读回 0 字节，应为 2 字节",
+  "torque_enabled_after": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "finished_at": "2026-09-14T14:31:15.598761+08:00"
+}

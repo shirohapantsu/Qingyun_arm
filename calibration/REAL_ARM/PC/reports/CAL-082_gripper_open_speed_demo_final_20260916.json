@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-082",
+  "parameter": "gripper.open_speed_pct_s",
+  "status": "CONFIRMED_DEMO",
+  "previous_value_pct_s": 25.0,
+  "selected_command_rate_pct_s": 20.0,
+  "selection_basis": "lower tested command rate has improved position-time fitted tracking ratio and smaller dynamic lag; operator reported no abnormality",
+  "scope": "single successful empty-gripper trial per command-rate candidate, 25% to 75%, 30 Hz, current 12V demo assembly and SRAM baseline",
+  "not_proven": ["optimal or maximum speed", "repeatability", "full opening range", "loaded release behavior", "instantaneous physical speed bound", "complete grasp safety"],
+  "successful_trials": [
+    {"command_rate_pct_s": 25.0, "measured_linear_rate_pct_s": 21.682484125741112, "max_tracking_lag_pct": 10.193133047210296, "peak_current_ma": 13.0, "report": "CAL-082_gripper_open_speed_attempt1_20260916.json"},
+    {"command_rate_pct_s": 20.0, "measured_linear_rate_pct_s": 18.500573467475, "max_tracking_lag_pct": 6.988555078683831, "peak_current_ma": 13.0, "final_settled_pct": 74.74964234620887, "report": "CAL-082_gripper_open_speed_attempt3_20260916.json"}
+  ],
+  "failed_attempt": {"report": "CAL-082_gripper_open_speed_attempt2_20260916.json", "opening_sequence_executed": false, "independent_safe_recovery": "PASS"},
+  "operator_observation_both_successful_trials": "无异常",
+  "torque_enabled_after_latest_motion": [0, 0, 0, 0, 0, 0],
+  "gripper_sram_after_latest_motion": {"Acceleration": 5, "Goal_Time": 0, "Goal_Velocity": 0, "Torque_Limit": 500},
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256_before": "3888ae865ab126f3626cd2deab5fd48681b761cc15f2d11a745603c7e005d9b5",
+  "profile_sha256_after": "1f1e305912fb367eb4215c6a502b03c6f653d7eef65a0163b7b87a8ee4d90d8f",
+  "profile_written": true,
+  "eeprom_written": false,
+  "full_regression_run": false,
+  "pending_downstream": ["CAL-092", "CAL-094", "CAL-096", "CAL-097"],
+  "next_parameter": "CAL-083"
+}

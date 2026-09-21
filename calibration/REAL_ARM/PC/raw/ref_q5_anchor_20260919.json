@@ -1,0 +1,15 @@
+{
+  "pose_label": "q5_anchor_same_placement",
+  "phone_reading_deg": 0.0,
+  "note": "q5 三行同锚法锚点：当前贴法下读数 0 的状态，参考定义为 0。后续两行参考 = 本锚点 + 符号修正×(读数-r1)，贴放偏差相消",
+  "samples": [
+    {
+      "q_reference_deg": [null, null, null, null, 0.0],
+      "approach_direction": "joint_sweep",
+      "sweep_joint_index": 4,
+      "sweep_direction": 0,
+      "fixture_id": "P0_phone_inclinometer_20260919",
+      "load_label": "unloaded"
+    }
+  ]
+}

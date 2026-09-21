@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-024",
+  "status": "CONFIRMED_NOMINAL_FOR_DEMO",
+  "captured_at": "2026-09-14",
+  "parameter": "tool.rotation_e_tcp",
+  "source": "urdf_fixed_installation_angle_and_project_tcp_axis_convention",
+  "derivation": {
+    "urdf_joint": "wrist_roll",
+    "urdf_origin_pitch_rad": 0.0486795,
+    "urdf_origin_pitch_deg": 2.789129898807091,
+    "formula": "[[0,-sin(a),cos(a)],[0,-cos(a),-sin(a)],[1,0,0]], a=wrist_roll.origin.rpy.pitch",
+    "tcp_axes": {
+      "plus_x": "representative gripper closing direction",
+      "plus_z": "approach direction",
+      "plus_y": "plus_z cross plus_x"
+    },
+    "exact_nominal_rotation_e_tcp": [
+      [0.0, -0.04866027636027247, 0.9988153870984077],
+      [0.0, -0.9988153870984077, -0.04866027636027247],
+      [1.0, 0.0, 0.0]
+    ]
+  },
+  "result": {
+    "configured_rotation_e_tcp_retained": [
+      [0.0, -0.0486886, 0.998814],
+      [0.0, -0.998814, -0.0486886],
+      [1.0, 0.0, 0.0]
+    ],
+    "configured_equivalent_tilt_deg": 2.790754668685614,
+    "tilt_difference_from_urdf_deg": 0.0016247698785231582,
+    "max_element_difference_from_exact_nominal": 0.000028323639727531602,
+    "configured_determinant": 0.99999998636596,
+    "configured_orthogonality_max_abs_error": 1.363404000809254e-8
+  },
+  "decision": {
+    "profile_value_changed": false,
+    "reason": "The configured rounded matrix already represents the URDF nominal transform within 2.84e-5 per element and passes the profile SO(3) tolerance."
+  },
+  "scope_and_limitations": {
+    "accepted_scope": "demo_nominal_geometry",
+    "physical_tool_axis_measurement_performed": false,
+    "assembly_rotation_error_verified": false,
+    "mandatory_physical_error_parameter": "CAL-029 tool.orientation_error_bound_deg",
+    "profile_status_remains_draft": true
+  },
+  "evidence": {
+    "urdf_path": "../../../libs/so_arm_core/so101_new_calib.urdf",
+    "urdf_sha256": "3a65d2d35e68a8d2f0c2cc176d19b884506543c93ba72980145b80abe276022c",
+    "profile_sha256": "cfd4830f99fabd90a9b2f889b22cbf39f5bdb90ae6fca78d49c0c6d527247bbd"
+  },
+  "integration": {
+    "hardware_accessed": false,
+    "motion_instructions_sent": 0,
+    "eeprom_written": false,
+    "software_test_policy": "deferred_until_completion_of_the_tool_module"
+  }
+}

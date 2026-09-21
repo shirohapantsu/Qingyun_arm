@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "parameter_ids": [
+    "CAL-091",
+    "CAL-092"
+  ],
+  "status": "CONFIRMED_DEMO_INTEGRATED",
+  "operator_observation": "无异常",
+  "independent_successful_cycles": 3,
+  "profile_sha256_before": "aabb213608b99f707433f1c7add925fcd7b0972c53aafbb7acdacee83a6af85d",
+  "profile_sha256_after": "4a1782e01bab930fd19e4b557a831dd9b406ca3fddc889480b1fc6a1dd30f7a2",
+  "only_changed_fields": {
+    "gripper.close_timeout_s": {
+      "before": 6,
+      "after": 4.7
+    },
+    "gripper.open_timeout_s": {
+      "before": 6,
+      "after": 4.3
+    }
+  },
+  "all_other_profile_fields_preserved": true,
+  "sources": [
+    {
+      "report": "CAL-091_092_empty_timing_repeat1_attempt1_20260917.json",
+      "source_sha256_before_operator_review": "96e25a444afe2eaf0360b6fa829c26ba6b5c4c9fab3fa508cd46a487435e617d",
+      "raw_samples_sha256": "9cbdec8f7478fcc8673f9741fc66556364763a34a0b2beb9e8ef05bf646fb1f6",
+      "finished_at": "2026-09-17T18:29:52.724151+08:00",
+      "source_sha256_after_operator_review": "4f2910836127d50003faf0bde750f68c1c93cb36787c15b116a31c1f96273674"
+    },
+    {
+      "report": "CAL-091_092_empty_timing_repeat2_attempt1_20260917.json",
+      "source_sha256_before_operator_review": "d3abcaa5e14110cb449f6036114daa41debc44cbe938fc643b9709811cfb6881",
+      "raw_samples_sha256": "3a959c4e131b658cab989a81e627d11b0a445aec83bc3ee1d8b8e3a5723173af",
+      "finished_at": "2026-09-17T18:30:18.770150+08:00",
+      "source_sha256_after_operator_review": "051827649ceb9d836dde21c4beae1190f662bfbbec285099d724b0f60d10a591"
+    },
+    {
+      "report": "CAL-091_092_empty_timing_repeat3_attempt1_20260917.json",
+      "source_sha256_before_operator_review": "1dfa8934e6398b73270fde35f99bbbc7f5d4ba26cf31a0ae2b32eacd660b5b48",
+      "raw_samples_sha256": "09ee2cca9db357110fcf12c5b0cd6c06a63da84f0c35b62bd66c4d6403c81e53",
+      "finished_at": "2026-09-17T18:31:41.036836+08:00",
+      "source_sha256_after_operator_review": "9be5f10143f200ad2d325b89118e0b163d9c702c974cec5d68d13574ede05b03"
+    }
+  ],
+  "raw_samples_unchanged": true,
+  "derived_timeout_fields": {
+    "opening": {
+      "observed_completion_s": [
+        3.5343837340187747,
+        3.5011613089882303,
+        3.466794559994014
+      ],
+      "max_observed_completion_s": 3.5343837340187747,
+      "engineering_margin_s": 0.706876746803755,
+      "conditional_timeout_candidate_s": 4.3,
+      "current_timeout_s": 6
+    },
+    "closing": {
+      "observed_completion_s": [
+        3.902252086001681,
+        3.903568847978022,
+        3.9018542840203736
+      ],
+      "max_observed_completion_s": 3.903568847978022,
+      "engineering_margin_s": 0.7807137695956045,
+      "conditional_timeout_candidate_s": 4.7,
+      "current_timeout_s": 6
+    }
+  },
+  "checks": {
+    "AST": "PASS",
+    "gripper_parser": "PASS",
+    "table_coverage": "PASS",
+    "calibration_loader": "PASS",
+    "fitter_preserves_current_values_and_placeholders": "PASS",
+    "real_loader_still_refuses_draft": true,
+    "real_loader_reason": "status: mode=real 要求 status=verified，实际 'draft'"
+  },
+  "fitter_update": "Preserve base open/close timeouts and explicitly label preserved_base_not_fitted, never blindly overwrite accepted timeout with6s; placeholder preservation does not mark it measured.",
+  "regression_test_added": "tests/test_calibration.py::test_grasp_fit保留已有超时而非覆盖为常数",
+  "new_motion_commands": 0,
+  "cumulative_gripper_goals": 5644,
+  "arm_goals": 0,
+  "eeprom_written": false,
+  "full_tests_run": false,
+  "profile_status": "draft",
+  "verification": null,
+  "limitations": [
+    "Only three EMPTY demo cycles at20/15pct_s with55pct opening and1.21pct empty completion; not full100pct/contact/fruit/force/slip/physical stop response evidence.",
+    "Timeout allowance max(0.5s,20%observed max) is engineering margin, not measured worst-case bound.",
+    "Changing endpoints, speed, SRAM/controller or CAL-096/097 completion thresholds/dwell requires timing review.",
+    "CAL-084~088 contact group and CAL-ISSUE-044 historical arm raw862 below865 remain unresolved; never bypass production draft gate.",
+    "Original automatic capture statuses/profile fingerprints and pre-observation fit snapshot are preserved; review hashes reflect only appended operator review.",
+    "Pure fitter preservation diagnostic returned updates but did not apply its other computed fields."
+  ]
+}

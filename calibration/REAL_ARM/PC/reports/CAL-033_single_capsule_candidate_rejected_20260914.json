@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-033",
+  "evaluated_date": "2026-09-14",
+  "source": "urdf_stl_triangle_geometry",
+  "status": "candidate_rejected_profile_unchanged",
+  "inputs": {
+    "urdf_path": "libs/so_arm_core/so101_new_calib.urdf",
+    "urdf_sha256": "3a65d2d35e68a8d2f0c2cc176d19b884506543c93ba72980145b80abe276022c",
+    "profile_path": "calibration/REAL_ARM/PC/profile.json",
+    "profile_sha256": "f179b7b46505678d34592073e248557cf2ece7c23fd75160585e09f3c252220f",
+    "fit_tool": "scripts/fit_urdf_link_capsules.py",
+    "fit_tool_sha256_at_rejected_stage": "c6b9d798657abf9e787655582706d804c4a20957ec0b3c155fb0e5b734bd487a",
+    "note": "The tool was subsequently extended for per-mesh fitting; the final version hash is recorded in the accepted CAL-033/CAL-034 report."
+  },
+  "method": {
+    "surface_coverage": "Each STL triangle is assigned as a unit; all three vertices are enclosed by one convex capsule.",
+    "axis_candidates": [
+      "PCA axes",
+      "link-coordinate axes",
+      "current profile segment direction"
+    ],
+    "cad_margin_mm": 0.5,
+    "installed_pad_outgrowth_mm": 3.0
+  },
+  "single_capsule_demo_radius_mm": {
+    "base_link": 57.8424,
+    "shoulder_link": 38.9856,
+    "upper_arm_link": 40.4976,
+    "lower_arm_link": 33.8340,
+    "wrist_link": 35.7834,
+    "gripper_link": 42.1704,
+    "moving_jaw_so101_v1_link": 29.7061
+  },
+  "offline_usability_check": {
+    "temporary_profile_only": true,
+    "unconfirmed_workspace_obstacles_removed": true,
+    "pose": "workspace.home_joints_deg",
+    "gripper_pct": 0.0,
+    "passed": false,
+    "failure": "shoulder_body falsely intersects the table by 28.1 mm because the enclosing capsule is too coarse"
+  },
+  "decision": "Do not write the one-capsule candidates. Continue with a finer multi-capsule decomposition and union-coverage proof.",
+  "profile_changed": false
+}

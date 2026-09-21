@@ -1,0 +1,334 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-082",
+  "test": "empty_gripper_runtime_style_incremental_open",
+  "started_at": "2026-09-16T17:12:30.546587+08:00",
+  "status": "FAIL",
+  "independent_recovery": {
+    "operation": "disable_all_torque_then_readonly_sram_verification",
+    "torque_enabled_after": [0, 0, 0, 0, 0, 0],
+    "gripper_sram_verified": {"Acceleration": 5, "Goal_Time": 0, "Goal_Velocity": 0, "Torque_Limit": 500},
+    "result": "PASS",
+    "opening_speed_trial_executed": false
+  },
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256": "3888ae865ab126f3626cd2deab5fd48681b761cc15f2d11a745603c7e005d9b5",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_to_wood_board_no_gap",
+    "load": "empty_gripper"
+  },
+  "operator_confirmation": "CAL-082就绪",
+  "start_pct": 25.0,
+  "end_pct": 75.0,
+  "start_raw": 1848,
+  "end_raw": 2548,
+  "fps": 30.0,
+  "tick_s": 0.03333333333333333,
+  "steps": 75,
+  "candidate_speed_pct_s": 20.0,
+  "commanded_speed_pct_s": 20.0,
+  "eeprom_written": false,
+  "joint_servo_motion_commands_sent": 0,
+  "gripper_motion_commands_sent": 1,
+  "samples": [],
+  "readonly_preflight": {
+    "response_status_level": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "model_numbers": [
+      777,
+      777,
+      777,
+      777,
+      777,
+      777
+    ],
+    "torque_enabled": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "initial_sample": {
+    "monotonic_ns": 102679447921260,
+    "position_raw": 1654,
+    "gripper_pct": 11.087267525035765,
+    "velocity_register_raw": 0,
+    "velocity_pct_s": 0.0,
+    "current_register_raw": 0,
+    "current_ma": 0.0,
+    "moving": 0
+  },
+  "original_sram_settings": {
+    "Acceleration": 5,
+    "Goal_Time": 0,
+    "Goal_Velocity": 0,
+    "Torque_Limit": 500
+  },
+  "preposition_samples": [
+    {
+      "monotonic_ns": 102679501819786,
+      "position_raw": 1654,
+      "gripper_pct": 11.087267525035765,
+      "velocity_register_raw": 0,
+      "velocity_pct_s": 0.0,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    },
+    {
+      "monotonic_ns": 102679553325601,
+      "position_raw": 1654,
+      "gripper_pct": 11.087267525035765,
+      "velocity_register_raw": 0,
+      "velocity_pct_s": 0.0,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102679604971282,
+      "position_raw": 1654,
+      "gripper_pct": 11.087267525035765,
+      "velocity_register_raw": 0,
+      "velocity_pct_s": 0.0,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102679656855238,
+      "position_raw": 1658,
+      "gripper_pct": 11.373390557939913,
+      "velocity_register_raw": 150,
+      "velocity_pct_s": 10.726994199302576,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102679708647447,
+      "position_raw": 1664,
+      "gripper_pct": 11.802575107296137,
+      "velocity_register_raw": 100,
+      "velocity_pct_s": 7.151329466201715,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102679760536933,
+      "position_raw": 1671,
+      "gripper_pct": 12.303290414878397,
+      "velocity_register_raw": 150,
+      "velocity_pct_s": 10.726994199302576,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102679812767643,
+      "position_raw": 1680,
+      "gripper_pct": 12.947067238912732,
+      "velocity_register_raw": 200,
+      "velocity_pct_s": 14.30265893240343,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102679864760177,
+      "position_raw": 1689,
+      "gripper_pct": 13.590844062947067,
+      "velocity_register_raw": 150,
+      "velocity_pct_s": 10.726994199302576,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102679916443397,
+      "position_raw": 1700,
+      "gripper_pct": 14.377682403433477,
+      "velocity_register_raw": 200,
+      "velocity_pct_s": 14.30265893240343,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102679968294534,
+      "position_raw": 1712,
+      "gripper_pct": 15.236051502145923,
+      "velocity_register_raw": 250,
+      "velocity_pct_s": 17.87832366550429,
+      "current_register_raw": 2,
+      "current_ma": 13.0,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102680019969349,
+      "position_raw": 1726,
+      "gripper_pct": 16.237482117310442,
+      "velocity_register_raw": 300,
+      "velocity_pct_s": 21.45398839860515,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102680071467261,
+      "position_raw": 1741,
+      "gripper_pct": 17.310443490701,
+      "velocity_register_raw": 300,
+      "velocity_pct_s": 21.45398839860515,
+      "current_register_raw": 2,
+      "current_ma": 13.0,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102680123091413,
+      "position_raw": 1756,
+      "gripper_pct": 18.38340486409156,
+      "velocity_register_raw": 300,
+      "velocity_pct_s": 21.45398839860515,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102680174760207,
+      "position_raw": 1770,
+      "gripper_pct": 19.38483547925608,
+      "velocity_register_raw": 300,
+      "velocity_pct_s": 21.45398839860515,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102680226785742,
+      "position_raw": 1783,
+      "gripper_pct": 20.314735336194563,
+      "velocity_register_raw": 250,
+      "velocity_pct_s": 17.87832366550429,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102680278576489,
+      "position_raw": 1795,
+      "gripper_pct": 21.17310443490701,
+      "velocity_register_raw": 250,
+      "velocity_pct_s": 17.87832366550429,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102680330668195,
+      "position_raw": 1806,
+      "gripper_pct": 21.95994277539342,
+      "velocity_register_raw": 200,
+      "velocity_pct_s": 14.30265893240343,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102680382451569,
+      "position_raw": 1815,
+      "gripper_pct": 22.603719599427755,
+      "velocity_register_raw": 150,
+      "velocity_pct_s": 10.726994199302576,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102680434711332,
+      "position_raw": 1824,
+      "gripper_pct": 23.24749642346209,
+      "velocity_register_raw": 150,
+      "velocity_pct_s": 10.726994199302576,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102680486931523,
+      "position_raw": 1831,
+      "gripper_pct": 23.74821173104435,
+      "velocity_register_raw": 100,
+      "velocity_pct_s": 7.151329466201715,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102680538642794,
+      "position_raw": 1836,
+      "gripper_pct": 24.105865522174536,
+      "velocity_register_raw": 150,
+      "velocity_pct_s": 10.726994199302576,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102680590310156,
+      "position_raw": 1840,
+      "gripper_pct": 24.391988555078683,
+      "velocity_register_raw": 100,
+      "velocity_pct_s": 7.151329466201715,
+      "current_register_raw": 1,
+      "current_ma": 6.5,
+      "moving": 1
+    },
+    {
+      "monotonic_ns": 102680641888314,
+      "position_raw": 1843,
+      "gripper_pct": 24.606580829756794,
+      "velocity_register_raw": 0,
+      "velocity_pct_s": 0.0,
+      "current_register_raw": 0,
+      "current_ma": 0.0,
+      "moving": 0
+    }
+  ],
+  "test_sram_settings": {
+    "Acceleration": 5,
+    "Goal_Time": 0,
+    "Goal_Velocity": 10,
+    "Torque_Limit": 600
+  },
+  "failure": "RuntimeError: 正式速度段前 SRAM 未恢复到运行期原值",
+  "torque_final_check_error": "MotorCommunicationError: READ id=1 addr=40 n=1 帧头不完整：FF 06",
+  "finished_at": "2026-09-16T17:12:32.143360+08:00"
+}

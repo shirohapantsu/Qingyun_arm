@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-054",
+  "parameter": "timing.max_feedback_age_s",
+  "date": "2026-09-15",
+  "status": "DERIVED_AND_VERIFIED_FOR_UNLOADED_STATIC_DEMO",
+  "profile_changed": true,
+  "profile_sha256_before": "b7a2ceadf5325cca15547a33fc0df26de5907c4e628c67c797d8d19d31a8a06d",
+  "profile_sha256_after": "52e2b621a303368f0774cf9ee439da852f2992480b0dfec1c21c55dad4106ba9",
+  "source_reports": [
+    "CAL-051_read_timeout_static_1000ticks_20260915.json",
+    "CAL-053_feedback_span_static_1000ticks_20260915.json"
+  ],
+  "source_evidence": "../raw/cal051_feedback_read_timing_1000ticks_20260915.jsonl",
+  "source_sha256": "91f2d95bbe8729021deb3ed3f1b2c4af99a134682a96fba08191938232c36f5d",
+  "inputs_s": {
+    "cal_053_max_feedback_span_s": 0.0093,
+    "cal_051_observed_max_read_s": 0.007754172,
+    "fixed_processing_margin_s": 0.02
+  },
+  "formula": "round(CAL-053 + max(CAL-051 read duration) + 0.020, 4)",
+  "formula_unrounded_s": 0.037054172,
+  "old_value_s": 0.05,
+  "derived_value_s": 0.0371,
+  "decision": "Apply 37.1 ms. Feedback age is measured from sample_start_ns, so the threshold includes the calibrated whole-arm coherence span, the observed worst complete read duration, and the specified 20 ms processing/scheduling margin.",
+  "verification": {
+    "positive": true,
+    "greater_than_max_feedback_span_s": true,
+    "processing_margin_preserved_s": 0.02,
+    "profile_value_matches_derivation": true
+  },
+  "hardware_accessed": false,
+  "eeprom_written": false,
+  "scope_limit": "This is a deterministic derivation from unloaded static timing evidence. Active-motion and stressed-CPU validation remain part of the later timing/motion integration test."
+}

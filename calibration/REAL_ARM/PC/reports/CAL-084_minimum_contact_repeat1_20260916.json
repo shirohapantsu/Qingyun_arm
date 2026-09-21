@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-084",
+  "source": "manual_contact_pose_hardware_read_only",
+  "status": "CONFIRMED_CONTACT_REFERENCE_COORDINATE",
+  "contact_label": "first_contact",
+  "accepted_contact_observation": true,
+  "reference_gap_m": 0.024099570815450644,
+  "actual_gap_m": 0.0182,
+  "accepted_for_profile_fit": true,
+  "gap_table_measurement_plane_mm_behind_hard_fingertip": 20.0,
+  "reference_plane_mismatch": true,
+  "profile_sha256": "1f1e305912fb367eb4215c6a502b03c6f653d7eef65a0163b7b87a8ee4d90d8f",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "models": [
+    777,
+    777,
+    777,
+    777,
+    777,
+    777
+  ],
+  "sample_role": "minimum",
+  "repeat": 1,
+  "contact_band_distance_from_each_fingertip_mm": 10.0,
+  "operator_measured_gap_mm": 18.2,
+  "pose_held_through_capture_confirmed": true,
+  "burst": {
+    "captured_at": "2026-09-16T17:30:47.798627+08:00",
+    "raw_position_by_sample": [
+      [
+        2154,
+        934,
+        2128,
+        2757,
+        2042,
+        1663
+      ],
+      [
+        2154,
+        934,
+        2128,
+        2757,
+        2042,
+        1663
+      ],
+      [
+        2154,
+        934,
+        2128,
+        2757,
+        2042,
+        1663
+      ],
+      [
+        2154,
+        934,
+        2128,
+        2757,
+        2042,
+        1663
+      ],
+      [
+        2154,
+        934,
+        2128,
+        2757,
+        2042,
+        1663
+      ],
+      [
+        2154,
+        934,
+        2128,
+        2757,
+        2042,
+        1663
+      ],
+      [
+        2154,
+        934,
+        2128,
+        2757,
+        2042,
+        1663
+      ],
+      [
+        2154,
+        934,
+        2128,
+        2757,
+        2042,
+        1663
+      ],
+      [
+        2154,
+        934,
+        2128,
+        2757,
+        2042,
+        1663
+      ],
+      [
+        2154,
+        934,
+        2128,
+        2757,
+        2042,
+        1663
+      ]
+    ],
+    "raw_position_representative": [
+      2154,
+      934,
+      2128,
+      2757,
+      2042,
+      1663
+    ],
+    "raw_position_static_span": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_before": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_after": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "gripper_raw": 1663,
+  "gripper_pct": 11.7310443490701,
+  "gap_table_interpolated_mm": 24.099570815450644,
+  "direct_minus_table_gap_mm": -5.8995708154506445,
+  "environment_basis": "CAL-050 current demo baseline; no changed conditions reported",
+  "write_instructions_sent": 0,
+  "motion_instructions_sent": 0,
+  "eeprom_written": false,
+  "profile_written": false
+}

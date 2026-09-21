@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-036",
+  "date": "2026-09-14",
+  "scope": "REAL_ARM/PC demo collision sampling policy",
+  "status": "confirmed_demo",
+  "profile_changed": false,
+  "profile_sha256": "62da9cf9057c5bdc301467f990e4a5e9217f8f05193744364d28fa50eea7665a",
+  "max_joint_substep_deg": 0.5,
+  "inputs": {
+    "fps": 30,
+    "max_command_step_deg": [2.2, 2.2, 2.2, 2.2, 2.2],
+    "tcp_bounds_upper_m": [0.42, 0.1, 0.23],
+    "tcp_bound_radius_m": 0.489182992345
+  },
+  "derived": {
+    "substeps_inserted_for_2_2_deg_node_delta": 4,
+    "resulting_segment_delta_deg": 0.44,
+    "worst_case_sweep_inflation_at_0_5_deg_m": 0.004268926931
+  },
+  "runtime_guards": [
+    "segment endpoints are densified so every checked increment is at most max_joint_substep_deg",
+    "capsule sweep inflation is computed from each base-frame capsule endpoint to each joint axis",
+    "object inflation uses the conservative upper TCP-bound radius"
+  ],
+  "directed_tests": {
+    "command": "pytest -q tests/test_safety_geometry.py -k '相邻节点按max_joint_substep加密 or 扫掠余量按加密后的子步长封顶 or 扫掠余量用基座系端点计算'",
+    "result": "3 passed, 26 deselected"
+  },
+  "limitations": [
+    "No full trajectory or physical-motion test was run at this stage, per operator instruction.",
+    "Revisit after CAL-058 to CAL-060 if measured tracking dynamics or performance makes 0.5 degrees unsuitable."
+  ]
+}

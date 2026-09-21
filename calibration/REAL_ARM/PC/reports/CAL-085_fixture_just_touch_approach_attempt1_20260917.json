@@ -1,0 +1,308 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-085",
+  "dependent_parameter_id": "CAL-093",
+  "test": "single_plastic_fixture_nominal_contact_approach_no_hold",
+  "status": "FAIL",
+  "started_at": "2026-09-17T19:00:14.134859+08:00",
+  "profile_sha256": "fe6aaf95e8418975d6eb966fe20ad55a8743084f63c443474aa838c21beffb2f",
+  "approved_plan": {
+    "schema_version": 1,
+    "parameter_id": "CAL-085",
+    "dependent_parameter_id": "CAL-093",
+    "status": "APPROVED_ONE_NOMINAL_CONTACT_APPROACH",
+    "required_confirmation": "批准，CAL-085假果轻触接近首轮就绪",
+    "profile_sha256": "fe6aaf95e8418975d6eb966fe20ad55a8743084f63c443474aa838c21beffb2f",
+    "reference_report": "CAL-085_feedback_hold_empty_preparation_attempt1_20260917.json",
+    "reference_report_sha256": "c267e68451de2e33b18e386dd1e69023bc77289c8bd8c7bd04839924ad067346",
+    "reference_raw_samples_sha256": "1728f235acf7c85074077e1df63e5eb0164d0ac75b5885c812b8e3a7ccb1fda0",
+    "source_operator_observation": "无异常，假果基准摆放就绪，接触带20mm",
+    "fixture_contact_band_mm": 20,
+    "fixture_independently_supported": true,
+    "fixture_nominal_width_mm": 42,
+    "width_is_approximate_not_new_measurement": true,
+    "calculation": {
+      "finished_at": "2026-09-17T18:53:13.512019+08:00",
+      "current_profile_sha256": "fe6aaf95e8418975d6eb966fe20ad55a8743084f63c443474aa838c21beffb2f",
+      "nominal_fixture_width_m": 0.042,
+      "inverse_gap_nominal_pct": 26.221498371335507,
+      "inverse_gap_nominal_raw_float": 1865.5765472312703,
+      "proposed_target_raw": 1866,
+      "proposed_target_pct": 26.25178826895565,
+      "proposed_target_gap_m": 0.04203719599427754,
+      "max_nominal_move_s": 28.833333333333332,
+      "raw_samples_sha256": "1728f235acf7c85074077e1df63e5eb0164d0ac75b5885c812b8e3a7ccb1fda0"
+    },
+    "servo_id": 6,
+    "expected_start_raw": 2264,
+    "start_max_deviation_raw": 5,
+    "start_accepted_raw": [
+      2259,
+      2269
+    ],
+    "all_six_static_read_frames": 10,
+    "all_six_static_span_max_raw": 2,
+    "source_arm_max_deviation_raw": 10,
+    "all_axis_raw_domain_required": true,
+    "command_path": "Fresh legal starting feedback monotonically decreases to1866 only; no opening/prepositioning, goal below1866, second approach or retry.",
+    "close_target_raw": 1866,
+    "closing_command_speed_pct_s": 1,
+    "sample_fps": 30,
+    "feedback_bounds_raw": [
+      1499,
+      2897
+    ],
+    "max_tracking_error_raw": 10,
+    "all_phase_abs_current_abort_ma": 20,
+    "whole_powered_timeout_s": 30,
+    "final_hold_s": 0,
+    "settle_dwell_added": false,
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "approved_cycles": 1,
+    "operator_confirmation": "批准，CAL-085假果轻触接近首轮就绪",
+    "proposed_cycles": 1,
+    "arm_goals_authorized": 0,
+    "eeprom_writes_authorized": false,
+    "profile_writes_authorized": false,
+    "cleanup": "At last scheduled1866 goal feedback sample unload6immediately; always verify all6off and restore/readback originals. Failure never relaxes current/tracking/domain/deadline or auto retries.",
+    "operator_requirements": "Keep plastic fixture independently supported at20mm contact band with catch underneath; arms supported unchanged, fingers outside every pinch zone during motion,12Vcut immediately reachable. Observe unexpected contact/crush or fixture movement and cut power if needed.",
+    "operator_observation_required": "After unload/restore report whether both soft pads still have clearance, barely touch without visible compression, or show compression/movement; physical contact not inferred from current or table.",
+    "limitations": [
+      "1866 comes from existing20mm-reference gap table and approximate42mm nominal fixture width; not known first-touch or compression zero.",
+      "May stop with remaining clearance due target quantization/deadzone; no deeper commands without operator result/new scoped approval.",
+      "Raw current>20mA diagnostic abort and10raw tracking are not certified force/fruit-damage limits.",
+      "Up to30s active time explicitly proposed because full approach at1pct/s can take28.83s; no final squeeze/pressure hold.",
+      "No real fruit, load-bearing/lift, contact threshold integration, production gate bypass or full grasp."
+    ],
+    "new_motion_commands": 0
+  },
+  "operator_confirmation": "批准，CAL-085假果轻触接近首轮就绪",
+  "source_report_sha256": "c267e68451de2e33b18e386dd1e69023bc77289c8bd8c7bd04839924ad067346",
+  "joint_servo_motion_commands_sent": 0,
+  "gripper_motion_commands_sent": 0,
+  "eeprom_written": false,
+  "profile_written": false,
+  "closing_goal_updates_sent": 0,
+  "opening_goal_updates_sent": 0,
+  "final_hold_s": 0,
+  "samples": [],
+  "transaction_timeout_s": 0.25,
+  "environment": {
+    "power_v": 12,
+    "ambient_temperature_c": null,
+    "base_mount": "fixed to wooden board",
+    "load": "independently supported plastic fixture,20mm contact band"
+  },
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "readonly_preflight": {
+    "ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "models": [
+      777,
+      777,
+      777,
+      777,
+      777,
+      777
+    ],
+    "torques": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "readonly_eeprom": {
+    "shoulder_pan": {
+      "range_min": 718,
+      "range_max": 3424,
+      "homing_offset": -438
+    },
+    "shoulder_lift": {
+      "range_min": 865,
+      "range_max": 3333,
+      "homing_offset": -1961
+    },
+    "elbow_flex": {
+      "range_min": 796,
+      "range_max": 3095,
+      "homing_offset": 1791
+    },
+    "wrist_flex": {
+      "range_min": 729,
+      "range_max": 3192,
+      "homing_offset": -1795
+    },
+    "wrist_roll": {
+      "range_min": 0,
+      "range_max": 4095,
+      "homing_offset": 1079
+    },
+    "gripper": {
+      "range_min": 1458,
+      "range_max": 2980,
+      "homing_offset": -1600
+    }
+  },
+  "readonly_gripper_controller_settings": {
+    "P_Coefficient": 16,
+    "D_Coefficient": 32,
+    "I_Coefficient": 0,
+    "Minimum_Startup_Force": 16,
+    "CW_Dead_Zone": 1,
+    "CCW_Dead_Zone": 1
+  },
+  "fresh_readonly_baseline": {
+    "raw_position_by_sample": [
+      [
+        844,
+        862,
+        3069,
+        2383,
+        2043,
+        2264
+      ],
+      [
+        844,
+        862,
+        3069,
+        2383,
+        2043,
+        2264
+      ],
+      [
+        844,
+        862,
+        3069,
+        2383,
+        2043,
+        2264
+      ],
+      [
+        844,
+        862,
+        3069,
+        2383,
+        2043,
+        2264
+      ],
+      [
+        844,
+        862,
+        3069,
+        2383,
+        2043,
+        2264
+      ],
+      [
+        844,
+        862,
+        3069,
+        2383,
+        2043,
+        2264
+      ],
+      [
+        844,
+        862,
+        3069,
+        2383,
+        2043,
+        2264
+      ],
+      [
+        844,
+        862,
+        3069,
+        2383,
+        2043,
+        2264
+      ],
+      [
+        844,
+        862,
+        3069,
+        2383,
+        2043,
+        2264
+      ],
+      [
+        844,
+        862,
+        3069,
+        2383,
+        2043,
+        2264
+      ]
+    ],
+    "raw_position_static_span": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_after": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "arm_deviation_from_reference_raw": [
+    2,
+    59,
+    17,
+    7,
+    0
+  ],
+  "failure": "RuntimeError: Fresh start/static/source/domain differs; no writes",
+  "torque_enabled_after": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "sram_settings_after": {},
+  "gripper_position_after_torque_off_raw": 2264,
+  "finished_at": "2026-09-17T19:00:14.745870+08:00",
+  "post_capture_review": {
+    "status": "READONLY_REJECTION_OPERATOR_SCOPE_CLARIFIED",
+    "operator_scope_clarification": "只需要关注六轴即可，其他轴是我调整的",
+    "scope": "1..5positions changed intentionally, resume jaw-only checks on attempt2 without arm goals. Historical arm2raw862<865 retained; not arm-limit acceptance or EEPROM/limit change.",
+    "rejection_details": {
+      "source_axis2_raw": 921,
+      "observed_axis2_raw": 862,
+      "observed_axis3_raw": 3069,
+      "source_axis3_raw": 3086,
+      "axis2_calibration_range_raw": [865,3333],
+      "goals_sent": 0,
+      "sram_prepared": false,
+      "note": "sram_settings_after={}means preparation/read not reached; no fabricated restoration claim."
+    }
+  }
+}

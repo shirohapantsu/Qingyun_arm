@@ -1,0 +1,685 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-087",
+  "status": "UNVERIFIED",
+  "source": "offline_causal_replay_existing_hardware_samples_no_motion",
+  "profile_sha256": "1ea15d62d288bc02f56ccabe09593f60d68ad3fd6f5f37632589995dc7c18bb4",
+  "contact_threshold_used_ma": 10,
+  "source_report_sha256": {
+    "CAL-085_fixture_stronger_contact_attempt1_20260917.json": "32eb5954bca613449e7b6394e5dbe400549884c88d664bfa4f22edee2c6c5215",
+    "CAL-085_empty_current_repeat1_20260916.json": "f10575d8fd68df0d0bccc69c5e3e3ed7e134dc6ad0e856fe9a9c9533ede151d5",
+    "CAL-085_empty_expanded_control_repeat1_20260916.json": "cde19de8e2009444c7456f5a2ada29f331f9858631818acb2cf16a71bb36e951",
+    "CAL-085_empty_updated_baseline_control_repeat1_20260916.json": "a5edced49096a552b6e3df5d5ef3be8226b8254d38aa514740f81fc121f80cfe",
+    "CAL-085_empty_updated_baseline_control_repeat2_reposition_attempt1_20260916.json": "58a37279264ba6c7398e32ce81f6dda1f6a2db7fe7b9ef782440ca8ca4d067dc",
+    "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json": "6f3d05011219ee9877790e7d0da740771ecd0bb9584c61719d97257443bd29d0",
+    "CAL-085_empty_sustained_current_control_attempt1_20260917.json": "4033f8fce042919d1dfa3b0d36e030135c7576c3bc00220911d5f0f3e564e54c",
+    "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json": "bfdb3211a47c132de4bbb3f240ce03dba6c38c126c530adb4e811789783ab17d"
+  },
+  "contact_threshold_is_demo_candidate_not_integrated": true,
+  "contact_dwell_s_fixed_not_newly_calibrated": 0.1,
+  "sample_fps": 30,
+  "current_and_conditionally_retained_window_samples": 3,
+  "comparison": "strict abs rolling mean > threshold with continuous dwell, gap and empty-exclusion gates",
+  "comparisons": [
+    {
+      "window_samples": 1,
+      "fixture_replay": {
+        "included_frames": 160,
+        "peak_filtered_mean_ma": 13.0,
+        "longest_qualifying_run_s": 0.70188220901764,
+        "hit_count": 20,
+        "first_hit": {
+          "phase": "fixture_closing",
+          "position_raw": 1821,
+          "command_raw": 1808,
+          "mean_ma": 13.0,
+          "continuous_above_s": 0.1000175740045961,
+          "delay_from_first_in_gate_raw_current_above_threshold_s": 0.1000175740045961
+        }
+      },
+      "empty_controls": [
+        {
+          "report": "CAL-085_empty_current_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 112,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_expanded_control_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat1_20260916.json",
+          "operator_observation": null,
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 13.0,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat2_reposition_attempt1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 614,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 145,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "same_endpoint_and_settings_matched_control",
+          "replay": {
+            "included_frames": 160,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        }
+      ],
+      "empty_reports_with_false_contact_hits": 0,
+      "nominal_fitter_delay_budget_s": 0.2,
+      "illustrative_extra_command_pct_at_trial1pct_s": 0.2,
+      "illustrative_extra_command_pct_at_profile15pct_s": 3.0
+    },
+    {
+      "window_samples": 2,
+      "fixture_replay": {
+        "included_frames": 160,
+        "peak_filtered_mean_ma": 13.0,
+        "longest_qualifying_run_s": 0.6686141380050685,
+        "hit_count": 19,
+        "first_hit": {
+          "phase": "fixture_closing",
+          "position_raw": 1819,
+          "command_raw": 1805,
+          "mean_ma": 13.0,
+          "continuous_above_s": 0.1000288359937258,
+          "delay_from_first_in_gate_raw_current_above_threshold_s": 0.33331804900080897
+        }
+      },
+      "empty_controls": [
+        {
+          "report": "CAL-085_empty_current_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 112,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_expanded_control_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat1_20260916.json",
+          "operator_observation": null,
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 9.75,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat2_reposition_attempt1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 614,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 145,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "same_endpoint_and_settings_matched_control",
+          "replay": {
+            "included_frames": 160,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        }
+      ],
+      "empty_reports_with_false_contact_hits": 0,
+      "nominal_fitter_delay_budget_s": 0.23333333333333334,
+      "illustrative_extra_command_pct_at_trial1pct_s": 0.23333333333333334,
+      "illustrative_extra_command_pct_at_profile15pct_s": 3.5
+    },
+    {
+      "window_samples": 3,
+      "fixture_replay": {
+        "included_frames": 160,
+        "peak_filtered_mean_ma": 13.0,
+        "longest_qualifying_run_s": 0.6686141380050685,
+        "hit_count": 20,
+        "first_hit": {
+          "phase": "fixture_closing",
+          "position_raw": 1820,
+          "command_raw": 1808,
+          "mean_ma": 10.833333333333334,
+          "continuous_above_s": 0.10005191000527702,
+          "delay_from_first_in_gate_raw_current_above_threshold_s": 0.1334154850046616
+        }
+      },
+      "empty_controls": [
+        {
+          "report": "CAL-085_empty_current_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 112,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_expanded_control_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat1_20260916.json",
+          "operator_observation": null,
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 8.666666666666666,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat2_reposition_attempt1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 614,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 145,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "same_endpoint_and_settings_matched_control",
+          "replay": {
+            "included_frames": 160,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        }
+      ],
+      "empty_reports_with_false_contact_hits": 0,
+      "nominal_fitter_delay_budget_s": 0.26666666666666666,
+      "illustrative_extra_command_pct_at_trial1pct_s": 0.26666666666666666,
+      "illustrative_extra_command_pct_at_profile15pct_s": 4.0
+    },
+    {
+      "window_samples": 4,
+      "fixture_replay": {
+        "included_frames": 160,
+        "peak_filtered_mean_ma": 13.0,
+        "longest_qualifying_run_s": 0.635034049017122,
+        "hit_count": 17,
+        "first_hit": {
+          "phase": "fixture_closing",
+          "position_raw": 1818,
+          "command_raw": 1804,
+          "mean_ma": 13.0,
+          "continuous_above_s": 0.13331770699005574,
+          "delay_from_first_in_gate_raw_current_above_threshold_s": 0.4001870089850854
+        }
+      },
+      "empty_controls": [
+        {
+          "report": "CAL-085_empty_current_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 112,
+            "peak_filtered_mean_ma": 4.875,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_expanded_control_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat1_20260916.json",
+          "operator_observation": null,
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat2_reposition_attempt1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 614,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 145,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "same_endpoint_and_settings_matched_control",
+          "replay": {
+            "included_frames": 160,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        }
+      ],
+      "empty_reports_with_false_contact_hits": 0,
+      "nominal_fitter_delay_budget_s": 0.3,
+      "illustrative_extra_command_pct_at_trial1pct_s": 0.3,
+      "illustrative_extra_command_pct_at_profile15pct_s": 4.5
+    },
+    {
+      "window_samples": 5,
+      "fixture_replay": {
+        "included_frames": 160,
+        "peak_filtered_mean_ma": 13.0,
+        "longest_qualifying_run_s": 0.834942374000093,
+        "hit_count": 23,
+        "first_hit": {
+          "phase": "fixture_closing",
+          "position_raw": 1820,
+          "command_raw": 1807,
+          "mean_ma": 10.4,
+          "continuous_above_s": 0.133060164982453,
+          "delay_from_first_in_gate_raw_current_above_threshold_s": 0.2000211419945117
+        }
+      },
+      "empty_controls": [
+        {
+          "report": "CAL-085_empty_current_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 112,
+            "peak_filtered_mean_ma": 5.2,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_expanded_control_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat1_20260916.json",
+          "operator_observation": null,
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat2_reposition_attempt1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 614,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 145,
+            "peak_filtered_mean_ma": 5.2,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "same_endpoint_and_settings_matched_control",
+          "replay": {
+            "included_frames": 160,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        }
+      ],
+      "empty_reports_with_false_contact_hits": 0,
+      "nominal_fitter_delay_budget_s": 0.3333333333333333,
+      "illustrative_extra_command_pct_at_trial1pct_s": 0.3333333333333333,
+      "illustrative_extra_command_pct_at_profile15pct_s": 5.0
+    },
+    {
+      "window_samples": 7,
+      "fixture_replay": {
+        "included_frames": 160,
+        "peak_filtered_mean_ma": 13.0,
+        "longest_qualifying_run_s": 0.8018857770075556,
+        "hit_count": 23,
+        "first_hit": {
+          "phase": "fixture_closing",
+          "position_raw": 1820,
+          "command_raw": 1807,
+          "mean_ma": 11.142857142857142,
+          "continuous_above_s": 0.10000356798991561,
+          "delay_from_first_in_gate_raw_current_above_threshold_s": 0.2000211419945117
+        }
+      },
+      "empty_controls": [
+        {
+          "report": "CAL-085_empty_current_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 112,
+            "peak_filtered_mean_ma": 3.7142857142857144,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_expanded_control_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 5.571428571428571,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat1_20260916.json",
+          "operator_observation": null,
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat2_reposition_attempt1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 5.571428571428571,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 614,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 145,
+            "peak_filtered_mean_ma": 3.7142857142857144,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "same_endpoint_and_settings_matched_control",
+          "replay": {
+            "included_frames": 160,
+            "peak_filtered_mean_ma": 5.571428571428571,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        }
+      ],
+      "empty_reports_with_false_contact_hits": 0,
+      "nominal_fitter_delay_budget_s": 0.4,
+      "illustrative_extra_command_pct_at_trial1pct_s": 0.4,
+      "illustrative_extra_command_pct_at_profile15pct_s": 6.0
+    }
+  ],
+  "current_profile220_threshold_fixture_replay": {
+    "included_frames": 160,
+    "peak_filtered_mean_ma": 13.0,
+    "longest_qualifying_run_s": 0.0,
+    "hit_count": 0,
+    "first_hit": null
+  },
+  "decision": "Retain3 conditionally; recorded evidence does not establish an optimum or require a larger window. No production integration/verification while threshold and physical evidence remain unresolved.",
+  "profile_written": false,
+  "eeprom_written": false,
+  "new_motion_commands": 0,
+  "limitations": [
+    "First above-threshold raw current is an electrical signal marker, not measured first physical contact.",
+    "Counterfactual replay cannot verify closed-loop contact hold because real commands change after first hit.",
+    "One stronger plastic trial at1pct/s; no true-fruit, production15pct/s, force, compression or stop-latency certification.",
+    "Fitter window/FPS+dwell+2/FPS budget is a nominal engineering formula, not a measured worst-case bound.",
+    "Historical controls include one without operator observation and are auxiliary, not seven equivalent matched repetitions."
+  ]
+}

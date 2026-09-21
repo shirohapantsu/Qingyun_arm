@@ -1,0 +1,16 @@
+{
+  "pose_label": "fk_validation_pose",
+  "verification": "独立验证构型(未参与拟合): 手机绝对倾角链式换算 q2_ref=-13.968+A; q3_ref=16.175+(B-A); q4_ref=-2.207+(C-B); q1=+45几何对角线; q5未拧按0。实测 A=30, B=16, C=-18。z=20.2cm 直尺竖直测固定指尖端。总线换算(新拟合)与参考差≤2.4°",
+  "samples": [
+    {
+      "q_reference_deg": [45.0, 16.032, 2.175, -36.207, 0.0],
+      "fk_check": true,
+      "measured_tcp_position_m": null,
+      "measured_tcp_height_m": 0.202,
+      "measured_tool_axes": null,
+      "approach_direction": "fk_validation",
+      "fixture_id": "phone_abs_inclinometer_chain_ruler_z_20260920",
+      "load_label": "unloaded"
+    }
+  ]
+}

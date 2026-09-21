@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-035",
+  "date": "2026-09-14",
+  "scope": "REAL_ARM/PC demo policy",
+  "status": "confirmed_demo",
+  "profile_changed": false,
+  "profile_sha256": "62da9cf9057c5bdc301467f990e4a5e9217f8f05193744364d28fa50eea7665a",
+  "collision_clearance_m": 0.003,
+  "semantics": "minimum environmental separation remaining after model and measurement inflation",
+  "separate_budget_terms_m": {
+    "cad_capsule_margin": 0.0005,
+    "link_position_error": 0.002,
+    "table_flatness": 0.001,
+    "trajectory_sweep_at_tcp_bounds_and_0_5_deg": 0.004268926931,
+    "object_total_inflation_at_current_inputs": 0.016319377927
+  },
+  "derived_static_nominal_cad_separation_m": {
+    "ordinary_link_to_table": 0.0065,
+    "ordinary_link_to_fixed_obstacle": 0.0055
+  },
+  "notes": [
+    "The installed 2+/-1 mm pads are handled by a separate 3 mm gripper capsule outgrowth and are not counted as clearance.",
+    "Self-collision currently uses capsule radii but not collision.clearance_m; CAL-035 governs table, fixed-obstacle and target/object checks.",
+    "CAL-032 final obstacles are unknown, so 3 mm is accepted only as a demo policy value and has not been validated on final workcell paths."
+  ]
+}

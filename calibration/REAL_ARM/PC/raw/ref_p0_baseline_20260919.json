@@ -1,0 +1,47 @@
+{
+  "pose_label": "P0_orthogonal_reference",
+  "phone_baseline_readings_deg": {"upper_arm_A": 0.0, "forearm_B": 0.0, "wrist_C": 0.0, "gripper_roll_D": 0.0},
+  "projection_aligned_to_grid": true,
+  "samples": [
+    {
+      "q_reference_deg": [0.0, -13.968, 16.175, -2.207, 0.0],
+      "approach_direction": "joint_sweep",
+      "sweep_joint_index": 0,
+      "sweep_direction": 0,
+      "fixture_id": "P0_phone_inclinometer_20260919",
+      "load_label": "unloaded"
+    },
+    {
+      "q_reference_deg": [0.0, -13.968, 16.175, -2.207, 0.0],
+      "approach_direction": "joint_sweep",
+      "sweep_joint_index": 1,
+      "sweep_direction": 0,
+      "fixture_id": "P0_phone_inclinometer_20260919",
+      "load_label": "unloaded"
+    },
+    {
+      "q_reference_deg": [0.0, -13.968, 16.175, -2.207, 0.0],
+      "approach_direction": "joint_sweep",
+      "sweep_joint_index": 2,
+      "sweep_direction": 0,
+      "fixture_id": "P0_phone_inclinometer_20260919",
+      "load_label": "unloaded"
+    },
+    {
+      "q_reference_deg": [0.0, -13.968, 16.175, -2.207, 0.0],
+      "approach_direction": "joint_sweep",
+      "sweep_joint_index": 3,
+      "sweep_direction": 0,
+      "fixture_id": "P0_phone_inclinometer_20260919",
+      "load_label": "unloaded"
+    },
+    {
+      "q_reference_deg": [0.0, -13.968, 16.175, -2.207, 0.0],
+      "approach_direction": "joint_sweep",
+      "sweep_joint_index": 4,
+      "sweep_direction": 0,
+      "fixture_id": "P0_phone_inclinometer_20260919",
+      "load_label": "unloaded"
+    }
+  ]
+}

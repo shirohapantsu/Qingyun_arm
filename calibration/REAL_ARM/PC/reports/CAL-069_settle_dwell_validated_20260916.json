@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-069",
+  "status": "CONFIRMED_FOR_CURRENT_DEMO",
+  "completed_at": "2026-09-16T12:23:42+08:00",
+  "parameter": "motion.settle_dwell_s",
+  "method": "Replay every trajectory backward from its final frame while final command, CAL-067 position tolerance, and CAL-068 corrected velocity tolerance are all continuously satisfied. Confirm that every continuous suffix covers the retained 0.15 s candidate.",
+  "inputs": {
+    "CAL-067_position_tolerance_deg": [1.0, 2.1, 3.0, 1.4, 1.0],
+    "CAL-068_velocity_tolerance_deg_s": [0.4, 0.4, 0.4, 0.4, 0.4],
+    "historical_stored_velocity_correction_factor": 0.02,
+    "candidate_dwell_s": 0.15,
+    "CAL-068_report": "CAL-068_settle_velocity_tolerance_derived_20260916.json",
+    "CAL-068_report_sha256": "41ecf98d890e14ce4673d51436d8340d25287fdf91203ea77690148ac4a03e17"
+  },
+  "replay": {
+    "deduplicated_passed_trajectories": 90,
+    "trajectories_covering_candidate_dwell": 90,
+    "continuous_stable_rows": 1222,
+    "continuous_span_min_s": 0.155891341,
+    "continuous_span_median_s": 0.1620013085,
+    "continuous_span_max_s": 0.300849347,
+    "result": "PASS"
+  },
+  "decision": {
+    "before_s": 0.15,
+    "after_s": 0.15,
+    "value_changed": false,
+    "claim_scope": "validated candidate for the current demo; not proven to be the minimum necessary dwell"
+  },
+  "fit_correction": {
+    "obsolete_behavior": "unconditionally write hard-coded 0.15 s",
+    "corrected_behavior": "retain the configured candidate only after every passed trajectory covers it under the fitted CAL-067 and CAL-068 thresholds",
+    "function": "scripts.calibrate._validate_settle_dwell",
+    "regression_test": "test_motion到位驻留时间要求位置速度同时连续满足",
+    "calibration_module_tests_passed": 57,
+    "calibration_module_tests_failed": 0
+  },
+  "profile_sha256_before": "dff211979a4005b6cef9e1a697987f08b6acb6aae46720d0d15b348e93927aeb",
+  "profile_sha256_after": "dff211979a4005b6cef9e1a697987f08b6acb6aae46720d0d15b348e93927aeb",
+  "profile_written": false,
+  "hardware_accessed_for_this_validation": false,
+  "eeprom_written": false,
+  "limitations": [
+    "The acquisition itself used a 0.15 s settling dwell, so this validates that candidate but does not identify a shorter minimum.",
+    "The evidence covers the current demo trajectories and maximum 92.4 g demo payload."
+  ],
+  "post_validation": {
+    "full_motion_group_regression": "deferred until CAL-063 through CAL-070 form a complete group, per operator instruction",
+    "result": "PASS"
+  },
+  "downstream": {
+    "CAL-070": "calibrate total settling timeout using observed time from final command to completion of this dwell"
+  }
+}

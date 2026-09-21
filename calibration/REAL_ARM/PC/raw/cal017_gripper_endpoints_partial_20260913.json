@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-017",
+  "status": "provisional_demo_only",
+  "capture_date": "2026-09-13",
+  "source": "manual_positioning_hardware_read_only_interactive_session",
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256_before_integration": "ead5f64852b04a4c811b142d3d012083ab350316d1daad2b44b2ba4047a21dbe",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_in_workspace",
+    "objects_removed": true,
+    "manual_positioning": true
+  },
+  "safety_preflight": {
+    "ids": [1, 2, 3, 4, 5, 6],
+    "model_numbers": [777, 777, 777, 777, 777, 777],
+    "torque_enabled_by_motor": [0, 0, 0, 0, 0, 0],
+    "official_gripper_range": [1458, 2980],
+    "passed": true
+  },
+  "planned_repeats_per_endpoint": 5,
+  "completed_repeats_per_endpoint": 2,
+  "samples_per_placement": 10,
+  "operator_requested_stop_before_remaining_repeats": true,
+  "placements": [
+    {
+      "endpoint": "closed",
+      "repeat": 1,
+      "sample_count": 10,
+      "gripper_raw_min": 1495,
+      "gripper_raw_max": 1495,
+      "gripper_raw_span": 0,
+      "gripper_raw_representative": 1495,
+      "torque_disabled_before_and_after": true
+    },
+    {
+      "endpoint": "open",
+      "repeat": 1,
+      "sample_count": 10,
+      "gripper_raw_min": 2897,
+      "gripper_raw_max": 2897,
+      "gripper_raw_span": 0,
+      "gripper_raw_representative": 2897,
+      "torque_disabled_before_and_after": true
+    },
+    {
+      "endpoint": "closed",
+      "repeat": 2,
+      "sample_count": 10,
+      "gripper_raw_min": 1499,
+      "gripper_raw_max": 1499,
+      "gripper_raw_span": 0,
+      "gripper_raw_representative": 1499,
+      "torque_disabled_before_and_after": true
+    },
+    {
+      "endpoint": "open",
+      "repeat": 2,
+      "sample_count": 10,
+      "gripper_raw_min": 2938,
+      "gripper_raw_max": 2938,
+      "gripper_raw_span": 0,
+      "gripper_raw_representative": 2938,
+      "torque_disabled_before_and_after": true
+    }
+  ],
+  "repeat_summary": {
+    "closed_representatives": [1495, 1499],
+    "open_representatives": [2897, 2938],
+    "closed_repeat_span": 4,
+    "open_repeat_span": 41
+  },
+  "provisional_candidate": {
+    "gripper_closed_raw": 1499,
+    "gripper_open_raw": 2897,
+    "raw_span": 1398,
+    "selection": "interior-most observed safe endpoint on each side",
+    "distance_from_official_lower_limit_counts": 41,
+    "distance_from_official_upper_limit_counts": 83
+  },
+  "limitations": [
+    "Only two of the required five alternating repeats were completed at each endpoint.",
+    "The open endpoint repeat span is 41 counts, so the selected value is conservative and restricted to the current demo.",
+    "The interactive process was stopped at the operator's request; this file preserves terminal-reported burst summaries rather than pretending that the full session completed."
+  ],
+  "read_tool": "scripts/read_gripper_endpoints.py",
+  "read_tool_sha256": "dcb71b3a824683f31f60cb4c1738b2ba62250cf6ac7b02de74a8e5d893d1cd6a",
+  "write_instructions_sent": 0,
+  "motion_instructions_sent": 0,
+  "eeprom_written": false
+}

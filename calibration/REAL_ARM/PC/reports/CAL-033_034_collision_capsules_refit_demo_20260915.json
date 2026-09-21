@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "parameter_ids": ["CAL-033", "CAL-034", "CAL-035", "CAL-036"],
+  "date": "2026-09-15",
+  "status": "CONFIRMED_FOR_CURRENT_DEMO_ROUTES",
+  "profile_changed": true,
+  "profile_sha256_before": "52e2b621a303368f0774cf9ee439da852f2992480b0dfec1c21c55dad4106ba9",
+  "profile_sha256_after": "ff27c260f69dbc1a9a440af88a2e757f3adcd438474c5123c8b9e9a97f24f539",
+  "urdf_sha256": "3a65d2d35e68a8d2f0c2cc176d19b884506543c93ba72980145b80abe276022c",
+  "motor_calibration_sha256": "ad315322ad4d19cc322c8f21d86d9667d9df9eca2de325bebbd72fa62deefff5",
+  "tools": {
+    "fit": {
+      "path": "scripts/fit_urdf_link_capsules.py",
+      "sha256": "b588cff431cdd04140e5f2d2b81d5f91563c7d72c407a10d8d21bace8c2f9682"
+    },
+    "validate": {
+      "path": "scripts/validate_urdf_capsule_fit.py",
+      "sha256": "f294f579df4f0c15fa405f7a4662cf7e0c894c870d3f8d19158973d898f9c02d"
+    }
+  },
+  "root_cause": "The previous fitter placed capsule centerline endpoints at the full axial mesh extrema. Spherical end caps then extended every approximation by one radius beyond each mesh end, creating severe false positives in folded poses.",
+  "fit_method": {
+    "decomposition": "one conservative capsule per URDF collision mesh",
+    "mesh_count": 17,
+    "capsule_count": 17,
+    "endpoint_strategy": "minimum_radius_maximum_inset_exact_enclosure",
+    "coverage_proof": "Every STL triangle is assigned as a unit and all three vertices are contained by its capsule; capsule convexity therefore contains the complete face.",
+    "cad_margin_m": 0.0005,
+    "installed_pad_outgrowth_m": 0.003,
+    "radii_reduced": false,
+    "profile_numeric_changes": "p0_m/p1_m only; radius_m unchanged"
+  },
+  "candidate_search": {
+    "rejected_uniform_axial_segments_per_mesh": [1, 2, 3, 4],
+    "rejected_uniform_3d_clusters_per_mesh": [2, 3, 4, 6, 8],
+    "rejected_uniform_parallel_cross_section_clusters_per_mesh": [2, 4, 8],
+    "reason": "These variants either retained false positives or raised the capsule count to 34-136 and the pairwise runtime cost without closing the known physical pose."
+  },
+  "ignore_pair_audit": {
+    "pair_count_before": 62,
+    "pair_count_after": 67,
+    "added_pairs": [
+      ["shoulder_01", "gripper_02"],
+      ["shoulder_03", "gripper_02"],
+      ["upper_arm_02", "wrist_01"],
+      ["upper_arm_02", "gripper_01"],
+      ["upper_arm_02", "gripper_02"]
+    ],
+    "basis": "Exactly the five capsule overlaps recorded in the operator-confirmed clear physical pose and its successfully executed recovery route; no whole-link or wildcard exemption was added."
+  },
+  "physical_reference": {
+    "pose_deg": [8.175824175824175, -85.44052747252749, 70.15302197802198, 68.82596703296704, 1.142857142857143],
+    "gripper_pct": 2.0028612303290414,
+    "operator_observation": "The physical pose and recovery path have no actual interference.",
+    "executed_recovery_evidence": "CAL-047_serial_recovery_to_waypoint_attempt5_20260915.json"
+  },
+  "post_write_validation": {
+    "candidate_collision_matches_profile": true,
+    "representative_pose_gripper_combinations": 16,
+    "representative_pose_result": "PASS",
+    "requested_path_count": 11,
+    "total_path_nodes": 3011,
+    "path_result": "PASS",
+    "paths": [
+      "physical_reference_to_waypoint at measured 2.002861% gripper",
+      "waypoint_to_home and home_to_waypoint at 0/25/50/75/100% gripper"
+    ],
+    "unconfirmed_workspace_obstacles_excluded": true
+  },
+  "unchanged_policies": {
+    "clearance_m": 0.003,
+    "max_joint_substep_deg": 0.5
+  },
+  "scope_limitations": [
+    "This is a demo route-scoped calibration, not proof over the full effective joint workspace.",
+    "The five new ignore pairs must be re-audited if home, waypoints, URDF, installed hardware, pads, or allowed routes change.",
+    "Final workcell obstacles remain deferred under CAL-032 and were excluded.",
+    "No serial device was accessed and no EEPROM was written during this refit."
+  ],
+  "hardware_accessed": false,
+  "eeprom_written": false
+}

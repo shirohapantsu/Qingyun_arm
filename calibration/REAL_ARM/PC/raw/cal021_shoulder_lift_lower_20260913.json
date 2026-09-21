@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-021",
+  "status": "CALIBRATING",
+  "captured_at": "2026-09-13T21:44:56.032479+08:00",
+  "source": "manual_application_limit_pose_hardware_read_only",
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256": "42ecedf806d03a2c8a6784f63f7c2a5c374a5ccbc5b3ab5df7d423236d4546ce",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_to_workspace"
+  },
+  "ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "model_numbers": [
+    777,
+    777,
+    777,
+    777,
+    777,
+    777
+  ],
+  "torque_enabled_by_motor": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "joint": "shoulder_lift",
+  "joint_index": 1,
+  "servo_id": 2,
+  "parent_link": "shoulder_link",
+  "child_link": "upper_arm_link",
+  "endpoint_side": "lower",
+  "nominal_application_limit_deg": -100.0,
+  "configured_margin_deg": 2.0,
+  "effective_test_target_deg": -98.0,
+  "operator_observation": "no_interference_at_requested_effective_boundary",
+  "official_raw_range": [
+    865,
+    3333
+  ],
+  "pose": {
+    "captured_at": "2026-09-13T21:44:55.553572+08:00",
+    "raw_position_by_sample": [
+      [
+        2070,
+        961,
+        1952,
+        2044,
+        2007,
+        1493
+      ],
+      [
+        2070,
+        961,
+        1952,
+        2044,
+        2007,
+        1493
+      ],
+      [
+        2071,
+        961,
+        1952,
+        2044,
+        2007,
+        1493
+      ],
+      [
+        2071,
+        961,
+        1952,
+        2044,
+        2007,
+        1493
+      ],
+      [
+        2071,
+        961,
+        1952,
+        2044,
+        2007,
+        1493
+      ],
+      [
+        2072,
+        961,
+        1952,
+        2044,
+        2007,
+        1493
+      ],
+      [
+        2073,
+        961,
+        1952,
+        2044,
+        2007,
+        1493
+      ],
+      [
+        2073,
+        961,
+        1952,
+        2044,
+        2007,
+        1493
+      ],
+      [
+        2073,
+        961,
+        1952,
+        2044,
+        2007,
+        1493
+      ],
+      [
+        2073,
+        961,
+        1952,
+        2044,
+        2007,
+        1493
+      ]
+    ],
+    "raw_position_representative": [
+      2072,
+      961,
+      1952,
+      2044,
+      2007,
+      1493
+    ],
+    "raw_position_static_span": [
+      3,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_before": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_after": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "raw_position_representative": 961,
+  "q_bus_deg": -100.04395604395606,
+  "q_urdf_deg": -189.71428571428606,
+  "target_error_deg": -91.71428571428606,
+  "all_joint_q_urdf_deg": [
+    2.813186813187088,
+    -189.71428571428606,
+    83.42857142857157,
+    5.626373626373342,
+    -4.219780219780561
+  ],
+  "write_instructions_sent": 0,
+  "motion_instructions_sent": 0,
+  "eeprom_written": false
+}

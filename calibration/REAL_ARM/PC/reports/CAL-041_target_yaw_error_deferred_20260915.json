@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-041",
+  "date": "2026-09-15",
+  "status": "deferred_by_operator",
+  "profile_changed": false,
+  "profile_sha256": "04c7e28def4f2d5a87beeaf63132faf9477ddee3f053136f908c91d7623a20ec",
+  "current_placeholder_deg": 5.0,
+  "operator_decision": "skip for now",
+  "blocking_dependencies": [
+    "qingyun/grabbing/vision.py is empty",
+    "CAL-110 camera-to-base extrinsics and scale/distortion calibration are unavailable",
+    "no paired visual yaw and independent long-axis reference measurements exist"
+  ],
+  "required_future_method": "compare repeated vision target.yaw_deg outputs with independently measured object long-axis references using wrapped angular error",
+  "runtime_effect": "the 5 degree placeholder increases close-axis width and inflates the object collision envelope",
+  "warning": "The value must not be cited as measured visual yaw accuracy or used to claim system-level safety."
+}

@@ -1,0 +1,15 @@
+{
+  "pose_label": "q5_halfturn_cw_plus180",
+  "verification": "几何法：自标准位(q5=0)顺时针滚转半圈。特征：打开90°活动指尖垂直朝地(180°类姿态签名) + 用户方向报告顺时针 + FK轴推导(顺时针=+q5) + bus量级181.4",
+  "sign_verdict": "sign[4]=-1 与旧标定一致；此前+90平放位的顺时针报告为方向记反（实际逆时针，bus才会+88.7）",
+  "samples": [
+    {
+      "q_reference_deg": [null, null, null, null, 180.0],
+      "approach_direction": "joint_sweep",
+      "sweep_joint_index": 4,
+      "sweep_direction": 1,
+      "fixture_id": "halfturn_geometric_20260919",
+      "load_label": "unloaded"
+    }
+  ]
+}

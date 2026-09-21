@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-018",
+  "status": "RETRACTED_DIRECTION_REFERENCE_ERROR",
+  "scope": "calibration_REAL_ARM_PC_demo",
+  "completed_at": "2026-09-13",
+  "parameter": "joints.sign",
+  "joint_order": [
+    "shoulder_pan",
+    "shoulder_lift",
+    "elbow_flex",
+    "wrist_flex",
+    "wrist_roll"
+  ],
+  "hardware": {
+    "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+    "resolved_port": "/dev/ttyACM0",
+    "usb_identity": {
+      "vid": "1a86",
+      "pid": "55d3",
+      "serial": "5B14114904"
+    },
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_in_workspace",
+    "servo_ids": [1, 2, 3, 4, 5],
+    "model_numbers": [777, 777, 777, 777, 777],
+    "torque_enabled_by_motor": [0, 0, 0, 0, 0, 0]
+  },
+  "method": {
+    "motion_source": "operator_manual_positioning_with_torque_disabled",
+    "bus_access": "read_only",
+    "samples_per_saved_pose": 10,
+    "minimum_direction_delta_counts": 30,
+    "formula": "q_urdf_deg = sign * q_bus_deg + zero_offset_deg",
+    "decision": "sign is +1 when the operator-confirmed URDF-positive pose has greater q_bus/raw than baseline and the URDF-negative pose lies on the opposite side; otherwise sign is -1."
+  },
+  "results": [
+    {
+      "index": 0,
+      "servo_id": 1,
+      "joint": "shoulder_pan",
+      "parent_link": "base_link",
+      "child_link": "shoulder_link",
+      "baseline_raw": 2125,
+      "urdf_positive_raw": 2287,
+      "urdf_negative_raw": 1919,
+      "positive_delta_counts": 162,
+      "negative_delta_counts": -206,
+      "sign": 1
+    },
+    {
+      "index": 1,
+      "servo_id": 2,
+      "joint": "shoulder_lift",
+      "parent_link": "shoulder_link",
+      "child_link": "upper_arm_link",
+      "baseline_raw": 1108,
+      "urdf_positive_raw": 1151,
+      "urdf_negative_raw": 990,
+      "positive_delta_counts": 43,
+      "negative_delta_counts": -118,
+      "sign": 1
+    },
+    {
+      "index": 2,
+      "servo_id": 3,
+      "joint": "elbow_flex",
+      "parent_link": "upper_arm_link",
+      "child_link": "lower_arm_link",
+      "baseline_raw": 2826,
+      "urdf_positive_raw": 3004,
+      "urdf_negative_raw": 2774,
+      "positive_delta_counts": 178,
+      "negative_delta_counts": -52,
+      "sign": 1
+    },
+    {
+      "index": 3,
+      "servo_id": 4,
+      "joint": "wrist_flex",
+      "parent_link": "lower_arm_link",
+      "child_link": "wrist_link",
+      "baseline_raw": 2290,
+      "urdf_positive_raw": 2343,
+      "urdf_negative_raw": 1598,
+      "positive_delta_counts": 53,
+      "negative_delta_counts": -692,
+      "sign": 1
+    },
+    {
+      "index": 4,
+      "servo_id": 5,
+      "joint": "wrist_roll",
+      "parent_link": "wrist_link",
+      "child_link": "gripper_link",
+      "baseline_raw": 3015,
+      "urdf_positive_raw": 3398,
+      "urdf_negative_raw": 2873,
+      "positive_delta_counts": 383,
+      "negative_delta_counts": -142,
+      "sign": 1
+    }
+  ],
+  "final_value": [1, 1, 1, 1, 1],
+  "checks": {
+    "all_positive_and_negative_poses_on_opposite_sides": true,
+    "all_absolute_deltas_at_least_30_counts": true,
+    "all_saved_pose_static_spans_zero": true,
+    "all_observations_inside_official_raw_ranges": true,
+    "stable_port_identity_checked_before_each_saved_pose": true,
+    "all_six_torque_disabled_before_and_after_each_saved_pose": true,
+    "write_instructions_sent": 0,
+    "motion_instructions_sent": 0,
+    "eeprom_written": false
+  },
+  "evidence": [
+    {
+      "report": "CAL-018_shoulder_pan_direction_20260913.json",
+      "sha256": "7ce2f3d255a8e51a849270925c6f98e529ca062e2892ea1e1e3795c3d854502f"
+    },
+    {
+      "report": "CAL-018_shoulder_lift_direction_20260913.json",
+      "sha256": "f71c58a0f106008077b9d82c8de064b2034f5e8988b46c317df1cebb38169563"
+    },
+    {
+      "report": "CAL-018_elbow_flex_direction_20260913.json",
+      "sha256": "d3246027122a054028731158b0f5e85a10f7d9e1b92bb539c614f1e17d6cbfde"
+    },
+    {
+      "report": "CAL-018_wrist_flex_direction_20260913.json",
+      "sha256": "34361cdea03f44aa9ccf5812b952d3d35337202b65ebc09d19cc2b0ba887ca69"
+    },
+    {
+      "report": "CAL-018_wrist_roll_direction_20260913.json",
+      "sha256": "c5f4178d2f77ccd36dff87b542a74247de858c5392d725bb63c12918b0da8be7"
+    }
+  ],
+  "implementation": {
+    "profile": "../profile.json",
+    "profile_sha256_after_integration": "2781d0d174b11af06763dfdd2c2d4e11251aa34eb1b396c8d90ddd6f2a456822",
+    "profile_sha256_after_retraction": "fa4594ebed194446e3900e62219f6ce4caa0c0e751f1a71a34eb2e829589f90c",
+    "joint_sign_restored_to_null": true,
+    "zero_offset_deg_remains_null": true,
+    "runtime_joint_mapping_remains_disabled_until_CAL_019": true
+  },
+  "retraction": {
+    "retracted_at": "2026-09-13",
+    "reason": "The operator motion labels for joints 2-5 were rechecked against local URDF motion at the true q=0 configuration. Joint 2 positive was described as forward/up instead of forward/down; joints 3-4 used pose-dependent proximity language; joint 5 roll direction was reversed for the stated viewing direction.",
+    "shoulder_pan_evidence_remains_individually_valid": true,
+    "raw_evidence_preserved": true
+  },
+  "notes": [
+    "The former [1,1,1,1,1] result is historical only and must not be used.",
+    "Repeat direction measurements from the actual URDF zero geometry before CAL-019."
+  ]
+}

@@ -1,0 +1,1032 @@
+{
+  "schema_version": 1,
+  "profile_id": "real_pc_v0",
+  "robot_id": "REAL_ARM_PC",
+  "status": "draft",
+  "model": {
+    "urdf_path": "../../../libs/so_arm_core/so101_new_calib.urdf",
+    "urdf_sha256": "3a65d2d35e68a8d2f0c2cc176d19b884506543c93ba72980145b80abe276022c",
+    "motor_calibration_path": "motor_calibration.json",
+    "motor_calibration_sha256": "ad315322ad4d19cc322c8f21d86d9667d9df9eca2de325bebbd72fa62deefff5"
+  },
+  "motor": {
+    "port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+    "baudrate": 1000000,
+    "ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "models": [
+      "sts3215",
+      "sts3215",
+      "sts3215",
+      "sts3215",
+      "sts3215",
+      "sts3215"
+    ],
+    "firmware": [
+      "3.10",
+      "3.10",
+      "3.10",
+      "3.10",
+      "3.10",
+      "3.10"
+    ],
+    "position_resolution": [
+      4096,
+      4096,
+      4096,
+      4096,
+      4096,
+      4096
+    ],
+    "current_ma_per_raw": [
+      6.5,
+      6.5,
+      6.5,
+      6.5,
+      6.5,
+      6.5
+    ],
+    "current_zero_raw": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "velocity_deg_s_per_raw": [
+      0.087890625,
+      0.087890625,
+      0.087890625,
+      0.087890625,
+      0.087890625,
+      0.087890625
+    ],
+    "gripper_closed_raw": 1499,
+    "gripper_open_raw": 2897
+  },
+  "joints": {
+    "sign": [
+      1,
+      1,
+      1,
+      1,
+      -1
+    ],
+    "zero_offset_deg": [
+      3.106227106227107,
+      -12.667633699633702,
+      8.420421245421243,
+      -3.5385018315018315,
+      2.1758241758241783
+    ],
+    "measured_limits_deg": [
+      [
+        -115.83882783882784,
+        122.05128205128206
+      ],
+      [
+        -121.1511501831502,
+        95.8158827838828
+      ],
+      [
+        -92.63452380952383,
+        109.4753663003663
+      ],
+      [
+        -111.80223809523811,
+        104.72523443223444
+      ],
+      [
+        -177.82417582417582,
+        182.17582417582418
+      ]
+    ],
+    "application_limits_deg": [
+      [
+        -117.45054945054946,
+        120.43956043956044
+      ],
+      [
+        -121.39657142857143,
+        95.57046153846156
+      ],
+      [
+        -92.92390109890111,
+        109.18598901098902
+      ],
+      [
+        -112.62458241758243,
+        103.90289010989012
+      ],
+      [
+        -179.07692307692307,
+        180.92307692307693
+      ]
+    ],
+    "margin_deg": [
+      2.0,
+      2.0,
+      2.0,
+      2.0,
+      2.0
+    ],
+    "hard_current_ma": [
+      900,
+      900,
+      900,
+      900,
+      900
+    ]
+  },
+  "tool": {
+    "rotation_e_tcp": [
+      [
+        0,
+        -0.0486886,
+        0.998814
+      ],
+      [
+        0,
+        -0.998814,
+        -0.0486886
+      ],
+      [
+        1,
+        0,
+        0
+      ]
+    ],
+    "translation_samples": [
+      {
+        "gripper_pct": 0,
+        "xyz_m": [
+          0.055,
+          -0.001,
+          0
+        ]
+      },
+      {
+        "gripper_pct": 50,
+        "xyz_m": [
+          0.055,
+          -0.0035,
+          0.0012
+        ]
+      },
+      {
+        "gripper_pct": 100,
+        "xyz_m": [
+          0.0548,
+          -0.006,
+          0.0025
+        ]
+      }
+    ],
+    "position_error_bound_m": 0.002,
+    "orientation_error_bound_deg": 1.2
+  },
+  "workspace": {
+    "target_bounds_m": [
+      [
+        0.325,
+        -0.07,
+        0.02
+      ],
+      [
+        0.4,
+        0.07,
+        0.028
+      ]
+    ],
+    "tcp_bounds_m": [
+      [
+        0.3,
+        -0.1,
+        0.015
+      ],
+      [
+        0.42,
+        0.1,
+        0.23
+      ]
+    ],
+    "table_z_m": -0.0024002597,
+    "table_flatness_m": 0.001,
+    "home_joints_deg": [
+      0.2637362637362637,
+      -44.561406593406595,
+      35.0760989010989,
+      57.39739560439561,
+      1.142857142857143
+    ],
+    "safe_waypoints_deg": [
+      [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ]
+    ],
+    "obstacles": [
+      {
+        "id": "bracket_east",
+        "bounds_m": [
+          [
+            0.28,
+            0.13,
+            0
+          ],
+          [
+            0.36,
+            0.18,
+            0.1
+          ]
+        ]
+      },
+      {
+        "id": "camera_pole",
+        "bounds_m": [
+          [
+            0.2,
+            -0.2,
+            0
+          ],
+          [
+            0.23,
+            -0.15,
+            0.15
+          ]
+        ]
+      }
+    ]
+  },
+  "collision": {
+    "link_capsules": [
+      {
+        "id": "base_01",
+        "link": "base_link",
+        "p0_m": [
+          -0.025779708775443232,
+          0.001374264952183256,
+          0.05139992861726643
+        ],
+        "p1_m": [
+          0.03404925009420088,
+          0.001374264952183256,
+          0.05139992861726643
+        ],
+        "radius_m": 0.028647912722803683
+      },
+      {
+        "id": "base_02",
+        "link": "base_link",
+        "p0_m": [
+          0.021135303381901636,
+          -0.0330324063097914,
+          0.033599893378040036
+        ],
+        "p1_m": [
+          0.021135303381901636,
+          0.033033683489170136,
+          0.033599893378040036
+        ],
+        "radius_m": 0.056741621680182965
+      },
+      {
+        "id": "base_03",
+        "link": "base_link",
+        "p0_m": [
+          0.012378918310548223,
+          -8.976570000339412e-09,
+          0.04409999932050705
+        ],
+        "p1_m": [
+          0.037384974278028574,
+          -8.976570000339412e-09,
+          0.04409999932050705
+        ],
+        "radius_m": 0.02208703316287026
+      },
+      {
+        "id": "base_04",
+        "link": "base_link",
+        "p0_m": [
+          -0.027182744623260674,
+          -0.01866730225749134,
+          0.04739999265358945
+        ],
+        "p1_m": [
+          -0.027182744623260674,
+          0.018300559238010713,
+          0.04739999265358945
+        ],
+        "radius_m": 0.021841050656497944
+      },
+      {
+        "id": "shoulder_01",
+        "link": "shoulder_link",
+        "p0_m": [
+          -0.03039919816339715,
+          2.225435205374833e-05,
+          -0.05274971465214447
+        ],
+        "p1_m": [
+          -0.03039919816339715,
+          2.225435205374833e-05,
+          -0.027743536674725774
+        ],
+        "radius_m": 0.022087022490569506
+      },
+      {
+        "id": "shoulder_02",
+        "link": "shoulder_link",
+        "p0_m": [
+          -0.03155060733170198,
+          -0.018307121658091705,
+          -0.02399987840070062
+        ],
+        "p1_m": [
+          -0.03155060733170198,
+          0.01972003148113898,
+          -0.02399987840070062
+        ],
+        "radius_m": 0.023742864474829352
+      },
+      {
+        "id": "shoulder_03",
+        "link": "shoulder_link",
+        "p0_m": [
+          -0.017699199499320986,
+          2.1973523344440485e-05,
+          -0.0370727178074669
+        ],
+        "p1_m": [
+          -0.017699199499320986,
+          2.1973523344440485e-05,
+          0.025309705442984498
+        ],
+        "radius_m": 0.03622430191634424
+      },
+      {
+        "id": "upper_arm_01",
+        "link": "upper_arm_link",
+        "p0_m": [
+          -0.11256999816339715,
+          -0.026549701046246897,
+          0.01830000983437951
+        ],
+        "p1_m": [
+          -0.11256999816339715,
+          -0.0015435371521616194,
+          0.01830000983437951
+        ],
+        "radius_m": 0.02208702672519626
+      },
+      {
+        "id": "upper_arm_02",
+        "link": "upper_arm_link",
+        "p0_m": [
+          -0.10873404975529047,
+          -0.00024999079005637564,
+          0.020150029436713218
+        ],
+        "p1_m": [
+          -1.3611316684869479e-08,
+          -0.00024999079005637564,
+          0.020150029436713218
+        ],
+        "radius_m": 0.03505266649029875
+      },
+      {
+        "id": "lower_arm_01",
+        "link": "lower_arm_link",
+        "p0_m": [
+          -0.09653131043007415,
+          -3.428393697407772e-10,
+          0.020199911294009498
+        ],
+        "p1_m": [
+          1.6391001002192401e-06,
+          -3.428393697407772e-10,
+          0.020199911294009498
+        ],
+        "radius_m": 0.03358608430029822
+      },
+      {
+        "id": "lower_arm_02",
+        "link": "lower_arm_link",
+        "p0_m": [
+          -0.10469980622848273,
+          0.0034499498975728866,
+          0.0030740545861944937
+        ],
+        "p1_m": [
+          -0.10469980622848273,
+          0.0034499498975728866,
+          0.03932910515968301
+        ],
+        "radius_m": 0.02366036237308039
+      },
+      {
+        "id": "lower_arm_03",
+        "link": "lower_arm_link",
+        "p0_m": [
+          -0.13344970344492227,
+          0.005200001326795114,
+          0.018300009834379505
+        ],
+        "p1_m": [
+          -0.10844355933568248,
+          0.005200001326795114,
+          0.018300009834379505
+        ],
+        "radius_m": 0.02208702545300626
+      },
+      {
+        "id": "wrist_01",
+        "link": "wrist_link",
+        "p0_m": [
+          1.1658032666684698e-06,
+          -0.0431349072282749,
+          0.01917026900345936
+        ],
+        "p1_m": [
+          -1.339501911484771e-06,
+          -0.041775751964252615,
+          0.04485943116262358
+        ],
+        "radius_m": 0.021742711457024666
+      },
+      {
+        "id": "wrist_02",
+        "link": "wrist_link",
+        "p0_m": [
+          -0.002170217710226092,
+          -0.06149825768409871,
+          0.022150006870512915
+        ],
+        "p1_m": [
+          -0.002170217710226092,
+          -0.007984564405416814,
+          0.022150006870512915
+        ],
+        "radius_m": 0.0357833946712435
+      },
+      {
+        "id": "gripper_01",
+        "link": "gripper_link",
+        "p0_m": [
+          -0.006256388386593569,
+          0.0004999866479462496,
+          -0.0234
+        ],
+        "p1_m": [
+          0.018749715341496012,
+          0.0004999866479462496,
+          -0.0234
+        ],
+        "radius_m": 0.02508702212470075
+      },
+      {
+        "id": "gripper_02",
+        "link": "gripper_link",
+        "p0_m": [
+          -0.0023101520998026807,
+          -0.0020054551617886157,
+          -0.005173975115881092
+        ],
+        "p1_m": [
+          -0.008649427391390909,
+          -0.0018881226632697806,
+          -0.06695625099603608
+        ],
+        "radius_m": 0.041072740616419974
+      },
+      {
+        "id": "moving_jaw_so101_v1_01",
+        "link": "moving_jaw_so101_v1_link",
+        "p0_m": [
+          -0.007169154589381007,
+          -0.056153850916262335,
+          0.01990124622175018
+        ],
+        "p1_m": [
+          0.0012932379728205709,
+          6.893398230329274e-05,
+          0.018872488738410662
+        ],
+        "radius_m": 0.029706309783031133
+      }
+    ],
+    "ignore_self_pairs": [
+      [
+        "base_01",
+        "base_02"
+      ],
+      [
+        "base_01",
+        "base_03"
+      ],
+      [
+        "base_01",
+        "base_04"
+      ],
+      [
+        "base_01",
+        "shoulder_01"
+      ],
+      [
+        "base_01",
+        "shoulder_02"
+      ],
+      [
+        "base_01",
+        "shoulder_03"
+      ],
+      [
+        "base_02",
+        "base_03"
+      ],
+      [
+        "base_02",
+        "base_04"
+      ],
+      [
+        "base_02",
+        "shoulder_01"
+      ],
+      [
+        "base_02",
+        "shoulder_02"
+      ],
+      [
+        "base_02",
+        "shoulder_03"
+      ],
+      [
+        "base_03",
+        "base_04"
+      ],
+      [
+        "base_03",
+        "shoulder_01"
+      ],
+      [
+        "base_03",
+        "shoulder_02"
+      ],
+      [
+        "base_03",
+        "shoulder_03"
+      ],
+      [
+        "base_04",
+        "shoulder_01"
+      ],
+      [
+        "base_04",
+        "shoulder_02"
+      ],
+      [
+        "base_04",
+        "shoulder_03"
+      ],
+      [
+        "shoulder_01",
+        "shoulder_02"
+      ],
+      [
+        "shoulder_01",
+        "shoulder_03"
+      ],
+      [
+        "shoulder_01",
+        "upper_arm_01"
+      ],
+      [
+        "shoulder_01",
+        "upper_arm_02"
+      ],
+      [
+        "shoulder_02",
+        "shoulder_03"
+      ],
+      [
+        "shoulder_02",
+        "upper_arm_01"
+      ],
+      [
+        "shoulder_02",
+        "upper_arm_02"
+      ],
+      [
+        "shoulder_03",
+        "upper_arm_01"
+      ],
+      [
+        "shoulder_03",
+        "upper_arm_02"
+      ],
+      [
+        "upper_arm_01",
+        "upper_arm_02"
+      ],
+      [
+        "upper_arm_01",
+        "lower_arm_01"
+      ],
+      [
+        "upper_arm_01",
+        "lower_arm_02"
+      ],
+      [
+        "upper_arm_01",
+        "lower_arm_03"
+      ],
+      [
+        "upper_arm_02",
+        "lower_arm_01"
+      ],
+      [
+        "upper_arm_02",
+        "lower_arm_02"
+      ],
+      [
+        "upper_arm_02",
+        "lower_arm_03"
+      ],
+      [
+        "lower_arm_01",
+        "lower_arm_02"
+      ],
+      [
+        "lower_arm_01",
+        "lower_arm_03"
+      ],
+      [
+        "lower_arm_01",
+        "wrist_01"
+      ],
+      [
+        "lower_arm_01",
+        "wrist_02"
+      ],
+      [
+        "lower_arm_02",
+        "lower_arm_03"
+      ],
+      [
+        "lower_arm_02",
+        "wrist_01"
+      ],
+      [
+        "lower_arm_02",
+        "wrist_02"
+      ],
+      [
+        "lower_arm_03",
+        "wrist_01"
+      ],
+      [
+        "lower_arm_03",
+        "wrist_02"
+      ],
+      [
+        "wrist_01",
+        "wrist_02"
+      ],
+      [
+        "wrist_01",
+        "gripper_01"
+      ],
+      [
+        "wrist_01",
+        "gripper_02"
+      ],
+      [
+        "wrist_02",
+        "gripper_01"
+      ],
+      [
+        "wrist_02",
+        "gripper_02"
+      ],
+      [
+        "gripper_01",
+        "gripper_02"
+      ],
+      [
+        "gripper_01",
+        "moving_jaw_so101_v1_01"
+      ],
+      [
+        "gripper_02",
+        "moving_jaw_so101_v1_01"
+      ],
+      [
+        "base_01",
+        "upper_arm_02"
+      ],
+      [
+        "base_02",
+        "upper_arm_02"
+      ],
+      [
+        "gripper_02",
+        "lower_arm_01"
+      ],
+      [
+        "gripper_02",
+        "lower_arm_03"
+      ],
+      [
+        "lower_arm_01",
+        "shoulder_01"
+      ],
+      [
+        "lower_arm_01",
+        "shoulder_03"
+      ],
+      [
+        "lower_arm_02",
+        "shoulder_01"
+      ],
+      [
+        "moving_jaw_so101_v1_01",
+        "wrist_01"
+      ],
+      [
+        "moving_jaw_so101_v1_01",
+        "wrist_02"
+      ],
+      [
+        "shoulder_01",
+        "wrist_02"
+      ],
+      [
+        "upper_arm_02",
+        "wrist_02"
+      ],
+      [
+        "shoulder_01",
+        "gripper_02"
+      ],
+      [
+        "shoulder_03",
+        "gripper_02"
+      ],
+      [
+        "upper_arm_02",
+        "wrist_01"
+      ],
+      [
+        "upper_arm_02",
+        "gripper_01"
+      ],
+      [
+        "upper_arm_02",
+        "gripper_02"
+      ]
+    ],
+    "clearance_m": 0.003,
+    "max_joint_substep_deg": 0.5
+  },
+  "places": {
+    "default": {
+      "position": [
+        0.32,
+        0.055,
+        0.024
+      ],
+      "yaw_deg": 10
+    },
+    "bin": {
+      "position": [
+        0.34,
+        -0.06,
+        0.024
+      ],
+      "yaw_deg": -10
+    }
+  },
+  "timing": {
+    "fps": 30,
+    "read_timeout_s": 0.02,
+    "write_timeout_s": 0.015,
+    "max_feedback_age_s": 0.0371,
+    "max_feedback_span_s": 0.0093,
+    "max_tick_lateness_s": 0.02,
+    "stop_poll_s": 0.01,
+    "planning_poll_s": 0.05
+  },
+  "motion": {
+    "max_velocity_deg_s": [
+      48.56,
+      48.56,
+      44.82,
+      44.82,
+      48.56
+    ],
+    "max_acceleration_deg_s2": [
+      209.77,
+      209.77,
+      202.23,
+      202.23,
+      209.77
+    ],
+    "max_command_step_deg": [
+      1.618,
+      1.618,
+      1.494,
+      1.494,
+      1.618
+    ],
+    "tcp_max_velocity_m_s": 0.22,
+    "tcp_max_acceleration_m_s2": 1.4,
+    "start_position_tol_deg": [
+      2.5,
+      2.5,
+      3.0,
+      2.5,
+      2.5
+    ],
+    "following_error_deg": [
+      5.0,
+      7.2,
+      6.7,
+      4.9,
+      4.9
+    ],
+    "following_error_hard_deg": [
+      6.9,
+      9.1,
+      8.5,
+      6.7,
+      6.8
+    ],
+    "following_error_dwell_s": 0.05,
+    "settle_position_tol_deg": [
+      1.0,
+      2.1,
+      3.0,
+      1.4,
+      1.0
+    ],
+    "settle_velocity_tol_deg_s": [
+      0.4,
+      0.4,
+      0.4,
+      0.4,
+      0.4
+    ],
+    "settle_dwell_s": 0.15,
+    "settle_timeout_s": 0.9
+  },
+  "ik": {
+    "position_tol_m": 0.007,
+    "tilt_tol_deg": 1.5,
+    "yaw_tol_deg": 2,
+    "position_weight": 1,
+    "orientation_weight": 0.1,
+    "max_iterations": 250,
+    "stagnation_iterations": 12,
+    "max_solve_s": 1.5,
+    "min_progress": 0.001,
+    "seed_joints_deg": [
+      [
+        0,
+        -90,
+        90,
+        0,
+        0
+      ],
+      [
+        10,
+        -85,
+        85,
+        -5,
+        0
+      ],
+      [
+        -10,
+        -85,
+        85,
+        -5,
+        0
+      ],
+      [
+        0,
+        -30,
+        60,
+        -40,
+        0
+      ]
+    ]
+  },
+  "grasp": {
+    "center_offset_object_m": [
+      0,
+      0,
+      0
+    ],
+    "yaw_offset_deg": 90.0,
+    "object_envelope_m": [
+      0.07,
+      0.045,
+      0.045
+    ],
+    "target_position_error_bound_m": 0.004,
+    "target_yaw_error_bound_deg": 5,
+    "object_shift_bound_m": 0.003,
+    "approach_height_m": 0.08,
+    "lift_height_m": 0.09,
+    "retreat_height_m": 0.08
+  },
+  "gripper": {
+    "gap_table": [
+      {
+        "gripper_pct": 0,
+        "gap_m": 0.0096
+      },
+      {
+        "gripper_pct": 25,
+        "gap_m": 0.0405
+      },
+      {
+        "gripper_pct": 50,
+        "gap_m": 0.0712
+      },
+      {
+        "gripper_pct": 75,
+        "gap_m": 0.0985
+      },
+      {
+        "gripper_pct": 100,
+        "gap_m": 0.1207
+      }
+    ],
+    "angle_table": [
+      {
+        "gripper_pct": 0,
+        "angle_deg": -10
+      },
+      {
+        "gripper_pct": 25,
+        "angle_deg": 17.5
+      },
+      {
+        "gripper_pct": 50,
+        "angle_deg": 45
+      },
+      {
+        "gripper_pct": 75,
+        "angle_deg": 72.5
+      },
+      {
+        "gripper_pct": 100,
+        "angle_deg": 100
+      }
+    ],
+    "preopen_pct": 37.65,
+    "release_pct": 55,
+    "open_speed_pct_s": 20,
+    "close_speed_pct_s": 15,
+    "contact_gap_range_m": [
+      0.022,
+      0.042
+    ],
+    "contact_current_ma": 13.0,
+    "hard_current_ma": 150.0,
+    "window_samples": 3,
+    "contact_dwell_s": 0.1,
+    "empty_closed_pct": 0.21,
+    "empty_tol_pct": 1.0,
+    "close_timeout_s": 4.7,
+    "open_timeout_s": 4.3,
+    "hold_dwell_s": 0.3,
+    "release_dwell_s": 0.5,
+    "slip_opening_change_pct": 6,
+    "settle_tol_pct": 0.6,
+    "settle_speed_pct_s": 0.3
+  },
+  "acceptance": {
+    "max_position_error_m": 0.01,
+    "max_tilt_error_deg": 3,
+    "max_yaw_error_deg": 4,
+    "max_stop_latency_s": 0.2,
+    "min_grasp_success_rate": 0.9,
+    "max_drop_rate": 0.05,
+    "max_damage_rate": 0.02,
+    "damage_observe_minutes": 30,
+    "min_grasp_trials": 30
+  },
+  "verification": null
+}

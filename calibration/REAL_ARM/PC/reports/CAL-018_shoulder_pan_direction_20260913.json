@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-018",
+  "status": "VERIFIED_FOR_DEMO",
+  "scope": "joint_element_0_shoulder_pan",
+  "captured_at": "2026-09-13",
+  "parameter": "joints.sign[0]",
+  "joint": {
+    "index": 0,
+    "name": "shoulder_pan",
+    "servo_id": 1,
+    "parent_link": "base_link",
+    "child_link": "shoulder_link",
+    "urdf_axis_joint_frame": [0.0, 0.0, 1.0],
+    "urdf_axis_parent_frame_at_zero": [0.0, 0.0, -1.0],
+    "positive_physical_reference": "Viewed vertically from above the base, rotate the shoulder and arm clockwise."
+  },
+  "hardware": {
+    "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+    "resolved_port": "/dev/ttyACM0",
+    "usb_identity": {
+      "vid": "1a86",
+      "pid": "55d3",
+      "serial": "5B14114904"
+    },
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_in_workspace",
+    "model_number": 777,
+    "official_raw_range": [718, 3424],
+    "torque_enabled_by_motor": [0, 0, 0, 0, 0, 0]
+  },
+  "observations": {
+    "baseline_raw": 2125,
+    "baseline_provenance": "Terminal-reported representative from the initial read-only interactive burst; the interactive runner handle became unavailable before the positive trigger, so the positive and negative poses were saved by independent one-shot readers.",
+    "urdf_positive_raw": 2287,
+    "urdf_negative_raw": 1919,
+    "positive_delta_counts": 162,
+    "negative_delta_counts": -206,
+    "positive_delta_bus_deg": 14.241758241758,
+    "negative_delta_bus_deg": -18.10989010989,
+    "positive_static_span_counts": 0,
+    "negative_static_span_counts": 0,
+    "samples_per_saved_pose": 10
+  },
+  "result": {
+    "joint_sign": 1,
+    "formula": "q_urdf_deg = joint_sign * q_bus_deg + zero_offset_deg",
+    "reason": "The operator-confirmed URDF-positive move increased q_bus/raw, while the URDF-negative move decreased it and landed on the opposite side of baseline."
+  },
+  "checks": {
+    "stable_port_identity_checked_before_each_saved_pose": true,
+    "all_six_torque_disabled_before_and_after_each_saved_pose": true,
+    "positive_and_negative_on_opposite_sides_of_baseline": true,
+    "both_motion_magnitudes_exceed_30_counts": true,
+    "all_observations_inside_official_range": true,
+    "write_instructions_sent": 0,
+    "motion_instructions_sent": 0,
+    "eeprom_written": false
+  },
+  "evidence": {
+    "positive_pose": "../raw/cal018_shoulder_pan_positive_20260913.json",
+    "positive_pose_sha256": "dd21bf6dbd6027dc6dca6f3ff462dd4414561648dc757dcd2a8bfbf93b4b07c1",
+    "negative_pose": "../raw/cal018_shoulder_pan_negative_20260913.json",
+    "negative_pose_sha256": "e9c1cf245da809500784ea3368686367e35bc5396109aa673b41b22dff7c0996",
+    "interactive_reader_sha256": "15a2b62ff5110ab46da7313d2eafd08f4e7d75a894aaa32dde0879485cfb186b",
+    "one_shot_reader_sha256": "e46edf2df5dd04a245efc6f5324216d276037b495a94186032e445da9abc0fc8"
+  },
+  "implementation": {
+    "profile_sha256": "fa4594ebed194446e3900e62219f6ce4caa0c0e751f1a71a34eb2e829589f90c",
+    "profile_write_deferred_until_all_five_sign_elements_are_measured": true
+  }
+}

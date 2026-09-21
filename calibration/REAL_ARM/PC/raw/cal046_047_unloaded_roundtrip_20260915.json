@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "parameter_ids": [
+    "CAL-046",
+    "CAL-047"
+  ],
+  "test": "unloaded_low_speed_waypoint_home_waypoint_round_trip",
+  "started_at": "2026-09-15T12:32:22.370430+08:00",
+  "status": "FAIL",
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256": "6a971b5c19b5316a56702980968103f9de0f998c8520758b0ccb47835b188bd1",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_to_wooden_work_surface_no_gap",
+    "load_label": "unloaded"
+  },
+  "segment_duration_s": 8.0,
+  "waypoint_deg": [
+    6.681318681318682,
+    -50.451516483516485,
+    10.900274725274727,
+    62.05673626373627,
+    1.054945054945055
+  ],
+  "home_deg": [
+    0.2637362637362637,
+    -44.561406593406595,
+    35.0760989010989,
+    57.39739560439561,
+    1.142857142857143
+  ],
+  "readonly_preflight": {
+    "torque_enabled": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "model_numbers": [
+      777,
+      777,
+      777,
+      777,
+      777,
+      777
+    ],
+    "snapshot": {
+      "raw_position": [
+        2128,
+        1672,
+        1978,
+        2716,
+        2046,
+        1717
+      ],
+      "raw_velocity": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "raw_current": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "sample_start_ns": 257571951852709,
+      "sample_end_ns": 257571955456981,
+      "q_bus_deg": [
+        5.010989010989011,
+        -37.53846153846154,
+        2.857142857142857,
+        66.41758241758242,
+        -0.13186813186813187
+      ],
+      "q_urdf_deg": [
+        6.5054945054945055,
+        -50.451516483516485,
+        10.988186813186815,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "gripper_pct": 15.593705293276109
+    },
+    "start_error_from_waypoint_deg": [
+      0.1758241758241761,
+      0.0,
+      0.0879120879120876,
+      0.0,
+      0.0
+    ]
+  },
+  "goal_seeded_to_present_before_torque_enable": true,
+  "eeprom_written": false,
+  "legs": [],
+  "feedback_before_goal_seed": {
+    "angles_deg": [
+      6.5054945054945055,
+      -50.451516483516485,
+      10.988186813186815,
+      62.05673626373627,
+      1.054945054945055
+    ],
+    "speeds_deg_s": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.0
+    ],
+    "currents_ma": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gripper_pct": 15.593705293276109,
+    "gripper_speed_pct_s": 0.0,
+    "gripper_current_ma": 0.0,
+    "sample_start_ns": 257571974870293,
+    "sample_end_ns": 257571978528775,
+    "sequence": 1
+  },
+  "goal_seed_raw": [
+    2128,
+    1672,
+    1978,
+    2716,
+    2046,
+    1717
+  ],
+  "failure": "MotorCommunicationError: 接收 READ id=1 addr=40 n=1 帧头 超出整次调用总时限（deadline 已到；运行期 I/O 不重试）",
+  "torque_disable_failure": "MotorCommunicationError: READ id=1 addr=40 n=1 帧头不完整：FF 83",
+  "finished_at": "2026-09-15T12:32:22.416032+08:00"
+}

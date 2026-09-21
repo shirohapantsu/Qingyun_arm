@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-056",
+  "parameter": "timing.stop_poll_s",
+  "date": "2026-09-15",
+  "status": "DERIVED_AND_CODE_VERIFIED_FOR_CURRENT_DEMO",
+  "profile_changed": false,
+  "profile_sha256": "52e2b621a303368f0774cf9ee439da852f2992480b0dfec1c21c55dad4106ba9",
+  "inputs": {
+    "fps": 30,
+    "tick_period_s": 0.03333333333333333,
+    "fraction_of_tick": 0.3,
+    "fractional_tick_s": 0.01,
+    "fixed_cap_s": 0.01
+  },
+  "formula": "round(min((1 / FPS) * 0.3, 0.010), 4)",
+  "derived_value_s": 0.01,
+  "old_value_s": 0.01,
+  "verification": {
+    "positive": true,
+    "not_greater_than_one_tick": true,
+    "fraction_of_tick": 0.3,
+    "profile_value_matches_derivation": true
+  },
+  "decision": "Retain 10 ms. At 30 Hz this is 30 percent of one control tick and equals the formula cap. Runtime waits already split sleeps into chunks no longer than stop_poll_s and re-check the stop condition between chunks.",
+  "hardware_accessed": false,
+  "eeprom_written": false,
+  "scope_limit": "This calibrates the polling interval, not end-to-end physical stopping latency. CAL-102 risk acceptance and hardware stop-latency measurement remain unresolved."
+}

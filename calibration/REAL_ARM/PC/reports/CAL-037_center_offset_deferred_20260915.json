@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-037",
+  "date": "2026-09-15",
+  "status": "deferred_by_operator",
+  "profile_changed": false,
+  "profile_sha256": "62da9cf9057c5bdc301467f990e4a5e9217f8f05193744364d28fa50eea7665a",
+  "current_placeholder_m": [0.0, 0.0, 0.0],
+  "operator_decision": "skip for now and determine after TCP calibration is complete",
+  "blocking_dependency": "CAL-025 tool.translation_samples",
+  "reason": "the object-frame offset to the grasp TCP cannot be physically interpreted until the real TCP translation is calibrated",
+  "downstream_invalid_until_resolved": ["CAL-042", "CAL-046", "CAL-047", "CAL-048", "CAL-049", "CAL-080", "CAL-098"],
+  "runtime_warning": "The current zero vector is a simulation placeholder and must not be cited as measured grasp-center evidence."
+}

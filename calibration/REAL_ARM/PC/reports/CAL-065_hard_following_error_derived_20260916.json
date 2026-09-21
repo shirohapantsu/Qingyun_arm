@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-065",
+  "status": "CONFIRMED_FOR_CURRENT_DEMO",
+  "completed_at": "2026-09-16T11:55:01+08:00",
+  "parameter": "motion.following_error_hard_deg",
+  "method": "Per axis, add one maximum legal command tick and three encoder counts to the CAL-064 soft following-error threshold, then round upward to 0.1 degree. Verify that a first feedback frame above the result triggers immediate TRACKING_ERROR with no dwell wait.",
+  "control_rationale": "The hard threshold covers transition from near the soft boundary through one maximum legal command tick plus encoder margin, while remaining much tighter than the obsolete 25 degree placeholder.",
+  "inputs": {
+    "CAL-064_soft_following_error_deg": [5.0, 7.2, 6.7, 4.9, 4.9],
+    "CAL-060_max_command_step_deg": [1.618, 1.618, 1.494, 1.494, 1.618],
+    "position_resolution_counts_per_revolution": [4096, 4096, 4096, 4096, 4096],
+    "three_count_margin_deg": [0.263671875, 0.263671875, 0.263671875, 0.263671875, 0.263671875],
+    "CAL-064_report": "CAL-064_following_error_tolerance_derived_20260916.json",
+    "CAL-064_report_sha256": "6b0f01d0aa5367fec7fe3a521eeabadb8b25797b55779c82d144d19145bd35ed"
+  },
+  "derivation": {
+    "rule": "ceil((soft + max_command_step + 3 counts) * 10) / 10",
+    "unrounded_deg": [6.881671875, 9.081671875, 8.457671875, 6.657671875, 6.781671875],
+    "candidate_deg": [6.9, 9.1, 8.5, 6.7, 6.8],
+    "hard_minus_soft_deg": [1.9, 1.9, 1.8, 1.8, 1.9],
+    "strictly_above_soft_per_axis": true
+  },
+  "normal_physical_evidence_replay": {
+    "source_family": "deduplicated passed CAL-058 and CAL-059 samples documented by CAL-064",
+    "unique_trajectories": 90,
+    "sample_rows": 4997,
+    "normal_max_error_deg": [
+      4.720929250463993,
+      6.892135994316671,
+      6.43010327572668,
+      4.552298901098908,
+      4.592088793881192
+    ],
+    "rows_above_candidate_hard_threshold": 0,
+    "result": "PASS"
+  },
+  "fit": {
+    "obsolete_rule": "CAL-064 soft threshold multiplied by 2.2",
+    "obsolete_value_deg": [25.0, 25.0, 25.0, 25.0, 25.0],
+    "obsolete_rule_issue": "The multiplier does not express sampling, command-step, encoder, or mechanical semantics.",
+    "after_deg": [6.9, 9.1, 8.5, 6.7, 6.8]
+  },
+  "fit_correction": {
+    "function": "scripts.calibrate._derive_hard_following_error_tolerance",
+    "regression_test": "test_motion硬跟踪阈值覆盖一个最大命令tick与编码余量"
+  },
+  "immediate_stop_verification": {
+    "current_profile_loaded": true,
+    "synthetic_error_axis": "shoulder_lift",
+    "synthetic_error_above_hard_deg": 0.1,
+    "result_status": "TRACKING_ERROR",
+    "result_reason_contains": "立即超限",
+    "virtual_time_advanced_s": 0.0,
+    "dwell_waited": false,
+    "focused_tests_passed": 3,
+    "focused_tests_failed": 0
+  },
+  "profile_sha256_before": "762cb64d4063a925e9f2af7e582ffb0a0fe2a5c72e87a0f10ddfaf38f602be1e",
+  "profile_sha256_after": "f8e3841a13d060bfa4d5ed3f28d4b4a74ebe2d09053502e9b9274800d1f6c4fc",
+  "profile_written": true,
+  "hardware_accessed_for_this_derivation": false,
+  "eeprom_written": false,
+  "limitations": [
+    "No destructive physical jam, manual obstruction, or collision test was performed.",
+    "This confirms immediate software response and compatibility with normal demo trajectories, not complete mechanical jam safety certification.",
+    "Joint current protection remains independently active at 900 mA software and 2015 mA EEPROM thresholds."
+  ],
+  "post_write_verification": {
+    "physical_sample_rows_replayed": 4997,
+    "rows_above_configured_hard_threshold": 0,
+    "current_profile_synthetic_first_frame_immediate_stop": true,
+    "full_motion_group_regression": "deferred until CAL-063 through CAL-070 form a complete group, per operator instruction",
+    "result": "PASS"
+  },
+  "downstream": {
+    "CAL-066": "calibrate soft-error dwell independently; hard threshold remains immediate and does not use dwell",
+    "CAL-023": "current protection remains a parallel immediate-stop channel"
+  }
+}

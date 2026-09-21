@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-050",
+  "date": "2026-09-15",
+  "status": "CONFIRMED_FOR_CURRENT_DEMO_CONDITION",
+  "profile_changed": false,
+  "profile_sha256": "6a971b5c19b5316a56702980968103f9de0f998c8520758b0ccb47835b188bd1",
+  "environment": {
+    "motor_supply_voltage_v": 12.0,
+    "ambient_temperature_c": 26.8,
+    "base_mount": {
+      "work_surface": "flat_wooden_board",
+      "fixed_to_work_surface": true,
+      "direct_contact": true,
+      "observable_gap_m": 0.0,
+      "same_reference_surface_as_table_calibration": true,
+      "fastener_or_clamp_detail": "not_separately_recorded_for_demo"
+    },
+    "finger_pads": {
+      "fixed_side": {
+        "length_mm": 48.0,
+        "thickness_including_adhesive_mm": 2.0,
+        "measurement_resolution_mm": 1.0,
+        "tip_aligned": true,
+        "boundary_clear": true,
+        "visible_lift_or_wedge": false
+      },
+      "moving_side": {
+        "length_mm": 40.0,
+        "thickness_including_adhesive_mm": 2.0,
+        "measurement_resolution_mm": 1.0,
+        "tip_aligned": true,
+        "boundary_clear": true,
+        "visible_lift_or_wedge": false
+      },
+      "measurement_sections_from_tip_mm": [10.0, 15.0, 20.0]
+    },
+    "demo_object_batch": {
+      "sample_count": 17,
+      "maximum_nominal_mass_g": 92.4,
+      "scale_resolution_g": 0.1,
+      "conservative_accounting_upper_mass_g": 92.5,
+      "maximum_dimensions_mm": [70.0, 45.0, 45.0]
+    }
+  },
+  "scope": "This baseline is sufficient for the current demo. Every timing, motion and grasp data file must repeat the actual run metadata; changing supply, mounting, pads or load batch invalidates direct comparison."
+}

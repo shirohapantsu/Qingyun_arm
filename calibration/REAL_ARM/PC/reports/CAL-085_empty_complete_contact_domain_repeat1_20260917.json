@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-085",
+  "test": "powered_empty_gripper_complete_contact_domain_control",
+  "started_at": "2026-09-17T12:40:30.326798+08:00",
+  "status": "FAIL",
+  "operator_confirmation": "批准，CAL-085接触范围空爪基线就绪",
+  "repeat": 1,
+  "plan_authorization_confirmation": "批准，CAL-085接触范围空爪基线就绪",
+  "reposition_before_repeat": false,
+  "actual_command_path_raw": [
+    1837,
+    1908,
+    1625
+  ],
+  "profile_sha256": "1ea15d62d288bc02f56ccabe09593f60d68ad3fd6f5f37632589995dc7c18bb4",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "approved_plan": {
+    "status": "AWAITING_EXPLICIT_APPROVAL_AND_EMPTY_READY",
+    "required_confirmation": "批准，CAL-085接触范围空爪基线就绪",
+    "servo_id": 6,
+    "expected_initial_raw": 1837,
+    "initial_tolerance_raw": 5,
+    "path_raw": [
+      1837,
+      1908,
+      1625
+    ],
+    "incremental_command_speed_pct_s": 1,
+    "sample_fps": 30,
+    "final_hold_s": 0.2,
+    "total_powered_timeout_s": 30,
+    "software_current_abort_ma": 65,
+    "max_tracking_error_raw": 10,
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "derivation": {
+      "contact_gap_range_m": [
+        0.022,
+        0.042
+      ],
+      "contact_pct_range": [
+        10.032362459546924,
+        26.221498371335507
+      ],
+      "contact_raw_boundaries_exact": [
+        1639.252427184466,
+        1865.5765472312703
+      ],
+      "outward_contact_raw_envelope": [
+        1639,
+        1866
+      ],
+      "opening_offset_raw": 42,
+      "closing_budget_raw": 14,
+      "resulting_empty_command_coverage": [
+        1625,
+        1908
+      ]
+    },
+    "reason": "single empty-only baseline over complete current demo contact coordinate envelope, so shifted first-contact references can use covered same-speed data instead of repeated tiny controls",
+    "scope": "onlyCAL-085 current baseline, not full software/hardware regression; expands empty command range and timeout30s by separate approval, no loaded movement, output/current/tracking increase or EEPROM writes",
+    "operator_requirements": "remove fixture while torque off, keep gripper near1837, independently support arm, full jaw sweep clear, hands outside every pinch zone, immediate12V power cut; confirm12V/fixed mounting unchanged",
+    "environment_note": "26.8C was historical baseline; today's ambient temperature not reconfirmed, must be recorded as unknown or supplied rather than claimed as new measurement",
+    "cleanup": "disable/read back all6torques and restore/read back original SRAM"
+  },
+  "environment": {
+    "power_v": 12,
+    "ambient_temperature_c": null,
+    "base_mount": "fixed to wooden board",
+    "load": "empty gripper",
+    "temperature_note": "today not remeasured; historical26.8C is not a new measurement"
+  },
+  "transaction_timeout_s": 0.25,
+  "joint_servo_motion_commands_sent": 0,
+  "gripper_motion_commands_sent": 0,
+  "eeprom_written": false,
+  "profile_written": false,
+  "samples": [],
+  "readonly_preflight": {
+    "ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "models": [
+      777,
+      777,
+      777,
+      777,
+      777,
+      777
+    ],
+    "torques": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "readonly_eeprom": {
+    "shoulder_pan": {
+      "range_min": 718,
+      "range_max": 3424,
+      "homing_offset": -438
+    },
+    "shoulder_lift": {
+      "range_min": 865,
+      "range_max": 3333,
+      "homing_offset": -1961
+    },
+    "elbow_flex": {
+      "range_min": 796,
+      "range_max": 3095,
+      "homing_offset": 1791
+    },
+    "wrist_flex": {
+      "range_min": 729,
+      "range_max": 3192,
+      "homing_offset": -1795
+    },
+    "wrist_roll": {
+      "range_min": 0,
+      "range_max": 4095,
+      "homing_offset": 1079
+    },
+    "gripper": {
+      "range_min": 1458,
+      "range_max": 2980,
+      "homing_offset": -1600
+    }
+  },
+  "readonly_gripper_controller_settings": {
+    "P_Coefficient": 16,
+    "D_Coefficient": 32,
+    "I_Coefficient": 0,
+    "Minimum_Startup_Force": 16,
+    "CW_Dead_Zone": 1,
+    "CCW_Dead_Zone": 1
+  },
+  "initial_sample": {
+    "monotonic_ns": 172757251774426,
+    "position_raw": 1835,
+    "gripper_pct": 24.034334763948497,
+    "velocity_register_raw": 0,
+    "velocity_pct_s": 0.0,
+    "current_register_raw": 0,
+    "current_ma": 0.0,
+    "moving": 0
+  },
+  "original_sram_settings": {
+    "Acceleration": 0,
+    "Goal_Time": 0,
+    "Goal_Velocity": 0,
+    "Torque_Limit": 500
+  },
+  "failure": "RuntimeError: Current SRAM differs from proposed settings; no motion",
+  "torque_enabled_after": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "sram_settings_after": {
+    "Acceleration": 0,
+    "Goal_Time": 0,
+    "Goal_Velocity": 0,
+    "Torque_Limit": 500
+  },
+  "finished_at": "2026-09-17T12:40:30.354728+08:00"
+}

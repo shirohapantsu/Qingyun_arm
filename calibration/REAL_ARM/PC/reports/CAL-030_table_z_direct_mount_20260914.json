@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-030",
+  "completed_date": "2026-09-14",
+  "source": "urdf_cad_derivation_plus_operator_mount_confirmation",
+  "status": "verified_for_current_demo_installation",
+  "cad_derivation": {
+    "urdf_path": "libs/so_arm_core/so101_new_calib.urdf",
+    "urdf_sha256": "3a65d2d35e68a8d2f0c2cc176d19b884506543c93ba72980145b80abe276022c",
+    "links": [
+      "base_link"
+    ],
+    "collision_mesh_count": 4,
+    "combined_aabb_min_z_m": -0.0024002597322628503,
+    "derivation_tool": "scripts/derive_urdf_geometry.py",
+    "derivation_tool_sha256": "a76dbaf1ff431352a239a181d5d1db57e12137d0d403e22bd13f9e8781b185c6"
+  },
+  "physical_installation": {
+    "operator_confirmation": "The lowest base contact surface directly contacts the workspace surface.",
+    "workspace_surface": "The robot base and the object pick/place area share the same wooden-board top surface.",
+    "standoff_height_m": 0.0,
+    "spacer_present": false
+  },
+  "formula": "table_z_m = combined_aabb_min_z_m - standoff_height_m",
+  "result": {
+    "table_z_m": -0.0024002597,
+    "previous_profile_value_m": 0.0
+  },
+  "profile_write": {
+    "path": "calibration/REAL_ARM/PC/profile.json",
+    "previous_sha256": "251b5a03d6a4282d225642b3deff8112edbc3af641909f5f28b64bd9777a4150",
+    "new_sha256": "f179b7b46505678d34592073e248557cf2ece7c23fd75160585e09f3c252220f",
+    "field": "workspace.table_z_m",
+    "written": true
+  },
+  "limitations": [
+    "This result assumes the physical mounting contact plane corresponds to the lowest CAD base surface.",
+    "Workspace surface flatness and tilt are measured separately by CAL-031.",
+    "Any spacer, mounting plate change or base relocation invalidates this value."
+  ]
+}

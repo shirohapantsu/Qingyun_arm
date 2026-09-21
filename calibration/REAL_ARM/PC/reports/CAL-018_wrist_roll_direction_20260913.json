@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-018",
+  "status": "RETRACTED_DIRECTION_REFERENCE_ERROR",
+  "scope": "joint_element_4_wrist_roll",
+  "captured_at": "2026-09-13",
+  "parameter": "joints.sign[4]",
+  "joint": {
+    "index": 4,
+    "name": "wrist_roll",
+    "servo_id": 5,
+    "parent_link": "wrist_link",
+    "child_link": "gripper_link",
+    "urdf_axis_joint_frame": [0.0, 0.0, 1.0],
+    "urdf_axis_parent_frame_at_zero": [0.0, 1.0, 0.0],
+    "positive_physical_reference": "Viewed from wrist_flex along the forearm toward the gripper, rotate the complete gripper assembly counterclockwise."
+  },
+  "hardware": {
+    "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+    "resolved_port": "/dev/ttyACM0",
+    "usb_identity": {
+      "vid": "1a86",
+      "pid": "55d3",
+      "serial": "5B14114904"
+    },
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_in_workspace",
+    "model_number": 777,
+    "official_raw_range": [0, 4095],
+    "torque_enabled_by_motor": [0, 0, 0, 0, 0, 0]
+  },
+  "observations": {
+    "baseline_raw": 3015,
+    "urdf_positive_raw": 3398,
+    "urdf_negative_raw": 2873,
+    "positive_delta_counts": 383,
+    "negative_delta_counts": -142,
+    "positive_delta_bus_deg": 33.67032967033,
+    "negative_delta_bus_deg": -12.483516483516,
+    "static_span_counts_by_pose": [0, 0, 0],
+    "samples_per_pose": 10,
+    "operator_motion_note": "The positive move was larger than requested, but remained inside the official raw range and the cable was returned across baseline for the negative observation."
+  },
+  "result": {
+    "joint_sign": 1,
+    "formula": "q_urdf_deg = joint_sign * q_bus_deg + zero_offset_deg",
+    "reason": "The operator-confirmed counterclockwise URDF-positive roll increased q_bus/raw; clockwise roll past baseline decreased it."
+  },
+  "checks": {
+    "stable_port_identity_checked_before_each_pose": true,
+    "all_six_torque_disabled_before_and_after_each_pose": true,
+    "positive_and_negative_on_opposite_sides_of_baseline": true,
+    "both_motion_magnitudes_exceed_30_counts": true,
+    "all_observations_inside_official_range": true,
+    "write_instructions_sent": 0,
+    "motion_instructions_sent": 0,
+    "eeprom_written": false
+  },
+  "evidence": {
+    "baseline_pose": "../raw/cal018_wrist_roll_baseline_20260913.json",
+    "baseline_pose_sha256": "85b8992f8f7b635de1b316ecc8674b3018030e29a657e2b11b36f01addf1ef6d",
+    "positive_pose": "../raw/cal018_wrist_roll_positive_20260913.json",
+    "positive_pose_sha256": "4efb0411e33ab088c1518c068d4c7f72e830cb161bdbb5a156ccc169f39578cb",
+    "negative_pose": "../raw/cal018_wrist_roll_negative_20260913.json",
+    "negative_pose_sha256": "30cd9d8c6e15855d7b38c806de612d6d9b14c4c9308060f504a85c40d7e5d08d",
+    "direction_reader_sha256": "0351fd90e0d5033fdfc38e0972c80dde113bdca120a136337f1f8360369cf5fe",
+    "one_shot_reader_sha256": "e46edf2df5dd04a245efc6f5324216d276037b495a94186032e445da9abc0fc8"
+  },
+  "implementation": {
+    "profile_write_deferred_until_all_five_sign_elements_are_measured": true
+  },
+  "retraction": {
+    "reason": "For the stated view from wrist toward gripper, local URDF positive roll is clockwise, not counterclockwise as instructed.",
+    "raw_evidence_preserved": true
+  }
+}

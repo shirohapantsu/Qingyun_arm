@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-058",
+  "status": "CALIBRATING_LOAD_REQUIRED",
+  "completed_at": "2026-09-15T19:30:00+08:00",
+  "scope": "unloaded demo baseline",
+  "test": "current pose to waypoint, 20/40/55-60 deg/s five-axis bidirectional sweep, then torque off",
+  "source_execution_report": "CAL-058_joint_velocity_unloaded_20260915.json",
+  "source_raw_jsonl": "../raw/cal058_joint_velocity_unloaded_20260915.jsonl",
+  "source_raw_sha256": "edcddd37541a0da3f8ffb85b2d674d004abd4ee924633b1ca49b1af943c8e933",
+  "source_profile_sha256": "ff27c260f69dbc1a9a440af88a2e757f3adcd438474c5123c8b9e9a97f24f539",
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_to_wooden_work_surface_no_gap",
+    "load_label": "unloaded"
+  },
+  "motion": {
+    "recovery_duration_s": 20.0,
+    "test_segments": 30,
+    "sample_rows": 1983,
+    "requested_levels_deg_s": [20.0, 40.0, 60.0],
+    "joint3_high_level_deg_s": 55.0,
+    "recovery_endpoint_abs_error_deg": [0.3516483516483522, 0.1758241758241752, 2.5494505494505493, 0.1758241758241752, 0.08791208791208804],
+    "temporary_settle_position_tolerance_deg": [2.6, 2.6, 2.6, 2.6, 2.6],
+    "settle_tolerance_profile_changed": false,
+    "all_segments_completed": true,
+    "torque_enabled_after": [0, 0, 0, 0, 0, 0]
+  },
+  "velocity_correction": {
+    "old_scale_deg_s_per_raw": 4.39453125,
+    "correct_scale_deg_s_per_raw": 0.087890625,
+    "correction_factor": 0.02,
+    "position_difference_same_sign_fraction": 1.0,
+    "position_difference_correlation": 0.9931766660497237,
+    "median_position_difference_to_feedback_ratio": 0.9975495715767082
+  },
+  "corrected_measured_peak_velocity_deg_s": [57.12890625, 61.5234375, 52.734375, 52.734375, 57.12890625],
+  "unloaded_candidate_max_velocity_deg_s": [48.56, 52.29, 44.82, 44.82, 48.56],
+  "fit_rule": "peak_ok * 0.85; no failed speed group was intentionally induced",
+  "peak_joint_current_ma": [32.5, 156.0, 110.5, 39.0, 26.0],
+  "software_hard_current_ma": [900.0, 900.0, 900.0, 900.0, 900.0],
+  "eeprom_protection_current_ma": [2015.0, 2015.0, 2015.0, 2015.0, 2015.0],
+  "current_threshold_result": "PASS_WITH_LARGE_UNLOADED_MARGIN",
+  "profile_max_velocity_written": false,
+  "eeprom_written": false,
+  "remaining_requirement": "Repeat the same sweep while holding the 92.4 g maximum demo sample, then take the per-axis minimum of unloaded and loaded candidates before writing motion.max_velocity_deg_s."
+}

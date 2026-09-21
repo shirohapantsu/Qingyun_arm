@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-039",
+  "date_recorded": "2026-09-15",
+  "measurement_date": "2026-09-11",
+  "scope": "current REAL_ARM/PC demo sample set",
+  "status": "confirmed_demo_observed_maxima",
+  "profile_changed": false,
+  "profile_sha256": "04c7e28def4f2d5a87beeaf63132faf9477ddee3f053136f908c91d7623a20ec",
+  "sample_count": 17,
+  "observed_axiswise_max_mm": {
+    "length": 70.0,
+    "width": 45.0,
+    "height": 45.0
+  },
+  "object_envelope_m": [0.07, 0.045, 0.045],
+  "measurement_resolution": null,
+  "raw_per_sample_dimensions_available": false,
+  "derived_with_yaw_offset_90_deg": {
+    "nominal_close_axis_width_m": 0.045,
+    "close_axis_width_at_5_deg_yaw_error_m": 0.05092966340646462,
+    "gap_at_current_70_pct_preopen_m": 0.09304
+  },
+  "limitations": [
+    "The three maxima may come from different samples and are intentionally combined as a conservative axis-aligned demo envelope.",
+    "No measurement-resolution allowance can be added because dimensional resolution was not supplied.",
+    "This is not a population maximum; expanding the object class or sample set requires remeasurement.",
+    "CAL-084 contact-gap range remains inconsistent with this width and must be recalibrated before grasp execution."
+  ]
+}

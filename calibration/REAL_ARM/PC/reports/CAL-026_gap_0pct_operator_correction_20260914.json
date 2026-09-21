@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-026",
+  "captured_date": "2026-09-14",
+  "source": "operator_manual_measurement_correction",
+  "status": "accepted_demo_single_measurement",
+  "measurement": {
+    "nominal_gripper_pct": 0.0,
+    "originally_reported_gap_mm": 0.96,
+    "corrected_gap_mm": 9.6,
+    "correction_type": "decimal_point_reading_error",
+    "measurement_plane_mm_behind_hard_fingertip": 20.0,
+    "surfaces": "uncompressed_inner_pad_surfaces",
+    "repeat_count": 1
+  },
+  "operator_confirmation": {
+    "eeprom_contents_at_measurement": "correct",
+    "eeprom_change_required_for_this_correction": false
+  },
+  "profile_updated": false,
+  "reason_profile_not_updated": "The demo gap table is written only after 0/25/50/75/100 percent points are complete and strictly monotonic."
+}

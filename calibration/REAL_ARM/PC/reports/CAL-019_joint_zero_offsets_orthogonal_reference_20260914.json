@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-019",
+  "status": "VERIFIED_FOR_DEMO",
+  "captured_at": "2026-09-14",
+  "parameter": "joints.zero_offset_deg",
+  "formula": "zero_offset_deg = q_reference_deg - joint_sign * q_bus_deg",
+  "reference": {
+    "name": "urdf_orthogonal_joint_center_reference",
+    "q_reference_deg": [0.0, -13.968, 16.175, -2.207, 0.0],
+    "geometry_mm": {
+      "servo_2_to_3": {
+        "forward": 0.0,
+        "vertical_up": 116.0
+      },
+      "servo_3_to_4": {
+        "forward": 135.0,
+        "vertical_up": 0.0
+      },
+      "servo_4_to_5": {
+        "forward": 61.1,
+        "lateral_positive_y": 18.1,
+        "vertical_up": 0.0
+      }
+    },
+    "warning": "Known nonzero URDF pose. It is neither URDF q=[0]*5 nor the LeRobot follower_zero.webp manual-calibration pose."
+  },
+  "joint_sign": [1, 1, 1, 1, -1],
+  "candidate_zero_offset_deg": [
+    [-2.3736263736263736, -11.946021978021978, 6.196978021978023, -4.360846153846154, 0.9230769230769231],
+    [1.4945054945054945, -12.913054945054945, 8.131043956043957, -4.360846153846154, 1.3626373626373627],
+    [2.3736263736263736, -13.704263736263735, 9.801373626373627, -6.910296703296703, -0.2197802197802198]
+  ],
+  "estimator": "componentwise_median_of_three_independent_manual_repositions",
+  "result": {
+    "zero_offset_deg": [1.4945054945054945, -12.913054945054945, 8.131043956043957, -4.360846153846154, 0.9230769230769231],
+    "component_spread_deg": [4.747252747252747, 1.7582417582417573, 3.604395604395604, 2.5494505494505493, 1.5824175824175826],
+    "component_mad_deg": [0.8791208791208791, 0.7912087912087902, 1.6703296703296697, 0.0, 0.43956043956043955]
+  },
+  "scope_and_uncertainty": {
+    "accepted_scope": "demo_only",
+    "reason": "The user explicitly limited calibration/REAL_ARM/PC to a usable demo. Manual reposition spread exceeds a 1 degree precision target on joints 1, 3, and 4, so this result must not be represented as precision calibration.",
+    "maximum_component_spread_deg": 4.747252747252747,
+    "upgrade_requirement": "Use a rigid angle fixture or external pose measurement and repeat CAL-019 before precision trajectories or quantitative FK validation."
+  },
+  "checks": {
+    "three_independent_repositions": true,
+    "ten_static_samples_per_reposition": true,
+    "all_current_joint_static_spans_at_most_one_count": true,
+    "all_six_torque_disabled_before_and_after_each_reposition": true,
+    "stable_port_and_usb_identity_checked_each_time": true,
+    "write_instructions_sent": 0,
+    "motion_instructions_sent": 0,
+    "eeprom_written": false
+  },
+  "evidence": [
+    {
+      "path": "../raw/cal019_urdf_orthogonal_reference_repeat1_20260914.json",
+      "sha256": "4ba3169d22a72ef7110a76e0b9654e747acaa9b9d6af28278c6932562b6d8247"
+    },
+    {
+      "path": "../raw/cal019_urdf_orthogonal_reference_repeat2_20260914.json",
+      "sha256": "7da0e1a5c44db061d264384b45a9bce000ecda367aaeea3828ffaf18c6469740"
+    },
+    {
+      "path": "../raw/cal019_urdf_orthogonal_reference_repeat3_20260914.json",
+      "sha256": "765cf213af628275b7498ebb8e1454f967b235e43a2e2e193eadcca484b1b9a0"
+    }
+  ],
+  "integration": {
+    "joint_sign_report": "CAL-018_joint_signs_orthogonal_reference_20260914.json",
+    "joint_sign_report_sha256": "3d3db6b3fa1f0c9df9de4a96a357ad081fcd504718f330a0977fecc6e35340fe",
+    "reader_sha256": "a8506c3abdd0aa720b296713719a84c316eebd95447dfd642c0edc3ed2a8b62c",
+    "profile_sha256_before": "ec1de31a39599552c4dbbc494206d558cc1a404a215a33f56133f3b290fa8dce",
+    "profile_sha256_after": "301bde3178fd213de9a4b5883ef22a4c1f87bbc5e373601dbda5bf4816fc4cfa",
+    "profile_field_written": "joints.zero_offset_deg"
+  }
+}

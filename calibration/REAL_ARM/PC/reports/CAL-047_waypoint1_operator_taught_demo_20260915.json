@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-047",
+  "parameter": "workspace.safe_waypoints_deg",
+  "date": "2026-09-15",
+  "status": "CONFIRMED_FOR_DEMO_PENDING_GROUP_MOTION_TEST",
+  "profile_changed": true,
+  "profile_sha256_before": "cb9e4116648a74140b7566d64239a853858bd71fc76c37195de30fef2b272bce",
+  "profile_sha256_after": "6a971b5c19b5316a56702980968103f9de0f998c8520758b0ccb47835b188bd1",
+  "minimum_waypoint_count_required": 1,
+  "configured_waypoint_count": 1,
+  "safe_waypoints_deg": [
+    [
+      6.681318681318682,
+      -50.451516483516485,
+      10.900274725274727,
+      62.05673626373627,
+      1.054945054945055
+    ]
+  ],
+  "attempts": [
+    {
+      "evidence": "../raw/cal047_waypoint1_operator_taught_20260915.json",
+      "q_urdf_deg": [
+        6.681318681318682,
+        -50.53942857142857,
+        10.81236263736264,
+        77.52926373626374,
+        1.2307692307692308
+      ],
+      "decision": "rejected",
+      "reason": "lower_arm_02 and gripper_02 conservative capsules overlapped by 2.6 mm at the taught pose"
+    },
+    {
+      "evidence": "../raw/cal047_waypoint1_operator_taught_attempt2_20260915.json",
+      "q_urdf_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "decision": "accepted_for_demo_static_validation",
+      "samples": 15,
+      "raw_position_static_span": [0, 0, 0, 0, 0, 0],
+      "torque_enabled_before_and_after": [0, 0, 0, 0, 0, 0]
+    }
+  ],
+  "checks": {
+    "stable_serial_verified_before_each_read": true,
+    "resolved_port": "/dev/ttyACM0",
+    "usb_identity": "1a86:55d3 serial 5B14114904",
+    "all_joints_inside_effective_limits": true,
+    "collision_check_gripper_pct": [0.0, 0.6437768240343348, 55.0, 70.0, 100.0],
+    "accepted_pose_collision_free_all_openings": true,
+    "home_to_waypoint_and_reverse_checked_gripper_pct": [0.0, 55.0, 70.0, 100.0],
+    "home_to_waypoint_and_reverse_collision_free": true,
+    "motion_instructions_sent": 0,
+    "eeprom_written": false
+  },
+  "scope": "One ordered waypoint, satisfying K>=1 for the current REAL_ARM/PC demo while TCP/vision workcell routes are deferred.",
+  "deferred_validation": "Run the CAL-046/047 unloaded low-speed round trip as one group test, then retain demo-load route validation for the motion calibration group."
+}

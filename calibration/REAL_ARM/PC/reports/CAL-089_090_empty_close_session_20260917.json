@@ -1,0 +1,559 @@
+{
+  "schema_version": 1,
+  "parameter_ids": [
+    "CAL-089",
+    "CAL-090"
+  ],
+  "status": "DEMO_INTEGRATED_CONFIRMED",
+  "required_confirmation": "批准，CAL-089/090空爪首轮就绪",
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256": "1ea15d62d288bc02f56ccabe09593f60d68ad3fd6f5f37632589995dc7c18bb4",
+  "reference_arm_pose_report": "CAL-085_fixture_stronger_contact_attempt1_20260917.json",
+  "expected_initial_position_raw": 1806,
+  "initial_position_max_deviation_raw": 10,
+  "servo_id": 6,
+  "fixed_open_target_raw": 1569,
+  "fixed_close_target_raw": 1499,
+  "closed_goal_definition": "Existing CAL-017 demo0pct safe command endpoint, not EEPROM lower limit1458. Never command below1499 or change endpoints to force success.",
+  "illustrative_command_path_raw": [
+    1806,
+    1569,
+    1499
+  ],
+  "incremental_command_speed_pct_s": 1,
+  "sample_fps": 30,
+  "initial_goal": "Fresh readback position; mark torque cleanup before first goal",
+  "gripper_static_span_max_raw": 2,
+  "arm_static_span_max_raw": 2,
+  "arm_reference_max_deviation_raw": 10,
+  "sram_settings": {
+    "Acceleration": 5,
+    "Goal_Time": 0,
+    "Goal_Velocity": 0,
+    "Torque_Limit": 500
+  },
+  "max_tracking_error_raw": 10,
+  "feedback_bounds_raw": [
+    1499,
+    2897
+  ],
+  "all_phase_trial_abort_current_ma": 20,
+  "current_comparison": "strict abs decoded current >20mA;6.5mA/raw current first triggering count4=26mA. Trial bound only, profile remains220/450; do not transplant as certified safety.",
+  "trial_timeout_s": 30,
+  "maximum_final_hold_s": 0.3,
+  "final_hold_frames": 9,
+  "final_hold_static_span_max_raw": 2,
+  "accepted_final_feedback_range_raw": [
+    1499,
+    1509
+  ],
+  "first_approved_cycles": 1,
+  "suggested_demo_total_cycles": 3,
+  "formal_protocol_total_cycles": 20,
+  "between_cycle_motion_authorized": false,
+  "arm_joint_goal_commands": 0,
+  "eeprom_written": false,
+  "profile_written": true,
+  "proposed_report": "CAL-089_090_empty_close_repeat1_attempt1_20260917.json",
+  "operator_requirements": "Remove all objects from jaw path, independently support all arm axes in source-supported pose, no fingers in any pinch zones, accessible immediate12V cut. Only jaw moves; keep12V/base mounting. Today ambient temperature unmeasured.",
+  "operator_observation_required": "Observe no obstruction/collision/unexpected motion; no-abnormality does not measure pressure or slip.",
+  "endpoint_observation_processing": "Terminal per-cycle representative is median of9stable frames, not9independent cycles. Reject feedback outside calibrated range without clipping, keep raw failure evidence. If error>10, current>20, instability, transaction/timing/timeout anomaly, unload6first and verify all6off; no deeper goals or automatic retry.",
+  "derivation_after_sufficient_demo_cycles": {
+    "empty_closed_pct": "round(P95(per-cycle median gripper_pct),2), matching current fitter",
+    "empty_tol_pct": "round(population_std(per-cycle median gripper_pct)+1.0,2), matching current fitter; with one cycle cannot estimate repeatability",
+    "prerequisite": "At least3separately approved successful demo cycles; formal20repeats remain unfulfilled. Check CAL-084 lowest contact pct > empty_closed_pct+empty_tol_pct and table domain before integration."
+  },
+  "scope": "Only first diagnostic cycle approved by exact readiness. No fixed whole-grasp test, new-arm pose, firmwareEEPROM change, production gate bypass, or extra hold/close.",
+  "limitations": [
+    "Powered endpoint repeatability cannot be computed from manual read-only endpoint1495/1499;1495is outside current pct mapping and must not be clipped to0.",
+    "Raw1806CAL-085 is about21.96pct, not full empty-close.",
+    "Low-speed1pct/s results do not certify configured15pct/s or derive full travel timeout.",
+    "No full tests until a complete accepted subgroup; CAL-084~088 conditional evidence not treated as accepted."
+  ],
+  "operator_confirmation": "批准，CAL-089/090空爪首轮就绪",
+  "powered_cycles": [
+    {
+      "repeat": 1,
+      "attempt": 1,
+      "report": "CAL-089_090_empty_close_repeat1_attempt1_20260917.json",
+      "status": "CONFIRMED_NO_ABNORMALITY",
+      "operator_observation": "无异常",
+      "actual_command_path_raw": [
+        1805,
+        1569,
+        1499
+      ],
+      "terminal_representative_raw": 1502,
+      "terminal_representative_pct": 0.2145922746781116,
+      "terminal_span_raw": 0,
+      "peak_abs_current_ma": 6.5,
+      "max_tracking_error_raw": 7,
+      "powered_duration_s": 22.23721070299507,
+      "final_hold_observed_duration_s": 0.2683300969947595,
+      "gripper_motion_commands_sent": 659,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_sram_settings": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "test_sram_settings": {
+        "Acceleration": 5,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "sram_settings_after": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "gripper_position_after_torque_off_raw": 1502,
+      "parameters_fitted": false,
+      "independent_cycles": 1
+    },
+    {
+      "repeat": 2,
+      "attempt": 1,
+      "report": "CAL-089_090_empty_close_repeat2_attempt1_20260917.json",
+      "status": "FAIL",
+      "failure": "RuntimeError: Initial/source pose not stable/approved; no writes",
+      "operator_observation": null,
+      "raw_position_static_span": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "raw_position_by_sample": [
+        [
+          842,
+          921,
+          3085,
+          2384,
+          2042,
+          1502
+        ],
+        [
+          842,
+          921,
+          3085,
+          2384,
+          2042,
+          1502
+        ],
+        [
+          842,
+          921,
+          3085,
+          2384,
+          2042,
+          1502
+        ],
+        [
+          842,
+          921,
+          3085,
+          2384,
+          2042,
+          1502
+        ],
+        [
+          842,
+          921,
+          3085,
+          2384,
+          2042,
+          1502
+        ],
+        [
+          842,
+          921,
+          3085,
+          2384,
+          2042,
+          1502
+        ],
+        [
+          842,
+          921,
+          3085,
+          2384,
+          2042,
+          1502
+        ],
+        [
+          842,
+          921,
+          3085,
+          2384,
+          2042,
+          1502
+        ],
+        [
+          842,
+          921,
+          3085,
+          2384,
+          2042,
+          1502
+        ],
+        [
+          842,
+          921,
+          3085,
+          2384,
+          2042,
+          1502
+        ]
+      ],
+      "arm_deviation_from_reference_raw": [
+        1,
+        59,
+        2,
+        0,
+        2
+      ],
+      "gripper_raw": 1502,
+      "gripper_motion_commands_sent": 0,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "sram_written": false,
+      "eeprom_written": false,
+      "profile_written": false,
+      "independent_successful_cycles": 0
+    },
+    {
+      "repeat": 2,
+      "attempt": 2,
+      "report": "CAL-089_090_empty_close_repeat2_attempt2_20260917.json",
+      "status": "CONFIRMED_NO_ABNORMALITY",
+      "operator_observation": "无异常",
+      "actual_command_path_raw": [
+        1502,
+        1569,
+        1499
+      ],
+      "terminal_representative_raw": 1502,
+      "terminal_representative_pct": 0.2145922746781116,
+      "terminal_span_raw": 1,
+      "independent_cycles": 1,
+      "peak_abs_current_ma": 6.5,
+      "max_tracking_error_raw": 8,
+      "terminal_current_counts_ma": {
+        "0.0": 9
+      },
+      "empty_parameters_fitted": false,
+      "repeatability_verified": false,
+      "powered_duration_s": 10.136828457994852,
+      "final_hold_observed_duration_s": 0.2684534929867368,
+      "gripper_motion_commands_sent": 296,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_sram_settings": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "test_sram_settings": {
+        "Acceleration": 5,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "sram_settings_after": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "gripper_position_after_torque_off_raw": 1502,
+      "operator_confirmed_arm2_pose_change": {
+        "operator_confirmation": "是我主动调整的，无视即可",
+        "servo_id": 2,
+        "old_reference_raw": 862,
+        "new_reference_raw": 921,
+        "max_deviation_raw": 10,
+        "source_readonly_report": "CAL-089_090_empty_close_repeat2_attempt1_20260917.json",
+        "scope": "Treat old axis2difference59 as intentional operator placement. Rebaseline axis2only to observed921; retain all-six staticspan2/rawvalid-domain, other source-axis deviation10 and all jaw guards. No arm goals/EEPROM/endpoint changes; remaining2/3preapproval retained.",
+        "mixed_arm_pose_demo_dataset": true
+      }
+    },
+    {
+      "repeat": 3,
+      "attempt": 1,
+      "report": "CAL-089_090_empty_close_repeat3_attempt1_20260917.json",
+      "status": "CONFIRMED_NO_ABNORMALITY",
+      "operator_observation": "无异常",
+      "actual_command_path_raw": [
+        1502,
+        1569,
+        1499
+      ],
+      "terminal_representative_raw": 1502,
+      "terminal_representative_pct": 0.2145922746781116,
+      "terminal_span_raw": 0,
+      "independent_cycles": 1,
+      "peak_abs_current_ma": 13,
+      "max_tracking_error_raw": 8,
+      "terminal_current_counts_ma": {
+        "0.0": 9
+      },
+      "empty_parameters_fitted": false,
+      "repeatability_verified": false,
+      "powered_duration_s": 10.13789973501116,
+      "final_hold_observed_duration_s": 0.2683758440252859,
+      "gripper_motion_commands_sent": 296,
+      "joint_servo_motion_commands_sent": 0,
+      "torque_enabled_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "original_sram_settings": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "test_sram_settings": {
+        "Acceleration": 5,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "sram_settings_after": {
+        "Acceleration": 0,
+        "Goal_Time": 0,
+        "Goal_Velocity": 0,
+        "Torque_Limit": 500
+      },
+      "gripper_position_after_torque_off_raw": 1502,
+      "operator_confirmed_arm2_pose_change": {
+        "operator_confirmation": "是我主动调整的，无视即可",
+        "servo_id": 2,
+        "old_reference_raw": 862,
+        "new_reference_raw": 921,
+        "max_deviation_raw": 10,
+        "source_readonly_report": "CAL-089_090_empty_close_repeat2_attempt1_20260917.json",
+        "scope": "Treat old axis2difference59 as intentional operator placement. Rebaseline axis2only to observed921; retain all-six staticspan2/rawvalid-domain, other source-axis deviation10 and all jaw guards. No arm goals/EEPROM/endpoint changes; remaining2/3preapproval retained.",
+        "mixed_arm_pose_demo_dataset": true
+      }
+    }
+  ],
+  "cumulative_gripper_goal_commands": 4978,
+  "remaining_demo_cycles": 0,
+  "repeat_motion_authorized": false,
+  "proposed_repeat2": {
+    "status": "ATTEMPT2_PASSED_PENDING_OPERATOR_OBSERVATION",
+    "required_confirmation": "是我主动调整的，无视即可",
+    "repeat": 2,
+    "servo_id": 6,
+    "reference_trial_report": "CAL-089_090_empty_close_repeat1_attempt1_20260917.json",
+    "profile_sha256": "1ea15d62d288bc02f56ccabe09593f60d68ad3fd6f5f37632589995dc7c18bb4",
+    "expected_initial_position_raw": 1502,
+    "initial_position_max_deviation_raw": 5,
+    "initial_feedback_must_be_in_calibrated_domain": true,
+    "accepted_initial_feedback_range_raw": [
+      1499,
+      1507
+    ],
+    "illustrative_command_path_raw": [
+      1502,
+      1569,
+      1499
+    ],
+    "fixed_open_target_raw": 1569,
+    "fixed_close_target_raw": 1499,
+    "incremental_command_speed_pct_s": 1,
+    "sample_fps": 30,
+    "gripper_static_span_max_raw": 2,
+    "arm_static_span_max_raw": 2,
+    "arm_reference_max_deviation_raw": 10,
+    "reference_arm_pose_report": "CAL-089_090_empty_close_repeat1_attempt1_20260917.json",
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "max_tracking_error_raw": 10,
+    "feedback_bounds_raw": [
+      1499,
+      2897
+    ],
+    "all_phase_trial_abort_current_ma": 20,
+    "trial_timeout_s": 30,
+    "maximum_final_hold_s": 0.3,
+    "final_hold_frames": 9,
+    "final_hold_static_span_max_raw": 2,
+    "accepted_final_feedback_range_raw": [
+      1499,
+      1509
+    ],
+    "approved_cycle_count": 1,
+    "arm_joint_goal_commands": 0,
+    "report": "CAL-089_090_empty_close_repeat2_attempt2_20260917.json",
+    "operator_requirements": "Empty jaw; independently support arm unchanged from repeat1, hands clear of all pinch zones, immediate12V cut. No arm goals or manual reposition required.2axis raw862 previously3below minimum: keep evidence visible, not arm-motion limit acceptance; no limit changes.",
+    "scope": "Exactly one repeat2 with unchanged targets/guards;repeat3 separately preapproved only after safe repeat2 cleanup. No extra closure/retry/EEPROM/profile writes.",
+    "limitations": "1additional independently approved cycle; still not formal20repeats,15pct_s safety or whole-grasp acceptance.",
+    "previously_proposed_confirmation": "批准，CAL-089/090第2轮空爪就绪",
+    "attempt": 2,
+    "operator_confirmed_arm2_pose_change": {
+      "operator_confirmation": "是我主动调整的，无视即可",
+      "servo_id": 2,
+      "old_reference_raw": 862,
+      "new_reference_raw": 921,
+      "max_deviation_raw": 10,
+      "source_readonly_report": "CAL-089_090_empty_close_repeat2_attempt1_20260917.json",
+      "scope": "Treat old axis2difference59 as intentional operator placement. Rebaseline axis2only to observed921; retain all-six staticspan2/rawvalid-domain, other source-axis deviation10 and all jaw guards. No arm goals/EEPROM/endpoint changes; remaining2/3preapproval retained.",
+      "mixed_arm_pose_demo_dataset": true
+    }
+  },
+  "repeat2_and_repeat3_approval": {
+    "operator_confirmation": "第二轮批准，第三轮无需申请直接执行即可",
+    "approved_repeats": [
+      2,
+      3
+    ],
+    "required_intercycle_condition": "Repeat2 automatic capture passes, all6torqueoff and SRAMrestored; repeat3 new preflight passes. Any failure blocks later cycle, no automatic retry. Final physical observations are still pending.",
+    "no_additional_readiness_request": true
+  },
+  "proposed_repeat3": {
+    "status": "PASS_PENDING_OPERATOR_OBSERVATION",
+    "required_confirmation": "是我主动调整的，无视即可",
+    "repeat": 3,
+    "servo_id": 6,
+    "reference_trial_report": "CAL-089_090_empty_close_repeat2_attempt2_20260917.json",
+    "profile_sha256": "1ea15d62d288bc02f56ccabe09593f60d68ad3fd6f5f37632589995dc7c18bb4",
+    "expected_initial_position_raw": 1502,
+    "initial_position_max_deviation_raw": 5,
+    "initial_feedback_must_be_in_calibrated_domain": true,
+    "accepted_initial_feedback_range_raw": [
+      1499,
+      1507
+    ],
+    "illustrative_command_path_raw": [
+      1502,
+      1569,
+      1499
+    ],
+    "fixed_open_target_raw": 1569,
+    "fixed_close_target_raw": 1499,
+    "incremental_command_speed_pct_s": 1,
+    "sample_fps": 30,
+    "gripper_static_span_max_raw": 2,
+    "arm_static_span_max_raw": 2,
+    "arm_reference_max_deviation_raw": 10,
+    "reference_arm_pose_report": "CAL-089_090_empty_close_repeat2_attempt2_20260917.json",
+    "sram_settings": {
+      "Acceleration": 5,
+      "Goal_Time": 0,
+      "Goal_Velocity": 0,
+      "Torque_Limit": 500
+    },
+    "max_tracking_error_raw": 10,
+    "feedback_bounds_raw": [
+      1499,
+      2897
+    ],
+    "all_phase_trial_abort_current_ma": 20,
+    "trial_timeout_s": 30,
+    "maximum_final_hold_s": 0.3,
+    "final_hold_frames": 9,
+    "final_hold_static_span_max_raw": 2,
+    "accepted_final_feedback_range_raw": [
+      1499,
+      1509
+    ],
+    "approved_cycle_count": 1,
+    "arm_joint_goal_commands": 0,
+    "report": "CAL-089_090_empty_close_repeat3_attempt1_20260917.json",
+    "operator_requirements": "Empty jaw; independently support arm unchanged from repeat1, hands clear of all pinch zones, immediate12V cut. No arm goals or manual reposition required.2axis raw862 previously3below minimum: keep evidence visible, not arm-motion limit acceptance; no limit changes.",
+    "scope": "Third cycle explicitly preapproved, now second passed/all6off/SRAMrestored. Exactly one cycle after fresh unchanged guards; no further loops/retry/EEPROM/profile writes.",
+    "limitations": "1additional independently approved cycle; still not formal20repeats,15pct_s safety or whole-grasp acceptance.",
+    "previously_proposed_confirmation": "批准，CAL-089/090第2轮空爪就绪",
+    "attempt": 1,
+    "operator_confirmed_arm2_pose_change": {
+      "operator_confirmation": "是我主动调整的，无视即可",
+      "servo_id": 2,
+      "old_reference_raw": 862,
+      "new_reference_raw": 921,
+      "max_deviation_raw": 10,
+      "source_readonly_report": "CAL-089_090_empty_close_repeat2_attempt1_20260917.json",
+      "scope": "Treat old axis2difference59 as intentional operator placement. Rebaseline axis2only to observed921; retain all-six staticspan2/rawvalid-domain, other source-axis deviation10 and all jaw guards. No arm goals/EEPROM/endpoint changes; remaining2/3preapproval retained.",
+      "mixed_arm_pose_demo_dataset": true
+    }
+  },
+  "authorization_note": "All three successful demo cycles confirmed no abnormality; duplicate replies add no samples. All previous motion authorizations consumed; no further motion or retry.",
+  "operator_confirmed_arm2_pose_change": {
+    "operator_confirmation": "是我主动调整的，无视即可",
+    "servo_id": 2,
+    "old_reference_raw": 862,
+    "new_reference_raw": 921,
+    "max_deviation_raw": 10,
+    "source_readonly_report": "CAL-089_090_empty_close_repeat2_attempt1_20260917.json",
+    "scope": "Treat old axis2difference59 as intentional operator placement. Rebaseline axis2only to observed921; retain all-six staticspan2/rawvalid-domain, other source-axis deviation10 and all jaw guards. No arm goals/EEPROM/endpoint changes; remaining2/3preapproval retained.",
+    "mixed_arm_pose_demo_dataset": true
+  },
+  "conditional_candidates": {
+    "empty_closed_pct": 0.21,
+    "empty_tol_pct": 1,
+    "source_terminal_representatives_raw": [
+      1502,
+      1502,
+      1502
+    ],
+    "independent_successful_cycles": 3,
+    "formal20cycles_complete": false,
+    "operator_observation_pending_repeats": [],
+    "profile_written": true,
+    "mixed_supported_arm_poses_user_confirmed": true
+  },
+  "operator_final_observation": "无异常",
+  "operator_duplicate_reply_note": "Repeated no-abnormality messages confirm the two queried cycles; do not increase independent repeat count.",
+  "integration": {
+    "profile_sha256_before": "1ea15d62d288bc02f56ccabe09593f60d68ad3fd6f5f37632589995dc7c18bb4",
+    "profile_sha256_after": "aabb213608b99f707433f1c7add925fcd7b0972c53aafbb7acdacee83a6af85d",
+    "empty_closed_pct": 0.21,
+    "empty_tol_pct": 1,
+    "empty_boundary_pct": 1.21,
+    "lowest_contact_gate_pct": 10.032362459546924,
+    "table_coverage_check": "PASS",
+    "calibration_loader_check": "PASS",
+    "real_loader_still_rejects_draft": true,
+    "real_loader_reason": "status: mode=real 要求 status=verified，实际 'draft'",
+    "report": "CAL-089_090_demo_integration_final_20260917.json",
+    "scope": "Exactly two profile empty fields updated; original capture fingerprint retained. Three low-speed mixed-support demo cycles, not formal20/fullspeed/wholegrasp acceptance."
+  }
+}

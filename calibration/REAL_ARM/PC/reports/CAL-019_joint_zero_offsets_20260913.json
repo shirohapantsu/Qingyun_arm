@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-019",
+  "status": "RETRACTED_PENDING_REFERENCE_CLARIFICATION",
+  "scope": "calibration_REAL_ARM_PC_demo",
+  "completed_at": "2026-09-13",
+  "parameter": "joints.zero_offset_deg",
+  "joint_order": [
+    "shoulder_pan",
+    "shoulder_lift",
+    "elbow_flex",
+    "wrist_flex",
+    "wrist_roll"
+  ],
+  "hardware": {
+    "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+    "resolved_port": "/dev/ttyACM0",
+    "usb_identity": {
+      "vid": "1a86",
+      "pid": "55d3",
+      "serial": "5B14114904"
+    },
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_to_workspace",
+    "servo_ids": [1, 2, 3, 4, 5],
+    "model_numbers": [777, 777, 777, 777, 777],
+    "torque_enabled_by_motor": [0, 0, 0, 0, 0, 0]
+  },
+  "method": {
+    "reference": "official SO-101 follower zero pose and repository-bound URDF q_reference=[0,0,0,0,0] deg",
+    "official_reference_url": "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot/follower_zero.webp",
+    "motion_source": "operator_manual_positioning_with_torque_disabled",
+    "bus_access": "read_only",
+    "independent_repositions": 3,
+    "samples_per_reposition": 10,
+    "joint_sign_from_CAL_018": [1, 1, 1, 1, 1],
+    "formula": "zero_offset_deg = q_reference_deg - joint_sign * q_bus_deg",
+    "aggregation": "coordinate-wise median across three independent manual zero-pose alignments"
+  },
+  "zero_pose_geometry_mm": {
+    "servo_2_to_3": {
+      "forward": 28.0,
+      "vertical_up": 112.57
+    },
+    "servo_3_to_4": {
+      "forward": 134.9,
+      "vertical_up": 5.2
+    },
+    "servo_4_to_5": {
+      "forward": 61.1,
+      "lateral": 18.1,
+      "vertical_up": 0.0,
+      "horizontal_distance": 63.724
+    }
+  },
+  "repetitions": [
+    {
+      "repeat_index": 1,
+      "joint_raw_representative": [2039, 3110, 1010, 1953, 2070],
+      "static_span_counts": [1, 1, 1, 1, 0, 0],
+      "zero_offset_deg_candidate": [
+        2.813186813187,
+        -88.879120879121,
+        82.241758241758,
+        0.659340659341,
+        -1.978021978022
+      ]
+    },
+    {
+      "repeat_index": 2,
+      "joint_raw_representative": [2040, 3124, 997, 1980, 2054],
+      "static_span_counts": [0, 0, 0, 0, 0, 0],
+      "zero_offset_deg_candidate": [
+        2.725274725275,
+        -90.10989010989,
+        83.384615384615,
+        -1.714285714286,
+        -0.571428571429
+      ]
+    },
+    {
+      "repeat_index": 3,
+      "joint_raw_representative": [2084, 3119, 1003, 1982, 2055],
+      "static_span_counts": [0, 0, 0, 0, 0, 0],
+      "zero_offset_deg_candidate": [
+        -1.142857142857,
+        -89.67032967033,
+        82.857142857143,
+        -1.89010989011,
+        -0.659340659341
+      ]
+    }
+  ],
+  "statistics": {
+    "coordinate_range_deg": [
+      3.956043956044,
+      1.230769230769,
+      1.142857142857,
+      2.549450549451,
+      1.406593406593
+    ],
+    "coordinate_median_absolute_deviation_deg": [
+      0.087912087912,
+      0.43956043956,
+      0.527472527473,
+      0.175824175824,
+      0.087912087912
+    ],
+    "observed_outliers": [
+      "shoulder_pan repeat 3 differs from the mutually consistent repeats 1 and 2",
+      "wrist_flex repeat 1 differs from the mutually consistent repeats 2 and 3"
+    ]
+  },
+  "final_value": [
+    2.725274725275,
+    -89.67032967033,
+    82.857142857143,
+    -1.714285714286,
+    -0.659340659341
+  ],
+  "checks": {
+    "all_observations_inside_official_raw_ranges": true,
+    "stable_port_identity_checked_before_each_repetition": true,
+    "all_six_torque_disabled_before_and_after_each_repetition": true,
+    "all_static_spans_at_most_one_count": true,
+    "robust_two_of_three_agreement_present_for_each_joint": true,
+    "formal_multi_angle_geometric_fit_completed": false,
+    "write_instructions_sent": 0,
+    "motion_instructions_sent": 0,
+    "eeprom_written": false
+  },
+  "evidence": [
+    {
+      "raw": "../raw/cal019_zero_pose_repeat1_20260913.json",
+      "sha256": "e82ea0c0e8cbe41a0e1a9b23598b217831250c926cd80aea9d86c91c8e817aa6"
+    },
+    {
+      "raw": "../raw/cal019_zero_pose_repeat2_20260913.json",
+      "sha256": "3be083c40259bd2cab4bbd46c525aafa3a9aa77af6534f116bd4a73aafdd2433"
+    },
+    {
+      "raw": "../raw/cal019_zero_pose_repeat3_20260913.json",
+      "sha256": "c0184d0536d9dca7471159a2be9f4eaae771527f88022f434d92bb4148034b6f"
+    }
+  ],
+  "implementation": {
+    "profile": "../profile.json",
+    "profile_sha256_after_integration": "42ecedf806d03a2c8a6784f63f7c2a5c374a5ccbc5b3ab5df7d423236d4546ce",
+    "runtime_joint_mapping_enabled": false,
+    "CAL_020_derived_from_authoritative_motor_calibration": false
+  },
+  "retraction": {
+    "retracted_at": "2026-09-13",
+    "reason": "The operator reported that the physical servo-2-to-servo-3 center line was vertical with servo 3 above servo 2 while the integrated mapping labeled the latest pose -189.714286 deg. The URDF predicts that geometry near q2=0 deg, not -189.714286 deg. The external reference used for the three zero-pose captures must therefore be clarified before integration.",
+    "profile_zero_offset_deg_restored_to_null": true,
+    "profile_sha256_after_retraction": "fa4594ebed194446e3900e62219f6ce4caa0c0e751f1a71a34eb2e829589f90c",
+    "raw_evidence_preserved": true
+  },
+  "limitations": [
+    "Accepted only for the current demo scope requested by the operator.",
+    "For formal or precision use, replace this single-pose manual alignment with multi-angle external geometric references and independent FK validation."
+  ]
+}

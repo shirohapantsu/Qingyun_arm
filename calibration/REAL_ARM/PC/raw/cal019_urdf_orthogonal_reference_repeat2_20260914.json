@@ -1,0 +1,308 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-019",
+  "status": "CALIBRATING",
+  "captured_at": "2026-09-14T13:26:01.498154+08:00",
+  "source": "urdf_known_geometry_pose_hardware_read_only",
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256": "ec1de31a39599552c4dbbc494206d558cc1a404a215a33f56133f3b290fa8dce",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "environment": {
+    "power": "12 V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_to_workspace"
+  },
+  "fixture_id": "urdf_orthogonal_joint_center_reference",
+  "repeat_index": 2,
+  "reference_definition": "repository-bound so101_new_calib.urdf orthogonal joint-center reference; this is a known nonzero URDF pose, not q=[0]*5 and not the LeRobot follower_zero.webp manual-calibration pose",
+  "reference_warning": "Known nonzero URDF reference pose; do not use follower_zero.webp or relabel this pose as q=[0]*5.",
+  "orthogonal_joint_center_reference": {
+    "name": "urdf_orthogonal_joint_center_reference",
+    "q_reference_deg": [
+      0.0,
+      -13.968,
+      16.175,
+      -2.207,
+      0.0
+    ],
+    "geometry_mm": {
+      "servo_2_to_3": {
+        "forward": 0.0,
+        "vertical_up": 116.0
+      },
+      "servo_3_to_4": {
+        "forward": 135.0,
+        "vertical_up": 0.0
+      },
+      "servo_4_to_5": {
+        "forward": 61.1,
+        "lateral_positive_y": 18.1,
+        "vertical_up": 0.0
+      }
+    },
+    "warning": "Known nonzero URDF reference pose; do not relabel as q=[0]*5 or as the LeRobot follower_zero.webp pose."
+  },
+  "urdf_zero_pose_geometry_mm": {
+    "joint_centers_in_base": {
+      "servo_1": [
+        38.8353,
+        0.0,
+        62.4
+      ],
+      "servo_2": [
+        69.2345,
+        -18.2778,
+        116.6
+      ],
+      "servo_3": [
+        97.2344,
+        -18.2778,
+        229.17
+      ],
+      "servo_4": [
+        232.1344,
+        -18.2773,
+        234.37
+      ],
+      "servo_5": [
+        293.2344,
+        -0.1773,
+        234.37
+      ]
+    },
+    "servo_2_to_3": {
+      "forward": 28.0,
+      "vertical_up": 112.57,
+      "center_distance": 116.000021,
+      "forward_from_vertical_deg": 13.969,
+      "exactly_vertical_up_requires_q2_deg": -13.969
+    },
+    "servo_3_to_4": {
+      "forward": 134.9,
+      "vertical_up": 5.2
+    },
+    "servo_4_to_5": {
+      "forward": 61.1,
+      "lateral": 18.1,
+      "vertical_up": 0.0,
+      "horizontal_distance": 63.724
+    }
+  },
+  "motor_names": [
+    "shoulder_pan",
+    "shoulder_lift",
+    "elbow_flex",
+    "wrist_flex",
+    "wrist_roll",
+    "gripper"
+  ],
+  "ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "model_numbers": [
+    777,
+    777,
+    777,
+    777,
+    777,
+    777
+  ],
+  "torque_enabled_by_motor": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "samples_per_pose": 10,
+  "pose": {
+    "captured_at": "2026-09-14T13:26:01.019304+08:00",
+    "raw_position_by_sample": [
+      [
+        2054,
+        2087,
+        2037,
+        1986,
+        2063,
+        1490
+      ],
+      [
+        2054,
+        2087,
+        2037,
+        1986,
+        2063,
+        1490
+      ],
+      [
+        2054,
+        2087,
+        2037,
+        1986,
+        2063,
+        1490
+      ],
+      [
+        2054,
+        2087,
+        2037,
+        1985,
+        2063,
+        1490
+      ],
+      [
+        2054,
+        2087,
+        2037,
+        1985,
+        2063,
+        1490
+      ],
+      [
+        2054,
+        2087,
+        2037,
+        1985,
+        2063,
+        1490
+      ],
+      [
+        2054,
+        2087,
+        2037,
+        1985,
+        2063,
+        1490
+      ],
+      [
+        2054,
+        2087,
+        2037,
+        1985,
+        2063,
+        1490
+      ],
+      [
+        2054,
+        2087,
+        2037,
+        1985,
+        2063,
+        1490
+      ],
+      [
+        2054,
+        2087,
+        2037,
+        1985,
+        2063,
+        1490
+      ]
+    ],
+    "raw_position_representative": [
+      2054,
+      2087,
+      2037,
+      1985,
+      2063,
+      1490
+    ],
+    "raw_position_static_span": [
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "torque_enabled_before": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_after": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "joint_raw_representative": [
+    2054,
+    2087,
+    2037,
+    1985,
+    2063
+  ],
+  "official_raw_ranges": [
+    [
+      718,
+      3424
+    ],
+    [
+      865,
+      3333
+    ],
+    [
+      796,
+      3095
+    ],
+    [
+      729,
+      3192
+    ],
+    [
+      0,
+      4095
+    ]
+  ],
+  "q_bus_deg": [
+    -1.4945054945054945,
+    -1.054945054945055,
+    8.043956043956044,
+    2.153846153846154,
+    1.3626373626373627
+  ],
+  "q_reference_deg": [
+    0.0,
+    -13.968,
+    16.175,
+    -2.207,
+    0.0
+  ],
+  "joint_sign": [
+    1,
+    1,
+    1,
+    1,
+    -1
+  ],
+  "zero_offset_deg_candidate": [
+    1.4945054945054945,
+    -12.913054945054945,
+    8.131043956043957,
+    -4.360846153846154,
+    1.3626373626373627
+  ],
+  "formula": "zero_offset_deg = q_reference_deg - joint_sign * q_bus_deg",
+  "write_instructions_sent": 0,
+  "motion_instructions_sent": 0,
+  "eeprom_written": false
+}

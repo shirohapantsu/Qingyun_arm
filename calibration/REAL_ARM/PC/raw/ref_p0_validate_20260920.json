@@ -1,0 +1,11 @@
+{
+  "pose_label": "P0_validation_repose",
+  "verification": "独立验证采样: 重摆P0, 手机实测 A=0, B=-0.5, C=-2; 链式换算 q2=-13.968+A, q3=16.175+(B-A), q4=-2.207+(C-B); q1=0网格对齐; q5未拧按0。总线换算(新拟合)与参考差≤2.2°",
+  "samples": [
+    {"q_reference_deg": [0.0, -13.968, 15.675, -3.707, 0.0], "approach_direction": "joint_sweep", "sweep_joint_index": 0, "sweep_direction": 0, "fixture_id": "P0_phone_inclinometer_20260920", "load_label": "unloaded"},
+    {"q_reference_deg": [0.0, -13.968, 15.675, -3.707, 0.0], "approach_direction": "joint_sweep", "sweep_joint_index": 1, "sweep_direction": 0, "fixture_id": "P0_phone_inclinometer_20260920", "load_label": "unloaded"},
+    {"q_reference_deg": [0.0, -13.968, 15.675, -3.707, 0.0], "approach_direction": "joint_sweep", "sweep_joint_index": 2, "sweep_direction": 0, "fixture_id": "P0_phone_inclinometer_20260920", "load_label": "unloaded"},
+    {"q_reference_deg": [0.0, -13.968, 15.675, -3.707, 0.0], "approach_direction": "joint_sweep", "sweep_joint_index": 3, "sweep_direction": 0, "fixture_id": "P0_phone_inclinometer_20260920", "load_label": "unloaded"},
+    {"q_reference_deg": [0.0, -13.968, 15.675, -3.707, 0.0], "approach_direction": "joint_sweep", "sweep_joint_index": 4, "sweep_direction": 0, "fixture_id": "P0_phone_inclinometer_20260920", "load_label": "unloaded"}
+  ]
+}

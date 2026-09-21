@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-014",
+  "status": "VERIFIED",
+  "measured_at": "2026-09-12",
+  "source": "hardware",
+  "input": "../raw/cal014_current_zero_20260912.jsonl",
+  "input_sha256": "0bf9997a5273a14c820c21589ffcd120de08c5a294dfaadcc8e603742da99a33",
+  "serial_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "serial_resolved_device": "/dev/ttyACM0",
+  "usb_identity": "1a86:55d3 / 1a86_USB_Single_Serial_5B14114904",
+  "environment": {
+    "motor_supply_v": 12.0,
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_in_work_area",
+    "load_label": "unloaded",
+    "pad_id": "fixed48_moving40_thickness2_flush_tip"
+  },
+  "motor_order": [
+    "shoulder_pan",
+    "shoulder_lift",
+    "elbow_flex",
+    "wrist_flex",
+    "wrist_roll",
+    "gripper"
+  ],
+  "sample_count": 30,
+  "torque_enabled_by_motor_unique": [[0, 0, 0, 0, 0, 0]],
+  "raw_current": {
+    "median": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "min": [0, 0, 0, 0, 0, 0],
+    "max": [0, 0, 0, 0, 0, 0],
+    "mad": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+  },
+  "raw_velocity": {
+    "min": [0, 0, 0, 0, 0, 0],
+    "max": [0, 0, 0, 0, 0, 0]
+  },
+  "sample_span_ms": {
+    "min": 3.424657,
+    "median": 3.7477945,
+    "max": 4.43692
+  },
+  "profile_field": "motor.current_zero_raw",
+  "previous_value": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+  "verified_value": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+  "numeric_value_changed": false,
+  "checks": {
+    "stable_port_identity_checked_before_access": true,
+    "all_samples_hardware": true,
+    "all_six_torque_disabled": true,
+    "all_six_static": true,
+    "sample_count_at_least_30": true,
+    "finite_uint16_raw_current": true,
+    "fit_reproduced_verified_value": true,
+    "capture_path_wrote_no_registers_or_motion_commands": true
+  }
+}

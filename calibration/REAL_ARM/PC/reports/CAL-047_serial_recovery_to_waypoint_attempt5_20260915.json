@@ -1,0 +1,505 @@
+{
+  "schema_version": 1,
+  "parameter_ids": [
+    "CAL-046",
+    "CAL-047"
+  ],
+  "test": "unloaded_low_speed_serial_recovery_to_waypoint",
+  "started_at": "2026-09-15T14:35:28.526913+08:00",
+  "status": "PASS",
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256": "52e2b621a303368f0774cf9ee439da852f2992480b0dfec1c21c55dad4106ba9",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_to_wooden_work_surface_no_gap",
+    "load_label": "unloaded_static"
+  },
+  "segment_duration_s": 20.0,
+  "configured_settle_timeout_s": 3.0,
+  "effective_settle_timeout_s": 10.0,
+  "settle_timeout_profile_changed": false,
+  "configured_settle_position_tol_deg": [
+    2.5,
+    2.5,
+    2.5,
+    2.5,
+    2.5
+  ],
+  "effective_settle_position_tol_deg": [
+    2.6,
+    2.6,
+    2.6,
+    2.6,
+    2.6
+  ],
+  "settle_position_tolerance_profile_changed": false,
+  "waypoint_deg": [
+    6.681318681318682,
+    -50.451516483516485,
+    10.900274725274727,
+    62.05673626373627,
+    1.054945054945055
+  ],
+  "home_deg": [
+    0.2637362637362637,
+    -44.561406593406595,
+    35.0760989010989,
+    57.39739560439561,
+    1.142857142857143
+  ],
+  "readonly_preflight": {
+    "torque_enabled": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "model_numbers": [
+      777,
+      777,
+      777,
+      777,
+      777,
+      777
+    ],
+    "snapshot": {
+      "raw_position": [
+        2134,
+        1383,
+        2796,
+        2720,
+        2045,
+        1527
+      ],
+      "raw_velocity": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "raw_current": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "sample_start_ns": 6855850460364,
+      "sample_end_ns": 6855854208763,
+      "q_bus_deg": [
+        5.538461538461539,
+        -62.94505494505495,
+        74.76923076923077,
+        66.76923076923077,
+        -0.2197802197802198
+      ],
+      "q_urdf_deg": [
+        7.032967032967034,
+        -75.85810989010989,
+        82.90027472527473,
+        62.40838461538462,
+        1.142857142857143
+      ],
+      "gripper_pct": 2.0028612303290414
+    },
+    "start_error_from_waypoint_deg": [
+      0.3516483516483522,
+      25.4065934065934,
+      72.0,
+      0.3516483516483504,
+      0.08791208791208804
+    ]
+  },
+  "goal_seeded_to_present_before_torque_enable": true,
+  "preflight_recovery_segment": {
+    "nodes": 601,
+    "duration_s": 20.0,
+    "start_deg": [
+      7.032967032967034,
+      -75.85810989010989,
+      82.90027472527473,
+      62.40838461538462,
+      1.142857142857143
+    ],
+    "target_deg": [
+      6.681318681318682,
+      -50.451516483516485,
+      10.900274725274727,
+      62.05673626373627,
+      1.054945054945055
+    ],
+    "gripper_pct": 2.0028612303290414,
+    "peak_joint_velocity_deg_s": [
+      0.03296678876759884,
+      2.3818504884593494,
+      6.749950000166862,
+      0.03296678876765213,
+      0.00824169719189971
+    ],
+    "peak_joint_acceleration_deg_s2": [
+      0.005075553847611047,
+      0.36670876543354325,
+      1.0392196501612716,
+      0.005075553846012326,
+      0.0012688884619027618
+    ],
+    "peak_tcp_velocity_m_s": 0.02202958536084281,
+    "peak_tcp_acceleration_m_s2": 0.0033995085933598568,
+    "initial_conservative_overlap_escape": [
+      {
+        "pair": [
+          "shoulder_01",
+          "lower_arm_03"
+        ],
+        "start_mm": -11.398963130296053,
+        "minimum_mm": -11.399650790097901,
+        "end_mm": 102.45805057859391,
+        "first_nonnegative_node": 143,
+        "monotonic_nondecreasing_with_0_01mm_tolerance": true
+      },
+      {
+        "pair": [
+          "shoulder_01",
+          "wrist_01"
+        ],
+        "start_mm": -0.4794159458470122,
+        "minimum_mm": -0.4819619471518565,
+        "end_mm": 124.23248867564763,
+        "first_nonnegative_node": 63,
+        "monotonic_nondecreasing_with_0_01mm_tolerance": true
+      },
+      {
+        "pair": [
+          "shoulder_01",
+          "gripper_01"
+        ],
+        "start_mm": -2.968343736953146,
+        "minimum_mm": -2.9711075508349545,
+        "end_mm": 112.85845359281801,
+        "first_nonnegative_node": 102,
+        "monotonic_nondecreasing_with_0_01mm_tolerance": true
+      },
+      {
+        "pair": [
+          "shoulder_01",
+          "gripper_02"
+        ],
+        "start_mm": -15.791962873376402,
+        "minimum_mm": -15.795881157648909,
+        "end_mm": 104.5996046647979,
+        "first_nonnegative_node": 204,
+        "monotonic_nondecreasing_with_0_01mm_tolerance": true
+      },
+      {
+        "pair": [
+          "shoulder_02",
+          "wrist_02"
+        ],
+        "start_mm": -6.489288671722729,
+        "minimum_mm": -6.490193506331926,
+        "end_mm": 147.4755964785073,
+        "first_nonnegative_node": 115,
+        "monotonic_nondecreasing_with_0_01mm_tolerance": true
+      },
+      {
+        "pair": [
+          "shoulder_02",
+          "gripper_01"
+        ],
+        "start_mm": -4.887588185821992,
+        "minimum_mm": -4.891949190985921,
+        "end_mm": 143.49902462891527,
+        "first_nonnegative_node": 128,
+        "monotonic_nondecreasing_with_0_01mm_tolerance": true
+      },
+      {
+        "pair": [
+          "shoulder_02",
+          "gripper_02"
+        ],
+        "start_mm": -15.735581993478565,
+        "minimum_mm": -15.737384174389549,
+        "end_mm": 137.8805349368352,
+        "first_nonnegative_node": 163,
+        "monotonic_nondecreasing_with_0_01mm_tolerance": true
+      },
+      {
+        "pair": [
+          "shoulder_03",
+          "lower_arm_02"
+        ],
+        "start_mm": -0.7048149132853343,
+        "minimum_mm": -0.7055297089799267,
+        "end_mm": 116.29207582942732,
+        "first_nonnegative_node": 54,
+        "monotonic_nondecreasing_with_0_01mm_tolerance": true
+      },
+      {
+        "pair": [
+          "shoulder_03",
+          "wrist_02"
+        ],
+        "start_mm": -10.80126320382105,
+        "minimum_mm": -10.802843982104342,
+        "end_mm": 127.39849012308832,
+        "first_nonnegative_node": 145,
+        "monotonic_nondecreasing_with_0_01mm_tolerance": true
+      },
+      {
+        "pair": [
+          "shoulder_03",
+          "gripper_01"
+        ],
+        "start_mm": -4.769768686787447,
+        "minimum_mm": -4.772318401182342,
+        "end_mm": 127.30975309794951,
+        "first_nonnegative_node": 117,
+        "monotonic_nondecreasing_with_0_01mm_tolerance": true
+      },
+      {
+        "pair": [
+          "shoulder_03",
+          "gripper_02"
+        ],
+        "start_mm": -17.11741520324956,
+        "minimum_mm": -17.12165020577324,
+        "end_mm": 119.69169721422332,
+        "first_nonnegative_node": 181,
+        "monotonic_nondecreasing_with_0_01mm_tolerance": true
+      },
+      {
+        "pair": [
+          "upper_arm_02",
+          "wrist_01"
+        ],
+        "start_mm": -24.72930829621423,
+        "minimum_mm": -24.730624866132437,
+        "end_mm": 113.00948062983197,
+        "first_nonnegative_node": 194,
+        "monotonic_nondecreasing_with_0_01mm_tolerance": true
+      },
+      {
+        "pair": [
+          "upper_arm_02",
+          "gripper_01"
+        ],
+        "start_mm": -11.384988401334436,
+        "minimum_mm": -14.29350114035589,
+        "end_mm": 107.50902016412518,
+        "first_nonnegative_node": 234,
+        "monotonic_nondecreasing_with_0_01mm_tolerance": false
+      },
+      {
+        "pair": [
+          "upper_arm_02",
+          "gripper_02"
+        ],
+        "start_mm": -39.163070634497494,
+        "minimum_mm": -39.17721977452044,
+        "end_mm": 96.80351197519043,
+        "first_nonnegative_node": 252,
+        "monotonic_nondecreasing_with_0_01mm_tolerance": true
+      }
+    ],
+    "initial_margin_intrusion_return": [],
+    "joint_margin_profile_changed": false,
+    "joint_limit_and_motion_checks": "PASS",
+    "collision_check": "OPERATOR_OVERRIDE_FOR_THIS_RECOVERY_ROUTE_ONLY",
+    "operator_confirmation": "操作者修改了位姿并要求重试；确认当前实体路径无实际干涉，仅本次demo恢复将到位容差临时放宽至2.6度，不放宽关节限位且不写回profile"
+  },
+  "eeprom_written": false,
+  "operator_collision_override": true,
+  "operator_confirmation": "操作者修改了位姿并要求重试；确认当前实体路径无实际干涉，仅本次demo恢复将到位容差临时放宽至2.6度，不放宽关节限位且不写回profile",
+  "legs": [
+    {
+      "name": "current_to_waypoint",
+      "elapsed_s": 20.27194687500014,
+      "ticks_played": 601,
+      "target_deg": [
+        6.681318681318682,
+        -50.451516483516485,
+        10.900274725274727,
+        62.05673626373627,
+        1.054945054945055
+      ],
+      "feedback": {
+        "angles_deg": [
+          6.857142857142858,
+          -50.62734065934066,
+          13.449725274725276,
+          62.84794505494506,
+          1.142857142857143
+        ],
+        "speeds_deg_s": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -0.0
+        ],
+        "currents_ma": [
+          0.0,
+          0.0,
+          45.5,
+          6.5,
+          0.0
+        ],
+        "gripper_pct": 2.0028612303290414,
+        "gripper_speed_pct_s": 0.0,
+        "gripper_current_ma": 0.0,
+        "sample_start_ns": 6880830849688,
+        "sample_end_ns": 6880836690221,
+        "sequence": 616
+      },
+      "endpoint_abs_error_deg": [
+        0.1758241758241761,
+        0.1758241758241752,
+        2.5494505494505493,
+        0.7912087912087884,
+        0.08791208791208804
+      ]
+    }
+  ],
+  "feedback_before_goal_seed": {
+    "angles_deg": [
+      7.032967032967034,
+      -75.59437362637362,
+      82.90027472527473,
+      62.584208791208795,
+      1.142857142857143
+    ],
+    "speeds_deg_s": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.0
+    ],
+    "currents_ma": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gripper_pct": 2.0028612303290414,
+    "gripper_speed_pct_s": 0.0,
+    "gripper_current_ma": 0.0,
+    "sample_start_ns": 6858335789713,
+    "sample_end_ns": 6858339634073,
+    "sequence": 1
+  },
+  "goal_seed_raw": [
+    2134,
+    1386,
+    2796,
+    2722,
+    2045,
+    1527
+  ],
+  "goal_seed_torque_readback": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "torque_enable_source": "goal_seed_implicit_enable_verified_by_six_reads",
+  "torque_enabled_readback": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "feedback_after_torque_enable": {
+    "angles_deg": [
+      7.032967032967034,
+      -75.59437362637362,
+      82.90027472527473,
+      62.584208791208795,
+      1.142857142857143
+    ],
+    "speeds_deg_s": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.0
+    ],
+    "currents_ma": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gripper_pct": 2.0028612303290414,
+    "gripper_speed_pct_s": 0.0,
+    "gripper_current_ma": 0.0,
+    "sample_start_ns": 6858544798290,
+    "sample_end_ns": 6858549038732,
+    "sequence": 2
+  },
+  "torque_enable_position_change_deg": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "peak_following_error_deg": [
+    0.28213201236263785,
+    0.5501288834622216,
+    3.0863640965226438,
+    0.7912087912087884,
+    0.08791208791208804
+  ],
+  "peak_joint_current_ma": [
+    6.5,
+    6.5,
+    130.0,
+    13.0,
+    6.5
+  ],
+  "torque_enabled_after": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "torque_disable_read_attempts": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "finished_at": "2026-09-15T14:35:51.231572+08:00"
+}

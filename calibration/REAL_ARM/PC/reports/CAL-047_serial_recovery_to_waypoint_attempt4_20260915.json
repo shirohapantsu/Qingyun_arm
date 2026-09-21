@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "parameter_ids": [
+    "CAL-046",
+    "CAL-047"
+  ],
+  "test": "unloaded_low_speed_serial_recovery_to_waypoint",
+  "started_at": "2026-09-15T14:24:21.475669+08:00",
+  "status": "FAIL",
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256": "52e2b621a303368f0774cf9ee439da852f2992480b0dfec1c21c55dad4106ba9",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_to_wooden_work_surface_no_gap",
+    "load_label": "unloaded_static"
+  },
+  "segment_duration_s": 20.0,
+  "configured_settle_timeout_s": 3.0,
+  "effective_settle_timeout_s": 10.0,
+  "settle_timeout_profile_changed": false,
+  "waypoint_deg": [
+    6.681318681318682,
+    -50.451516483516485,
+    10.900274725274727,
+    62.05673626373627,
+    1.054945054945055
+  ],
+  "home_deg": [
+    0.2637362637362637,
+    -44.561406593406595,
+    35.0760989010989,
+    57.39739560439561,
+    1.142857142857143
+  ],
+  "readonly_preflight": {
+    "torque_enabled": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "model_numbers": [
+      777,
+      777,
+      777,
+      777,
+      777,
+      777
+    ],
+    "snapshot": {
+      "raw_position": [
+        2133,
+        1245,
+        2379,
+        2956,
+        2044,
+        1528
+      ],
+      "raw_velocity": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "raw_current": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "sample_start_ns": 6188927580897,
+      "sample_end_ns": 6188931302816,
+      "q_bus_deg": [
+        5.450549450549451,
+        -75.07692307692308,
+        38.10989010989011,
+        87.51648351648352,
+        -0.3076923076923077
+      ],
+      "q_urdf_deg": [
+        6.945054945054945,
+        -87.98997802197803,
+        46.24093406593407,
+        83.15563736263736,
+        1.2307692307692308
+      ],
+      "gripper_pct": 2.0743919885550786
+    },
+    "start_error_from_waypoint_deg": [
+      0.2637362637362637,
+      37.53846153846155,
+      35.34065934065934,
+      21.098901098901095,
+      0.17582417582417587
+    ]
+  },
+  "goal_seeded_to_present_before_torque_enable": true,
+  "preflight_recovery_segment": {
+    "nodes": 601,
+    "duration_s": 20.0,
+    "start_deg": [
+      6.945054945054945,
+      -87.98997802197803,
+      46.24093406593407,
+      83.15563736263736,
+      1.2307692307692308
+    ],
+    "target_deg": [
+      6.681318681318682,
+      -50.451516483516485,
+      10.900274725274727,
+      62.05673626373627,
+      1.054945054945055
+    ],
+    "gripper_pct": 2.0743919885550786,
+    "peak_joint_velocity_deg_s": [
+      0.024725091575712455,
+      3.519204700941856,
+      3.313162271144243,
+      1.97800732605657,
+      0.016483394383806083
+    ],
+    "peak_joint_acceleration_deg_s2": [
+      0.003806665385308605,
+      0.5418153731497455,
+      0.5100931616105697,
+      0.3045332308246884,
+      0.0025377769234058434
+    ],
+    "peak_tcp_velocity_m_s": 0.012241033880676912,
+    "peak_tcp_acceleration_m_s2": 0.001916713140075505,
+    "initial_conservative_overlap_escape": [
+      {
+        "pair": [
+          "upper_arm_02",
+          "gripper_02"
+        ],
+        "start_mm": -9.577783864905903,
+        "minimum_mm": -9.578065913866423,
+        "end_mm": 96.8035228045172,
+        "first_nonnegative_node": 143,
+        "monotonic_nondecreasing_with_0_01mm_tolerance": true
+      },
+      {
+        "pair": [
+          "lower_arm_02",
+          "gripper_02"
+        ],
+        "start_mm": -1.7422495700639973,
+        "minimum_mm": -1.7566790152877334,
+        "end_mm": 7.14655893694234,
+        "first_nonnegative_node": 213,
+        "monotonic_nondecreasing_with_0_01mm_tolerance": true
+      }
+    ],
+    "joint_limit_and_motion_checks": "PASS",
+    "collision_check": "OPERATOR_OVERRIDE_FOR_THIS_RECOVERY_ROUTE_ONLY",
+    "operator_confirmation": "操作者确认卸力后姿态偏差由重力下落造成，并批准延长段末等待到10秒重试；当前实体路径无实际干涉"
+  },
+  "eeprom_written": false,
+  "operator_collision_override": true,
+  "operator_confirmation": "操作者确认卸力后姿态偏差由重力下落造成，并批准延长段末等待到10秒重试；当前实体路径无实际干涉",
+  "legs": [],
+  "feedback_before_goal_seed": {
+    "angles_deg": [
+      6.945054945054945,
+      -87.98997802197803,
+      46.24093406593407,
+      83.15563736263736,
+      1.2307692307692308
+    ],
+    "speeds_deg_s": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.0
+    ],
+    "currents_ma": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gripper_pct": 2.0743919885550786,
+    "gripper_speed_pct_s": 0.0,
+    "gripper_current_ma": 0.0,
+    "sample_start_ns": 6191282899713,
+    "sample_end_ns": 6191286563904,
+    "sequence": 1
+  },
+  "goal_seed_raw": [
+    2133,
+    1245,
+    2379,
+    2956,
+    2044,
+    1528
+  ],
+  "goal_seed_torque_readback": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "torque_enable_source": "goal_seed_implicit_enable_verified_by_six_reads",
+  "torque_enabled_readback": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "feedback_after_torque_enable": {
+    "angles_deg": [
+      6.945054945054945,
+      -87.98997802197803,
+      46.24093406593407,
+      83.15563736263736,
+      1.2307692307692308
+    ],
+    "speeds_deg_s": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.0
+    ],
+    "currents_ma": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gripper_pct": 2.0743919885550786,
+    "gripper_speed_pct_s": 0.0,
+    "gripper_current_ma": 0.0,
+    "sample_start_ns": 6191492446991,
+    "sample_end_ns": 6191496733418,
+    "sequence": 2
+  },
+  "torque_enable_position_change_deg": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "failure": "ExecutionError: serial_recovery_to_waypoint 段末未到位（容差 [2.5, 2.5, 2.5, 2.5, 2.5]deg，时限 10.0s）",
+  "failure_feedback_before_torque_disable": {
+    "angles_deg": [
+      6.857142857142858,
+      -50.62734065934066,
+      13.449725274725276,
+      62.84794505494506,
+      1.2307692307692308
+    ],
+    "speeds_deg_s": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.0
+    ],
+    "currents_ma": [
+      6.5,
+      0.0,
+      45.5,
+      6.5,
+      0.0
+    ],
+    "gripper_pct": 2.0743919885550786,
+    "gripper_speed_pct_s": 0.0,
+    "gripper_current_ma": 0.0,
+    "sample_start_ns": 6223380251490,
+    "sample_end_ns": 6223384048500,
+    "sequence": 1278
+  },
+  "torque_enabled_after": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "torque_disable_read_attempts": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "finished_at": "2026-09-15T14:24:53.779888+08:00"
+}

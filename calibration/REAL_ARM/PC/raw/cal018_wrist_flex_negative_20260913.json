@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-018",
+  "source": "manual_pose_hardware_read_only",
+  "captured_at": "2026-09-13T17:11:44.710034+08:00",
+  "profile": "calibration/REAL_ARM/PC/profile.json",
+  "profile_sha256": "fa4594ebed194446e3900e62219f6ce4caa0c0e751f1a71a34eb2e829589f90c",
+  "stable_port": "/dev/serial/by-id/usb-1a86_USB_Single_Serial_5B14114904-if00",
+  "resolved_port": "/dev/ttyACM0",
+  "usb_identity": {
+    "vid": "1a86",
+    "pid": "55d3",
+    "serial": "5B14114904"
+  },
+  "environment": {
+    "power": "12V",
+    "ambient_temperature_c": 26.8,
+    "base_mount": "fixed_in_workspace"
+  },
+  "ids": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "model_numbers": [
+    777,
+    777,
+    777,
+    777,
+    777,
+    777
+  ],
+  "torque_enabled_by_motor": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "joint": "wrist_flex",
+  "joint_index": 3,
+  "servo_id": 4,
+  "parent_link": "lower_arm_link",
+  "child_link": "wrist_link",
+  "pose_label": "urdf_negative",
+  "official_raw_range": [
+    729,
+    3192
+  ],
+  "pose": {
+    "captured_at": "2026-09-13T17:11:44.229361+08:00",
+    "raw_position_by_sample": [
+      [
+        2068,
+        938,
+        2186,
+        1598,
+        3061,
+        1491
+      ],
+      [
+        2068,
+        938,
+        2186,
+        1598,
+        3061,
+        1491
+      ],
+      [
+        2068,
+        938,
+        2186,
+        1598,
+        3061,
+        1491
+      ],
+      [
+        2068,
+        938,
+        2186,
+        1598,
+        3061,
+        1491
+      ],
+      [
+        2068,
+        938,
+        2186,
+        1598,
+        3061,
+        1491
+      ],
+      [
+        2068,
+        938,
+        2186,
+        1598,
+        3061,
+        1491
+      ],
+      [
+        2068,
+        938,
+        2186,
+        1598,
+        3061,
+        1491
+      ],
+      [
+        2068,
+        938,
+        2186,
+        1598,
+        3061,
+        1491
+      ],
+      [
+        2068,
+        938,
+        2186,
+        1598,
+        3061,
+        1491
+      ],
+      [
+        2068,
+        938,
+        2186,
+        1598,
+        3061,
+        1491
+      ]
+    ],
+    "raw_position_representative": [
+      2068,
+      938,
+      2186,
+      1598,
+      3061,
+      1491
+    ],
+    "raw_position_static_span": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_before": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "torque_enabled_after": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "joint_raw_representative": 1598,
+  "write_instructions_sent": 0,
+  "motion_instructions_sent": 0,
+  "eeprom_written": false
+}

@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-052",
+  "parameter": "timing.write_timeout_s",
+  "date": "2026-09-15",
+  "status": "VERIFIED_FOR_UNLOADED_STATIC_DEMO",
+  "profile_changed": false,
+  "profile_sha256": "6a971b5c19b5316a56702980968103f9de0f998c8520758b0ccb47835b188bd1",
+  "failed_probe": {
+    "source_evidence": "../raw/cal052_goal_write_timing_1000ticks_20260915.jsonl",
+    "source_sha256": "dfdf3e709f36b2a4134f36c5776c233d39ec15cd63536db4a7de79ed52687565",
+    "requested_ticks": 1000,
+    "completed_ticks": 100,
+    "result": "FAIL_SAFE_ABORT",
+    "write_register": "Goal_Position",
+    "goal_raw_equal_to_initial_present_position": [2148, 943, 3064, 2298, 2045, 1529],
+    "torque_enabled_before": [0, 0, 0, 0, 0, 0],
+    "torque_enabled_after_tick_100": [1, 1, 1, 1, 1, 1],
+    "raw_position_after_tick_100": [2148, 943, 3064, 2298, 2045, 1529],
+    "position_changed": false,
+    "eeprom_written": false,
+    "corrective_action": "The run aborted at the first periodic safety check. All six Torque_Enable registers were then explicitly written to 0 and read back as 0 before the replacement run.",
+    "finding": "On this physical STS3215 set, broadcasting Goal_Position while torque is disabled cannot be treated as a torque-off no-op: all six Torque_Enable registers subsequently read 1."
+  },
+  "source_evidence": "../raw/cal052_sync_write_timing_1000ticks_attempt2_20260915.jsonl",
+  "source_sha256": "a4562581b65ca08ea5a59792eb8c003f972254deae8d2fd621c01386dc31f5e6",
+  "test": {
+    "ticks": 1000,
+    "fps": 30.0,
+    "successful_writes": 1000,
+    "failed_writes": 0,
+    "transaction": "one six-servo broadcast SYNC_WRITE of the two-byte SRAM Goal_Time register; frame length matches the production Goal_Position SYNC_WRITE",
+    "no_op_values_before_and_after": [0, 0, 0, 0, 0, 0],
+    "measurement_timeout_s": 1.0,
+    "response_status_level_by_motor": [1, 1, 1, 1, 1, 1],
+    "torque_enabled_before": [0, 0, 0, 0, 0, 0],
+    "torque_enabled_after": [0, 0, 0, 0, 0, 0],
+    "periodic_torque_checks": 11,
+    "raw_position_before_and_after": [2148, 943, 3064, 2298, 2045, 1529],
+    "raw_position_stable": true,
+    "position_target_commands_sent": 0,
+    "eeprom_written": false
+  },
+  "write_latency_ms": {
+    "min": 0.149571,
+    "p50": 0.3121505,
+    "p95": 0.8158218,
+    "p99": 1.12315484,
+    "max": 2.43155
+  },
+  "tick_lateness_ms": {
+    "p50": 0.1060485,
+    "p95": 0.39787165,
+    "p99": 0.72786417,
+    "max": 0.935811
+  },
+  "fitter_formula": "round(max(P99 * 1.5, max), 4)",
+  "formula_candidate_s": 0.0024,
+  "retained_value_s": 0.015,
+  "decision": "Keep the existing 15 ms value. It is more conservative than the isolated static formula candidate. Response level 1 provides no device acknowledgement, and the prior mixed read/write path has unresolved timeouts and torque-state behavior, so reducing the configured write budget is unsupported.",
+  "scope_limit": "This verifies host-side submission timing for an equal-length, no-op two-byte SRAM SYNC_WRITE under unloaded torque-off static conditions. It does not prove device receipt, Goal_Position behavior, active-motion timing, USB drain latency, or mixed read/write recovery semantics."
+}

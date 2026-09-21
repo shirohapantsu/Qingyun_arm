@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-15",
+  "status": "bulk_deferred_by_operator",
+  "profile_changed": false,
+  "profile_sha256": "04c7e28def4f2d5a87beeaf63132faf9477ddee3f053136f908c91d7623a20ec",
+  "operator_instruction": "skip all items involving vision or TCP",
+  "deferred_parameter_ids": [
+    "CAL-025", "CAL-028", "CAL-029", "CAL-037", "CAL-040", "CAL-041",
+    "CAL-042", "CAL-043", "CAL-044", "CAL-045", "CAL-048", "CAL-049",
+    "CAL-057", "CAL-061", "CAL-062",
+    "CAL-071", "CAL-072", "CAL-073", "CAL-074", "CAL-075", "CAL-076",
+    "CAL-077", "CAL-078", "CAL-079",
+    "CAL-099", "CAL-100", "CAL-101",
+    "CAL-103", "CAL-104", "CAL-105", "CAL-106", "CAL-107", "CAL-110"
+  ],
+  "categories": {
+    "physical_tcp_transform_or_error": ["CAL-025", "CAL-028", "CAL-029", "CAL-037"],
+    "vision_and_camera_calibration": ["CAL-040", "CAL-041", "CAL-110"],
+    "tcp_or_vision_workcell_paths": ["CAL-042", "CAL-043", "CAL-044", "CAL-045", "CAL-048", "CAL-049"],
+    "tcp_planning_and_ik": ["CAL-057", "CAL-061", "CAL-062", "CAL-071", "CAL-072", "CAL-073", "CAL-074", "CAL-075", "CAL-076", "CAL-077", "CAL-078", "CAL-079"],
+    "tcp_or_vision_acceptance": ["CAL-099", "CAL-100", "CAL-101", "CAL-103", "CAL-104", "CAL-105", "CAL-106", "CAL-107"]
+  },
+  "completed_results_not_reverted": [
+    "CAL-024 CAD nominal tool rotation",
+    "CAL-026 measured gripper gap table",
+    "CAL-027 URDF nominal gripper angle table",
+    "CAL-035 and CAL-036 demo collision policies",
+    "CAL-038 operator-selected +90 degree grasp direction",
+    "CAL-039 current 17-sample demo object envelope"
+  ],
+  "explicitly_not_deferred": {
+    "joint_space_workcell": ["CAL-046", "CAL-047"],
+    "environment_and_joint_timing_motion": ["CAL-050", "CAL-051", "CAL-052", "CAL-053", "CAL-054", "CAL-055", "CAL-056", "CAL-058", "CAL-059", "CAL-060", "CAL-063", "CAL-064", "CAL-065", "CAL-066", "CAL-067", "CAL-068", "CAL-069", "CAL-070", "CAL-102"],
+    "standalone_gripper_and_grasp_physics": ["CAL-080", "CAL-081", "CAL-082", "CAL-083", "CAL-084", "CAL-085", "CAL-086", "CAL-087", "CAL-088", "CAL-089", "CAL-090", "CAL-091", "CAL-092", "CAL-093", "CAL-094", "CAL-095", "CAL-096", "CAL-097", "CAL-098"],
+    "physical_robot_geometry_and_backlash": ["CAL-109", "CAL-111"]
+  },
+  "warning": "All current profile values for deferred unresolved items remain placeholders. They must not be used as calibration evidence or to promote the profile to verified."
+}

@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-020",
+  "status": "RETRACTED_DEPENDS_ON_CAL019",
+  "scope": "calibration_REAL_ARM_PC_demo",
+  "completed_at": "2026-09-13",
+  "parameter": "joints.measured_limits_deg",
+  "joint_order": [
+    "shoulder_pan",
+    "shoulder_lift",
+    "elbow_flex",
+    "wrist_flex",
+    "wrist_roll"
+  ],
+  "inputs": {
+    "motor_calibration": "../motor_calibration.json",
+    "motor_calibration_sha256": "ad315322ad4d19cc322c8f21d86d9667d9df9eca2de325bebbd72fa62deefff5",
+    "position_resolution": [4096, 4096, 4096, 4096, 4096],
+    "joint_sign": [1, 1, 1, 1, 1],
+    "zero_offset_deg": [
+      2.725274725275,
+      -89.67032967033,
+      82.857142857143,
+      -1.714285714286,
+      -0.659340659341
+    ]
+  },
+  "formula": {
+    "q_bus_deg": "(raw - (range_min + range_max) / 2) * 360 / (resolution - 1)",
+    "q_urdf_deg": "joint_sign * q_bus_deg + zero_offset_deg",
+    "homing_offset_handling": "already applied by servo EEPROM; not added again"
+  },
+  "raw_limits": [
+    [718, 3424],
+    [865, 3333],
+    [796, 3095],
+    [729, 3192],
+    [0, 4095]
+  ],
+  "bus_limits_deg": [
+    [-118.945054945055, 118.945054945055],
+    [-108.483516483516, 108.483516483516],
+    [-101.054945054945, 101.054945054945],
+    [-108.263736263736, 108.263736263736],
+    [-180.0, 180.0]
+  ],
+  "final_value": [
+    [-116.21978021978, 121.67032967033],
+    [-198.153846153846, 18.813186813187],
+    [-18.197802197802, 183.912087912088],
+    [-109.978021978022, 106.549450549451],
+    [-180.659340659341, 179.340659340659]
+  ],
+  "checks": {
+    "authoritative_motor_calibration_hash_matches_profile": true,
+    "all_raw_ranges_have_positive_span": true,
+    "all_transformed_limits_are_ordered": true,
+    "derived_not_inferred_from_urdf_limits": true,
+    "eeprom_written": false
+  },
+  "implementation": {
+    "profile": "../profile.json",
+    "profile_sha256_after_integration": "42ecedf806d03a2c8a6784f63f7c2a5c374a5ccbc5b3ab5df7d423236d4546ce"
+  },
+  "retraction": {
+    "retracted_at": "2026-09-13",
+    "reason": "CAL-019 geometric-zero integration was retracted after a physical-geometry contradiction. These deterministic values are retained as historical calculations only and were restored to null in profile.json.",
+    "profile_measured_limits_deg_restored_to_null": true,
+    "profile_sha256_after_retraction": "fa4594ebed194446e3900e62219f6ce4caa0c0e751f1a71a34eb2e829589f90c"
+  },
+  "limitations": [
+    "The range derivation is exact for the bound motor calibration file, but inherits CAL-019's demo-only geometric-zero uncertainty.",
+    "Application, URDF and safety-margin intersections remain separate constraints and do not alter this measured-range record."
+  ]
+}

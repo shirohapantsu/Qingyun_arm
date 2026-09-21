@@ -3,26 +3,66 @@
 
 本项目由山西农业大学嵌入式实验室开发
 
+> ### ⚠️ 当前实现状态（待完成）
+>
+> **本工程目前还不能端到端运行。** `python main.py` 不会有任何输出且退出码为 0——
+> `main.py` 是 0 字节占位文件，**程序入口尚未实现**。
+>
+> 按实际文件行数核对（`wc -l`，2026-09-09）：
+>
+> | 模块 | 状态 | 行数 |
+> |---|---|---|
+> | `qingyun/grabbing/motor_control.py` | 已实现 | 1966 |
+> | `qingyun/grabbing/arm_control.py` | 已实现 | 949 |
+> | `qingyun/grabbing/safety.py` | 已实现 | 711 |
+> | `qingyun/grabbing/kinematics_ext.py` | 已实现 | 580 |
+> | `qingyun/grabbing/executor.py` | 已实现 | 379 |
+> | `qingyun/grabbing/trajectory.py` | 已实现 | 314 |
+> | `configs/common_interface.py`、`configs/motion_params.py` | 已实现 | — |
+> | **`main.py`**（程序入口） | **待实现（0 字节）** | 0 |
+> | **`qingyun/grabbing/vision.py`**（1号：视觉） | **待实现（0 字节）** | 0 |
+> | **`qingyun/asr.py`**（语音转文字） | **待实现（0 字节）** | 0 |
+> | **`qingyun/cloud_model.py`**（云端大模型） | **待实现（0 字节）** | 0 |
+> | **`qingyun/watchdog.py`**（看门狗） | **待实现（0 字节）** | 0 |
+>
+> 另外，**真机标定尚未完成**：`calibration/` 下目前只有仿真配置可用，真机参数仍在
+> 逐阶段测量中，进度与已知问题见
+> [真机标定问题记录](dev_logs/真机标定问题记录.md)。在完成 8 阶段实机标定并通过
+> `scripts/calibrate.py promote` 之前，**不得驱动真机**。
+>
+> 目前可用的部分是 `qingyun/grabbing/` 运动控制模块及其离线测试套件。
+
 ## 开发规范
 
 ### 1.工程结构图
 ```
 Qingyun_arm
 ├── configs                     # 配置文件
-│   └── common_interface.py
+│   ├── common_interface.py     # 冻结的公共接口契约
+│   └── motion_params.py        # profile.json 加载与校验（已实现）
 ├── libs                        # 库文件
-│   └── so_arm_core
-├── main.py                     # 程序入口
+│   └── so_arm_core             # vendor 自 LeRobot 0.5.1，见 libs/so_arm_core/SOURCE.md
+├── main.py                     # 程序入口            ⚠️ 待实现（0 字节）
+├── calibration                 # 标定包（仿真可用，真机标定进行中）
+├── docs                        # 技术与标定文档
+├── scripts
+│   └── calibrate.py            # 8 阶段标定 CLI（已实现）
 ├── qingyun                     # 核心功能包
-│   ├── asr.py                  # 语音转文字模块
-│   ├── cloud_model.py          # 云端大模型模块
-│   ├── grabbing                # 抓取模块
-│   │   ├── arm_control.py
-│   │   ├── motor_control.py
-│   │   └── vision.py
-│   └── watchdog.py
+│   ├── asr.py                  # 语音转文字模块      ⚠️ 待实现（0 字节）
+│   ├── cloud_model.py          # 云端大模型模块      ⚠️ 待实现（0 字节）
+│   ├── watchdog.py             # 看门狗              ⚠️ 待实现（0 字节）
+│   └── grabbing                # 抓取模块（本期主要交付）
+│       ├── arm_control.py      # 入口与编排（已实现）
+│       ├── motor_control.py    # STS3215 驱动与换算（已实现）
+│       ├── executor.py         # 轨迹回放（已实现）
+│       ├── safety.py           # 限位与碰撞校验（已实现）
+│       ├── trajectory.py       # 速度规划（已实现）
+│       ├── kinematics_ext.py   # FK/IK 与工具变换（已实现）
+│       └── vision.py           # 视觉接口            ⚠️ 待实现（0 字节）
 └── readme.md
 ```
+> 上表为 2026-09-09 的实际状态。标 **⚠️ 待实现** 的文件都是 0 字节占位，
+> 里面没有任何代码；导入或执行它们不会报错，只会静默什么都不做。
 
 ### 2. 任务说明与分工
 
@@ -58,51 +98,56 @@ Qingyun_arm
 
 #### 常规约定
 
-官方标准关节索引：*(需要确认)*
-- 索引 0: shoulder_pan (底座旋转)
-- 索引 1: shoulder_lift (大臂俯仰)
-- 索引 2: elbow_flex (小臂俯仰)
-- 索引 3: wrist_flex (手腕俯仰)
-- 索引 4: wrist_roll (手腕旋转)
-- 索引 5: gripper (夹爪, 0~100)
-  
+标准电机顺序（已对照本机 SO-ARM101 / LeRobot 源码）：
+- 索引 0 / ID 1: shoulder_pan (底座旋转)
+- 索引 1 / ID 2: shoulder_lift (大臂俯仰)
+- 索引 2 / ID 3: elbow_flex (小臂俯仰)
+- 索引 3 / ID 4: wrist_flex (手腕俯仰)
+- 索引 4 / ID 5: wrist_roll (手腕旋转)
+- 索引 5 / ID 6: gripper (夹爪，独立百分比字段，0=标定闭合端，100=标定张开端)
 
+运动接口中的关节数组只含前 5 项，shape `(5,)`，单位为 URDF 坐标下的 deg；夹爪不混入关节角数组。坐标使用右手基座系 `base_link`，单位 m。
 
 #### 开发前期接口约定
 
 ---
 **视觉与算法接口约定：**
 |     | 目标位置 | 目标角度 | 目标品级 |
-|:---:|:-------:|:------:|:-------:| 
-| 物理单位 | 米（m）| 角度制（deg） | A+ , A , B , C(不合格)|
-| 数据类型 | 一个np.float64的np.array | float | 字符串 |
-| 举例 | np.array([x,y,z]) | 12.3 | "A+" |
+|:---:|:-------:|:------:|:-------:|
+| 物理含义 | 基座系中的目标三维几何中心 | 目标长轴在基座 XY 平面内相对 +X 的角度，绕 +Z 右手为正 | 记录用元数据 |
+| 物理单位 | 米（m） | deg，模 180°，范围 `[-90, 90)` | A+、A、B、C（不合格） |
+| 数据类型 | `np.float64` 的 `np.array`，shape `(3,)` | float | 字符串 |
+| 举例 | `np.array([x,y,z], dtype=np.float64)` | `12.3` | `"A+"` |
 
-使用`VisionInterface`类封装数据进行传递  
+视觉负责确定可抓取目标，使用 `VisionInterface(position, yaw_deg, grade)` 下发。通过 `ArmController.grasp_and_place(target, place_id="default")` 开始一次同步抓取—放置，调用返回后再进入下一次视觉检测。程序单线程顺序执行，控制不向视觉查询数据。
+
+放置位置和角度保存在配置 `places[place_id]` 中，加载为 `PlacePose(position, yaw_deg)`；position 为释放时物体中心，yaw_deg 为物体长轴相对基座 +X 的角度。控制按指定 place_id 读取，不根据 grade 选择放置位置。
+
+完整字段见 [common_interface.py](configs/common_interface.py) 和 [运动控制文档](docs/机械臂运动控制模块技术文档.md)。
 
 ---
 
 **算法与电机控制接口约定:**
 
-算法（运动控制）To 电机（驱动）——同进程函数调用，2号对 `MotorController` 接口编程，3号负责实现（`motor_control.py`），测试用 Mock 驱动实现同一接口：
+算法（运动控制）To 电机（驱动）——同线程函数调用，2号对 `MotorController` 接口编程，3号负责实现（`motor_control.py`），Mock 实现同一接口：
 
-| | 关节角度指令 | 夹爪开合 | 状态反馈 | 停止 |
+| | 关节角度指令 | 夹爪开合 | 状态反馈 | 保持 |
 |:---:|:-------:|:------:|:-------:|:---:|
-| 接口 | `send_action(joints_deg, gripper_pct)` | 同左，`gripper_pct` 参数 | `get_feedback() -> JointFeedback` | `emergency_stop()` |
-| 物理单位 | deg（5个姿态关节角） | 0~100（百分比） | deg / (deg/s) / mA | - |
-| 数据类型 | `np.float64` 的 `np.array`（shape `(5,)`） | `float` | `JointFeedback` 数据类 | - |
+| 接口 | `send_action(joints_deg, gripper_pct)` | 同左，`gripper_pct` 参数 | `get_feedback() -> JointFeedback` | `hold_current() -> JointFeedback` |
+| 物理单位 | deg（5 个姿态关节角） | 0~100（百分比） | 关节 deg / deg/s / mA；夹爪 % / %/s / mA | 实测角度和开度 |
+| 数据类型 | `np.float64` 的 `np.array`，shape `(5,)` | float | `JointFeedback` 数据类 | 返回本次保持采用的反馈 |
 
-配套接口：`wait_until_settled(timeout_s, tol_deg) -> bool`（阻塞等待关节静止）。
+到位等待由算法侧 `ArmController.wait_settled(target_deg, timeout_s) -> bool` 完成，同时检查目标角度误差、速度和持续时间。`ArmController` 可接收无阻塞的同步 `should_stop` 回调，在规划检查点和动作循环中检查停止条件。
 
 约定细则：
-1. **`send_action` 必须非阻塞**：写入串口缓冲立即返回，内部禁止 `sleep`；内部先做关节行程软限位钳位（最后一道安全闸）再写总线。
-2. **时钟节拍归算法侧（2号）**：30Hz 回放循环与绝对时间对齐由 2号维护，电机侧不持有定时循环。
-3. **反馈同步读取**：`get_feedback` 一次返回 6 舵机（含夹爪）的角度、转速、电流。
-4. **`emergency_stop` = freeze**：以当前实测角度持续下发锁定输出；物理急停按钮由 3号接入舵机供电回路直接断电，不经软件。
+1. **有界 I/O**：`send_action` 是有写超时的单次同步提交，不等待到位、不持有周期循环。整条参数检查通过后发送；越限抛 `MotorLimitError`，不静默裁剪。
+2. **时钟节拍归算法侧（2号）**：30Hz 分段回放、反馈检查和到位等待在当前调用线程顺序执行，明显迟到时停止，不跳帧追赶。
+3. **反馈单位与时序**：五关节角度/速度/电流与夹爪开度/速度/电流分开返回，附采样开始/结束时刻和递增序号。3号负责方向、零位和物理单位转换，通信失败抛异常。
+4. **软件保持与物理急停**：`hold_current` 读一次有效反馈并写一次保持目标；异常后锁存故障并返回。调用返回后的保持由舵机已提交的位置目标维持。物理急停按钮直接切断舵机电源。
 
-使用 `MotorController` Protocol（定义于 `common_interface.py`）约束双方实现。
+使用 `MotorController` Protocol 约束双方实现。`GraspResult` 返回状态、执行阶段、原因、place_id、夹持状态估计及是否需要复位。
 
-详细设计见 `docs/机械臂运动控制模块技术文档.md`。
+详细实现见 [机械臂运动控制模块技术文档](docs/机械臂运动控制模块技术文档.md)；配置与测量方法见 [真机参数测量与标定指南](docs/真机参数测量与标定指南.md)。
 
 ### 4. 使用git和github管理开发
 
@@ -218,6 +263,8 @@ git push origin release/v0.1-grabbing
 git fetch origin
 git checkout release/v0.1-grabbing
 python main.py
+#    ⚠️ 待实现：main.py 目前是 0 字节占位文件，这条命令会静默返回且退出码 0。
+#    它"跑通了"不代表抓取闭环可用，必须等入口与 vision 模块实现后再以此步验收。
 
 # 3. 验证无误后合并到 main，并创建 GitHub Release Tag
 git checkout main
@@ -230,8 +277,10 @@ git push origin main --tags
 
 1. **香橙派真机“只读”铁律**：
    * 严禁在香橙派 5 上直接修改业务代码或进行 Git 合并操作。
-   * 香橙派只做一件事：从 GitHub 拉取通过测试的代码并执行（`git pull` $
-ightarrow$ `python main.py`）。
+   * 香橙派只做一件事：从 GitHub 拉取通过测试的代码并执行（`git pull` $\rightarrow$ `python main.py`）。
+   * ⚠️ **待完成**：上面这条链路目前走不通——`main.py` 与 `qingyun/grabbing/vision.py`
+     都还是 0 字节占位。在入口实现之前，真机上唯一可用的验证路径是离线测试套件与
+     `scripts/calibrate.py` 的只读采集（**注意：只读采集不等于可以运动**）。
 2. **`common_interface.py` 契约绝对冻结**：
    * 任何人不得单方面修改公共数据结构与枚举。若确需增减字段，必须 3 人协商一致后单独提交 `refactor(interface)` PR。
 3. **严禁将大文件与权重提交至 Git 仓库**：

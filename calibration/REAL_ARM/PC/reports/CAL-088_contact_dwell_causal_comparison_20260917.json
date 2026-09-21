@@ -1,0 +1,798 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-088",
+  "status": "UNVERIFIED",
+  "source": "offline_causal_replay_existing_hardware_samples_no_motion",
+  "profile_sha256": "1ea15d62d288bc02f56ccabe09593f60d68ad3fd6f5f37632589995dc7c18bb4",
+  "window_samples_fixed": 3,
+  "sample_fps": 30,
+  "contact_threshold_used_ma": 10,
+  "contact_threshold_is_demo_candidate_not_integrated": true,
+  "current_and_conditionally_retained_contact_dwell_s": 0.1,
+  "source_window_comparison_report": "CAL-087_current_window_causal_comparison_20260917.json",
+  "source_window_comparison_sha256": "f025c4427658c3205866e1c1f327994f0f53d7c1be24b04a4bc5eb2caad15b47",
+  "source_report_sha256": {
+    "CAL-085_fixture_stronger_contact_attempt1_20260917.json": "32eb5954bca613449e7b6394e5dbe400549884c88d664bfa4f22edee2c6c5215",
+    "CAL-085_empty_current_repeat1_20260916.json": "f10575d8fd68df0d0bccc69c5e3e3ed7e134dc6ad0e856fe9a9c9533ede151d5",
+    "CAL-085_empty_expanded_control_repeat1_20260916.json": "cde19de8e2009444c7456f5a2ada29f331f9858631818acb2cf16a71bb36e951",
+    "CAL-085_empty_updated_baseline_control_repeat1_20260916.json": "a5edced49096a552b6e3df5d5ef3be8226b8254d38aa514740f81fc121f80cfe",
+    "CAL-085_empty_updated_baseline_control_repeat2_reposition_attempt1_20260916.json": "58a37279264ba6c7398e32ce81f6dda1f6a2db7fe7b9ef782440ca8ca4d067dc",
+    "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json": "6f3d05011219ee9877790e7d0da740771ecd0bb9584c61719d97257443bd29d0",
+    "CAL-085_empty_sustained_current_control_attempt1_20260917.json": "4033f8fce042919d1dfa3b0d36e030135c7576c3bc00220911d5f0f3e564e54c",
+    "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json": "bfdb3211a47c132de4bbb3f240ce03dba6c38c126c530adb4e811789783ab17d"
+  },
+  "matched_control_report": "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json",
+  "fixture_report": "CAL-085_fixture_stronger_contact_attempt1_20260917.json",
+  "comparison": "strict rolling absolute mean >10mA continuously >=dwell; same gap and empty-exclusion gates",
+  "comparisons": [
+    {
+      "contact_dwell_s": 0.03333333333333333,
+      "fixture_replay": {
+        "included_frames": 160,
+        "peak_filtered_mean_ma": 13.0,
+        "longest_qualifying_run_s": 0.6686141380050685,
+        "hit_count": 24,
+        "first_hit": {
+          "phase": "fixture_closing",
+          "position_raw": 1821,
+          "command_raw": 1809,
+          "mean_ma": 13.0,
+          "continuous_above_s": 0.03359740201267414,
+          "delay_from_first_in_gate_raw_current_above_threshold_s": 0.06696097701205872
+        }
+      },
+      "empty_controls": [
+        {
+          "report": "CAL-085_empty_current_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 112,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_expanded_control_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat1_20260916.json",
+          "operator_observation": null,
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 8.666666666666666,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat2_reposition_attempt1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 614,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 145,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "same_endpoint_and_settings_matched_control",
+          "replay": {
+            "included_frames": 160,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        }
+      ],
+      "empty_reports_with_false_contact_hits": 0,
+      "nominal_fitter_delay_budget_s": 0.2,
+      "illustrative_extra_command_pct_at_trial1pct_s": 0.2,
+      "illustrative_extra_command_pct_at_profile15pct_s": 3.0
+    },
+    {
+      "contact_dwell_s": 0.06666666666666667,
+      "fixture_replay": {
+        "included_frames": 160,
+        "peak_filtered_mean_ma": 13.0,
+        "longest_qualifying_run_s": 0.6686141380050685,
+        "hit_count": 20,
+        "first_hit": {
+          "phase": "fixture_closing",
+          "position_raw": 1820,
+          "command_raw": 1808,
+          "mean_ma": 10.833333333333334,
+          "continuous_above_s": 0.10005191000527702,
+          "delay_from_first_in_gate_raw_current_above_threshold_s": 0.1334154850046616
+        }
+      },
+      "empty_controls": [
+        {
+          "report": "CAL-085_empty_current_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 112,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_expanded_control_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat1_20260916.json",
+          "operator_observation": null,
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 8.666666666666666,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat2_reposition_attempt1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 614,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 145,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "same_endpoint_and_settings_matched_control",
+          "replay": {
+            "included_frames": 160,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        }
+      ],
+      "empty_reports_with_false_contact_hits": 0,
+      "nominal_fitter_delay_budget_s": 0.23333333333333334,
+      "illustrative_extra_command_pct_at_trial1pct_s": 0.23333333333333334,
+      "illustrative_extra_command_pct_at_profile15pct_s": 3.5
+    },
+    {
+      "contact_dwell_s": 0.1,
+      "fixture_replay": {
+        "included_frames": 160,
+        "peak_filtered_mean_ma": 13.0,
+        "longest_qualifying_run_s": 0.6686141380050685,
+        "hit_count": 20,
+        "first_hit": {
+          "phase": "fixture_closing",
+          "position_raw": 1820,
+          "command_raw": 1808,
+          "mean_ma": 10.833333333333334,
+          "continuous_above_s": 0.10005191000527702,
+          "delay_from_first_in_gate_raw_current_above_threshold_s": 0.1334154850046616
+        }
+      },
+      "empty_controls": [
+        {
+          "report": "CAL-085_empty_current_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 112,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_expanded_control_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat1_20260916.json",
+          "operator_observation": null,
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 8.666666666666666,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat2_reposition_attempt1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 614,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 145,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "same_endpoint_and_settings_matched_control",
+          "replay": {
+            "included_frames": 160,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        }
+      ],
+      "empty_reports_with_false_contact_hits": 0,
+      "nominal_fitter_delay_budget_s": 0.26666666666666666,
+      "illustrative_extra_command_pct_at_trial1pct_s": 0.26666666666666666,
+      "illustrative_extra_command_pct_at_profile15pct_s": 4.0
+    },
+    {
+      "contact_dwell_s": 0.15,
+      "fixture_replay": {
+        "included_frames": 160,
+        "peak_filtered_mean_ma": 13.0,
+        "longest_qualifying_run_s": 0.6686141380050685,
+        "hit_count": 17,
+        "first_hit": {
+          "phase": "fixture_closing",
+          "position_raw": 1818,
+          "command_raw": 1804,
+          "mean_ma": 13.0,
+          "continuous_above_s": 0.16689779597800225,
+          "delay_from_first_in_gate_raw_current_above_threshold_s": 0.4001870089850854
+        }
+      },
+      "empty_controls": [
+        {
+          "report": "CAL-085_empty_current_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 112,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_expanded_control_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat1_20260916.json",
+          "operator_observation": null,
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 8.666666666666666,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat2_reposition_attempt1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 614,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 145,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "same_endpoint_and_settings_matched_control",
+          "replay": {
+            "included_frames": 160,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        }
+      ],
+      "empty_reports_with_false_contact_hits": 0,
+      "nominal_fitter_delay_budget_s": 0.31666666666666665,
+      "illustrative_extra_command_pct_at_trial1pct_s": 0.31666666666666665,
+      "illustrative_extra_command_pct_at_profile15pct_s": 4.75
+    },
+    {
+      "contact_dwell_s": 0.2,
+      "fixture_replay": {
+        "included_frames": 160,
+        "peak_filtered_mean_ma": 13.0,
+        "longest_qualifying_run_s": 0.6686141380050685,
+        "hit_count": 16,
+        "first_hit": {
+          "phase": "fixture_closing",
+          "position_raw": 1818,
+          "command_raw": 1804,
+          "mean_ma": 13.0,
+          "continuous_above_s": 0.20007536499178968,
+          "delay_from_first_in_gate_raw_current_above_threshold_s": 0.43336457799887285
+        }
+      },
+      "empty_controls": [
+        {
+          "report": "CAL-085_empty_current_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 112,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_expanded_control_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat1_20260916.json",
+          "operator_observation": null,
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 8.666666666666666,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat2_reposition_attempt1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 614,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 145,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "same_endpoint_and_settings_matched_control",
+          "replay": {
+            "included_frames": 160,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        }
+      ],
+      "empty_reports_with_false_contact_hits": 0,
+      "nominal_fitter_delay_budget_s": 0.3666666666666667,
+      "illustrative_extra_command_pct_at_trial1pct_s": 0.3666666666666667,
+      "illustrative_extra_command_pct_at_profile15pct_s": 5.5
+    },
+    {
+      "contact_dwell_s": 0.3,
+      "fixture_replay": {
+        "included_frames": 160,
+        "peak_filtered_mean_ma": 13.0,
+        "longest_qualifying_run_s": 0.6686141380050685,
+        "hit_count": 12,
+        "first_hit": {
+          "phase": "fixture_closing",
+          "position_raw": 1816,
+          "command_raw": 1802,
+          "mean_ma": 13.0,
+          "continuous_above_s": 0.33327150699915364,
+          "delay_from_first_in_gate_raw_current_above_threshold_s": 0.5665607200062368
+        }
+      },
+      "empty_controls": [
+        {
+          "report": "CAL-085_empty_current_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 112,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_expanded_control_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat1_20260916.json",
+          "operator_observation": null,
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 8.666666666666666,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat2_reposition_attempt1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 614,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 145,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "same_endpoint_and_settings_matched_control",
+          "replay": {
+            "included_frames": 160,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        }
+      ],
+      "empty_reports_with_false_contact_hits": 0,
+      "nominal_fitter_delay_budget_s": 0.4666666666666667,
+      "illustrative_extra_command_pct_at_trial1pct_s": 0.4666666666666667,
+      "illustrative_extra_command_pct_at_profile15pct_s": 7.0
+    },
+    {
+      "contact_dwell_s": 0.5,
+      "fixture_replay": {
+        "included_frames": 160,
+        "peak_filtered_mean_ma": 13.0,
+        "longest_qualifying_run_s": 0.6686141380050685,
+        "hit_count": 6,
+        "first_hit": {
+          "phase": "fixture_hold",
+          "position_raw": 1815,
+          "command_raw": 1801,
+          "mean_ma": 13.0,
+          "continuous_above_s": 0.5018308259896003,
+          "delay_from_first_in_gate_raw_current_above_threshold_s": 0.7351200389966834
+        }
+      },
+      "empty_controls": [
+        {
+          "report": "CAL-085_empty_current_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 112,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_expanded_control_repeat1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat1_20260916.json",
+          "operator_observation": null,
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 8.666666666666666,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_updated_baseline_control_repeat2_reposition_attempt1_20260916.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 127,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_complete_contact_domain_repeat1_attempt2_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 614,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_sustained_current_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "historical_observational_not_same_endpoint",
+          "replay": {
+            "included_frames": 145,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        },
+        {
+          "report": "CAL-085_empty_stronger_contact_matched_control_attempt1_20260917.json",
+          "operator_observation": "无异常",
+          "evidence_kind": "same_endpoint_and_settings_matched_control",
+          "replay": {
+            "included_frames": 160,
+            "peak_filtered_mean_ma": 6.5,
+            "longest_qualifying_run_s": 0.0,
+            "hit_count": 0,
+            "first_hit": null
+          }
+        }
+      ],
+      "empty_reports_with_false_contact_hits": 0,
+      "nominal_fitter_delay_budget_s": 0.6666666666666666,
+      "illustrative_extra_command_pct_at_trial1pct_s": 0.6666666666666666,
+      "illustrative_extra_command_pct_at_profile15pct_s": 10.0
+    }
+  ],
+  "current_profile220_threshold_fixture_replay": {
+    "included_frames": 160,
+    "peak_filtered_mean_ma": 13.0,
+    "longest_qualifying_run_s": 0.0,
+    "hit_count": 0,
+    "first_hit": null
+  },
+  "decision": "Retain current0.1s conditionally; no recorded empty qualifying runs establish a necessary minimum dwell. Do not shorten solely because these traces have zero false positives, or lengthen without physical compression budget.",
+  "cal084_to_cal088_group_status": "NOT_ACCEPTED_FOR_PRODUCTION_OR_FULL_GRASP",
+  "profile_written": false,
+  "eeprom_written": false,
+  "new_motion_commands": 0,
+  "limitations": [
+    "Electrical first-above-threshold signal is not measured first physical contact.",
+    "Sampling jitter and strict dwell comparison can defer a hit by a tick;0.1s is not a fixed frame count.",
+    "Only one enhanced plastic fixture trace at1pct/s and one same-endpoint empty match; six historical controls are auxiliary, including one without operator observation.",
+    "Changing the dwell changes the counterfactual first-hit time; later open-loop samples do not reproduce real feedback-opening hold commands.",
+    "Nominal fitter budget is not a measured worst-case latency; extra command percentage is not physical compression or pressure.",
+    "No real-fruit/production15pct_s/damage/stop-response/holding validation; current220mA configuration still misses the fixture signal."
+  ]
+}

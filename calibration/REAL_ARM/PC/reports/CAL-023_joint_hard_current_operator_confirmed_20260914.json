@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "parameter_id": "CAL-023",
+  "status": "CONFIRMED_FOR_DEMO_PENDING_MOTION_REVALIDATION",
+  "captured_at": "2026-09-14",
+  "parameter": "joints.hard_current_ma",
+  "source": "operator_confirmed_existing_demo_threshold_below_eeprom_protection_current",
+  "result": {
+    "hard_current_ma": [900.0, 900.0, 900.0, 900.0, 900.0]
+  },
+  "hardware_upper_bound": {
+    "joint_servo_ids": [1, 2, 3, 4, 5],
+    "eeprom_Protection_Current_raw": [310, 310, 310, 310, 310],
+    "current_ma_per_raw": [6.5, 6.5, 6.5, 6.5, 6.5],
+    "eeprom_Protection_Current_ma": [2015.0, 2015.0, 2015.0, 2015.0, 2015.0],
+    "software_threshold_fraction_of_eeprom_protection": 0.4466501240694789
+  },
+  "runtime_semantics": {
+    "comparison": "abs(joint_current_ma) > joints.hard_current_ma",
+    "action": "immediate TRACKING_ERROR stop in executor monitor and planning hold checks",
+    "eeprom_protection_is_not_replaced": true
+  },
+  "scope_and_limitations": {
+    "accepted_scope": "demo_only",
+    "rated_load_motion_current_measured": false,
+    "stall_or_collision_test_performed": false,
+    "false_trip_margin_verified": false,
+    "profile_status_remains_draft": true,
+    "mandatory_revalidation_stage": "CAL-058_to_CAL-070_motion",
+    "mandatory_revalidation_data": "per_joint_absolute_peak_current_for_representative_demo_trajectories_and_loads"
+  },
+  "evidence": {
+    "eeprom_snapshot": "../raw/cal012_eeprom_after_writeback_20260913.json",
+    "eeprom_snapshot_sha256": "882ad31a07325d74b4617ee047e7d6bd03811ee55691fd6e8698767f662095a1",
+    "current_scale_parameter": "CAL-015",
+    "operator_decision": "Retain 900 mA per joint for the demo and annotate mandatory motion-stage revalidation."
+  },
+  "integration": {
+    "profile_sha256": "cfd4830f99fabd90a9b2f889b22cbf39f5bdb90ae6fca78d49c0c6d527247bbd",
+    "profile_field_changed": false,
+    "hardware_accessed": false,
+    "motion_instructions_sent": 0,
+    "eeprom_written": false,
+    "software_test_policy": "run_once_after_completion_of_the_joints_module"
+  }
+}

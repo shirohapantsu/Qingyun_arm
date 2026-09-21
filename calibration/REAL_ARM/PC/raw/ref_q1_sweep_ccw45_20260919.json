@@ -1,0 +1,14 @@
+{
+  "pose_label": "q1_sweep_ccw_minus45_diagonal",
+  "verification": "俯视：小臂投影与网格垫另一条对角线(-45°)平行对齐；方向：俯视逆时针(URDF负向) → ref=-45；总线校验 q1_bus=-47.65 与 +45 侧(41.93) 对称性一致",
+  "samples": [
+    {
+      "q_reference_deg": [-45.0, null, null, null, null],
+      "approach_direction": "joint_sweep",
+      "sweep_joint_index": 0,
+      "sweep_direction": -1,
+      "fixture_id": "mat_diagonal_geometric_20260919",
+      "load_label": "unloaded"
+    }
+  ]
+}
