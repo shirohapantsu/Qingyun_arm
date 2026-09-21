@@ -22,12 +22,12 @@ MOTOR_NAMES = (*JOINT_NAMES, "gripper")
 
 @dataclass(frozen=True)
 class VisionInterface:
-    """视觉下发的已确定可抓取目标；一次调用对应一个目标。"""
-
     position: FloatArray  # (3,) 目标几何中心，base_link，m
     yaw_deg: float        # 目标长轴相对基座 +X，绕 +Z 为正，[-90, 90)，模 180°
-    grade: str            # 品级元数据，控制仅记录，不用于选择放置点
-
+    length_m: float       # 长轴长度
+    width_m: float        # 短轴宽度
+    ripe: bool            # YOLO 成熟度判定，C 级唯一来源
+    valid_count: int      # 当次视野合法候选总数（ignore 封顶判据）
 
 @dataclass(frozen=True)
 class PlacePose:
