@@ -1,0 +1,15 @@
+{
+  "pose_label": "q5_flat_cw_plus90",
+  "verification": "几何法：锚点处夹爪侧面竖直，滚转90°后放平。方向由 URDF 裁决：活动指(+Y侧)翻到上方 = 绕世界+X正转90° = q5 +90。旧标定 sign[4]=-1 与本观测矛盾，判定旧值错误",
+  "axis_check": "FK: gripper Z(q5=0) = world +X；右手定则：绕指离观察者的轴正转=顺时针(从腕看夹爪)；用户报告顺时针+活动指在上，两条独立证据一致",
+  "samples": [
+    {
+      "q_reference_deg": [null, null, null, null, 90.0],
+      "approach_direction": "joint_sweep",
+      "sweep_joint_index": 4,
+      "sweep_direction": 1,
+      "fixture_id": "flat_face_geometric_20260919",
+      "load_label": "unloaded"
+    }
+  ]
+}

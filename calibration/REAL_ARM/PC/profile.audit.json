@@ -1,0 +1,94 @@
+{
+  "joints": {
+    "fit_sample_ids": [
+      "0ad5f83eb9",
+      "19d733b35b",
+      "38c2a1ebaf",
+      "3bbc958666",
+      "43647a65ee",
+      "70ec2669ae",
+      "76bdee7293",
+      "7d74263c7a",
+      "806854ebfe",
+      "83754f7b78",
+      "893cdf83f4",
+      "98b1b50082",
+      "98da4fbf23",
+      "a30e14872c",
+      "a5d11b62a2",
+      "a9a3901942",
+      "abb53cc0f2",
+      "b3024dce84",
+      "bed835b938",
+      "c2cdf55264",
+      "c63fcebdd7",
+      "d13cec9c52",
+      "d54cce2dbc",
+      "d88692c77e",
+      "e810c071bc"
+    ],
+    "updated_fields": [
+      "joints.margin_deg",
+      "joints.measured_limits_deg",
+      "joints.sign",
+      "joints.zero_offset_deg"
+    ],
+    "notes": {},
+    "residuals": {
+      "sign_fit_rms_deg": [
+        0.534623,
+        0.820398,
+        0.651994,
+        0.346759,
+        0.79385
+      ],
+      "calibration_raw_limits": [
+        [
+          718,
+          3424
+        ],
+        [
+          865,
+          3333
+        ],
+        [
+          796,
+          3095
+        ],
+        [
+          729,
+          3192
+        ],
+        [
+          0,
+          4095
+        ]
+      ],
+      "calibration_bus_limits_deg": [
+        [
+          -118.945055,
+          118.945055
+        ],
+        [
+          -108.483516,
+          108.483516
+        ],
+        [
+          -101.054945,
+          101.054945
+        ],
+        [
+          -108.263736,
+          108.263736
+        ],
+        [
+          -180.0,
+          180.0
+        ]
+      ],
+      "endpoint_repeat_spread_deg": {},
+      "endpoint_vs_calibration_deg": {},
+      "fk_validation_configs": 10
+    }
+  }
+}

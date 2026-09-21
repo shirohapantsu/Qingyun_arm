@@ -1,0 +1,16 @@
+{
+  "pose_label": "fk_check_07",
+  "verification": "手机绝对倾角链式换算: q2_ref=-13.968+A; q3_ref=16.175+(B-A); q4_ref=-2.207+(C-B); q1=0网格线对齐; q5未拧按0。实测 A=16, B=36, C=24.5。z=6.8cm 直尺竖直测固定指尖端。位置验证推迟到tool阶段(指南5.6)",
+  "samples": [
+    {
+      "q_reference_deg": [0.0, 2.032, 36.175, -13.707, 0.0],
+      "fk_check": true,
+      "measured_tcp_position_m": null,
+      "measured_tcp_height_m": 0.068,
+      "measured_tool_axes": null,
+      "approach_direction": "fk_validation",
+      "fixture_id": "phone_abs_inclinometer_chain_ruler_z_20260920",
+      "load_label": "unloaded"
+    }
+  ]
+}

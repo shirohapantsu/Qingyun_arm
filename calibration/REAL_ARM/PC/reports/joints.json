@@ -1,0 +1,98 @@
+{
+  "profile_id": "real_pc_v0",
+  "parameter_sha256": "9e2c5185bb104e6fa47fbdfe46e2e02cdf02f29d701b2b7d15e4e98060479801",
+  "operator": "w",
+  "operator_reviewed": true,
+  "stages": {
+    "joints": {
+      "input_sha256": "9f1128bb2082cf797018d921c8212a2920513c8346875aa9b09e5d3a987da30e",
+      "fit_sample_ids": [
+        "0ad5f83eb9",
+        "19d733b35b",
+        "38c2a1ebaf",
+        "3bbc958666",
+        "43647a65ee",
+        "70ec2669ae",
+        "76bdee7293",
+        "7d74263c7a",
+        "806854ebfe",
+        "83754f7b78",
+        "893cdf83f4",
+        "98b1b50082",
+        "98da4fbf23",
+        "a30e14872c",
+        "a5d11b62a2",
+        "a9a3901942",
+        "abb53cc0f2",
+        "b3024dce84",
+        "bed835b938",
+        "c2cdf55264",
+        "c63fcebdd7",
+        "d13cec9c52",
+        "d54cce2dbc",
+        "d88692c77e",
+        "e810c071bc"
+      ],
+      "validation_sample_ids": [
+        "19064cdf6d",
+        "48f56b61dc",
+        "5accedac5d",
+        "9f0e6c8859",
+        "a35f8c3b8c",
+        "c43d4674f4"
+      ],
+      "checks": [
+        {
+          "name": "有效限位最小可用跨度(deg)",
+          "field_path": "joints.margin_deg",
+          "measured": 185.464391,
+          "limit": 10.0,
+          "comparison": ">=",
+          "passed": true,
+          "evidence_type": "offline",
+          "evidence_refs": [
+            "9f1128bb2082",
+            "19064cdf6d",
+            "48f56b61dc",
+            "5accedac5d",
+            "9f0e6c8859"
+          ]
+        },
+        {
+          "name": "方向/零位拟合残差(deg)",
+          "field_path": "joints.zero_offset_deg",
+          "measured": 0.820398,
+          "limit": 1.0,
+          "comparison": "<=",
+          "passed": true,
+          "evidence_type": "physical",
+          "evidence_refs": [
+            "9f1128bb2082",
+            "19064cdf6d",
+            "48f56b61dc",
+            "5accedac5d",
+            "9f0e6c8859"
+          ]
+        },
+        {
+          "name": "FK 独立验证构型数",
+          "field_path": "workspace.tcp_bounds_m",
+          "measured": 10.0,
+          "limit": 10.0,
+          "comparison": ">=",
+          "passed": true,
+          "evidence_type": "physical",
+          "evidence_refs": [
+            "9f1128bb2082",
+            "19064cdf6d",
+            "48f56b61dc",
+            "5accedac5d",
+            "9f0e6c8859"
+          ]
+        }
+      ],
+      "passed": true
+    }
+  },
+  "overall_pass": false
+}

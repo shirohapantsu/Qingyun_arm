@@ -1,0 +1,19 @@
+{
+  "pose_label": "q4_sweep_gripper_up_operator_confirmed",
+  "phone_reading_deg": -27.5,
+  "phone_baseline_c4_deg": 0.0,
+  "upper_arm_reading_deg": 0.0,
+  "forearm_reading_deg": 0.0,
+  "note": "操作者确认：忽略本轮上游大臂后倾（总线显示约-1.5°），直接按手机实测-27.5记参考。若fit时4号轴RMS超1°，需用两次读数法重测本姿态",
+  "reference_note": "只有 sweep_joint_index 元素是权威参考角，其余为 null（未参与拟合）",
+  "samples": [
+    {
+      "q_reference_deg": [null, null, null, -29.707, null],
+      "approach_direction": "joint_sweep",
+      "sweep_joint_index": 3,
+      "sweep_direction": -1,
+      "fixture_id": "P0_phone_inclinometer_20260919",
+      "load_label": "unloaded"
+    }
+  ]
+}

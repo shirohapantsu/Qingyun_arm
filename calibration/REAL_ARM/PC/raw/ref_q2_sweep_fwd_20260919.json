@@ -1,0 +1,16 @@
+{
+  "pose_label": "q2_sweep_forward_tilt",
+  "phone_reading_deg": 24.0,
+  "phone_baseline_c2_deg": 0.0,
+  "reference_note": "只有 sweep_joint_index 元素是权威参考角，其余为 null（未参与拟合）",
+  "samples": [
+    {
+      "q_reference_deg": [null, 10.032, null, null, null],
+      "approach_direction": "joint_sweep",
+      "sweep_joint_index": 1,
+      "sweep_direction": 1,
+      "fixture_id": "P0_phone_inclinometer_20260919",
+      "load_label": "unloaded"
+    }
+  ]
+}

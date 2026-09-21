@@ -1,0 +1,14 @@
+{
+  "pose_label": "q5_quarter_ccw_minus90",
+  "verification": "活动指开合方向朝右(正视) = q5=-90 特征；与 bus +92.79 在 sign=-1 下一致。sign[4]=-1 由三重独立证据确认：CAL-018(09-14)、半转顺时针+指尖朝地特征、本姿态开合朝向",
+  "samples": [
+    {
+      "q_reference_deg": [null, null, null, null, -90.0],
+      "approach_direction": "joint_sweep",
+      "sweep_joint_index": 4,
+      "sweep_direction": -1,
+      "fixture_id": "jaw_open_direction_geometric_20260919",
+      "load_label": "unloaded"
+    }
+  ]
+}

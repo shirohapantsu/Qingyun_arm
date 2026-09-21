@@ -1,0 +1,124 @@
+{
+  "profile_id": "real_pc_v0",
+  "parameter_sha256": "c910cd6be46f581f67e4983d43a7c8c7e6625b7baf84dea3d07587d70c5d076a",
+  "operator": "w",
+  "operator_reviewed": true,
+  "stages": {
+    "motor": {
+      "input_sha256": "7935361355b394dd9f9dd514b90eaec312c383f0e0bee355e619faf0d4063729",
+      "fit_sample_ids": [],
+      "validation_sample_ids": [
+        "1cb3586305",
+        "3dacec7749",
+        "4b3d06b307",
+        "a10e97853d",
+        "a75b5ccc48",
+        "abe8df3ab9",
+        "cf740f235c",
+        "e58432f72f",
+        "ebf3a27311",
+        "f7a205a86b"
+      ],
+      "checks": [
+        {
+          "name": "夹爪两端读数不同",
+          "field_path": "motor.gripper_closed_raw",
+          "measured": 1398.0,
+          "limit": 1.0,
+          "comparison": ">=",
+          "passed": true,
+          "evidence_type": "offline",
+          "evidence_refs": [
+            "7935361355b3",
+            "1cb3586305",
+            "3dacec7749",
+            "4b3d06b307",
+            "a10e97853d"
+          ]
+        },
+        {
+          "name": "编码分辨率大于 1",
+          "field_path": "motor.position_resolution",
+          "measured": 4096.0,
+          "limit": 1.0,
+          "comparison": ">=",
+          "passed": true,
+          "evidence_type": "offline",
+          "evidence_refs": [
+            "7935361355b3",
+            "1cb3586305",
+            "3dacec7749",
+            "4b3d06b307",
+            "a10e97853d"
+          ]
+        },
+        {
+          "name": "电流比例为正",
+          "field_path": "motor.current_ma_per_raw",
+          "measured": 6.5,
+          "limit": 0.0,
+          "comparison": ">=",
+          "passed": true,
+          "evidence_type": "offline",
+          "evidence_refs": [
+            "7935361355b3",
+            "1cb3586305",
+            "3dacec7749",
+            "4b3d06b307",
+            "a10e97853d"
+          ]
+        },
+        {
+          "name": "6 通道同型号",
+          "field_path": "motor.models",
+          "measured": 1.0,
+          "limit": 1.0,
+          "comparison": "==",
+          "passed": true,
+          "evidence_type": "offline",
+          "evidence_refs": [
+            "7935361355b3",
+            "1cb3586305",
+            "3dacec7749",
+            "4b3d06b307",
+            "a10e97853d"
+          ]
+        },
+        {
+          "name": "motor.models 与采集 metadata 逐项一致",
+          "field_path": "motor.models",
+          "measured": 1.0,
+          "limit": 1.0,
+          "comparison": "==",
+          "passed": true,
+          "evidence_type": "physical",
+          "evidence_refs": [
+            "7935361355b3",
+            "1cb3586305",
+            "3dacec7749",
+            "4b3d06b307",
+            "a10e97853d"
+          ]
+        },
+        {
+          "name": "motor.firmware 与采集 metadata 逐项一致",
+          "field_path": "motor.firmware",
+          "measured": 1.0,
+          "limit": 1.0,
+          "comparison": "==",
+          "passed": true,
+          "evidence_type": "physical",
+          "evidence_refs": [
+            "7935361355b3",
+            "1cb3586305",
+            "3dacec7749",
+            "4b3d06b307",
+            "a10e97853d"
+          ]
+        }
+      ],
+      "passed": true
+    }
+  },
+  "overall_pass": false
+}
