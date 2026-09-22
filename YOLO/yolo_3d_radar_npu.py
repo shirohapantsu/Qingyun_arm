@@ -13,7 +13,7 @@ import os
 # 🍓 用户常用配置区 (方便手动修改)
 # ==========================================
 TARGET_MODEL = "11l_berry_best-rk3588.rknn"  # 当前使用的模型文件名
-IMGSZ = 736                                  # 模型输入分辨率 (如 736, 640, 416)
+IMGSZ = 640                                  # 模型输入分辨率 (如 736, 640, 416)
 CONF_THRES = 0.25                            # 置信度阈值 (越小越容易识别，越大越严格)
 IOU_THRES = 0.45                             # 重叠框过滤阈值
 # --- 相机物理分辨率配置 (重标定后若改动请修改此处) ---
@@ -97,45 +97,48 @@ class YOLO_NPU:
 
     def detect(self, img_bgr):
         h0, w0 = img_bgr.shape[:2]
-        # 诊断确认的正确格式: NHWC, uint8, 不归一化
         img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
         img_in = np.expand_dims(cv2.resize(img_rgb, (IMGSZ, IMGSZ)), axis=0)
 
         outputs = self.rknn.inference(inputs=[img_in])
-        preds = outputs[0][0].T  # (2100, 4 + classes)
+        preds = outputs[0][0].T  # (8400, 7) for OBB
 
-        boxes = preds[:, :4]
-        class_scores = preds[:, 4:]
+        boxes = preds[:, :4]     # cx, cy, w, h
+        class_scores = preds[:, 4:-1]
+        angles_rad = preds[:, -1]
         
         scores = np.max(class_scores, axis=1)
         class_ids = np.argmax(class_scores, axis=1)
 
-        # 自动补 sigmoid（如果模型输出的是 logits）
         if scores.max() > 1.0 or scores.min() < -0.01:
             scores = 1 / (1 + np.exp(-np.clip(scores, -50, 50)))
 
         mask = scores > self.conf
-        boxes, scores, class_ids = boxes[mask], scores[mask], class_ids[mask]
+        boxes, scores, class_ids, angles_rad = boxes[mask], scores[mask], class_ids[mask], angles_rad[mask]
         if len(boxes) == 0:
             return []
 
-        # cx,cy,w,h → x1,y1,w,h 并还原到原始画面尺寸
         sx, sy = w0 / IMGSZ, h0 / IMGSZ
-        x1 = (boxes[:, 0] - boxes[:, 2] / 2) * sx
-        y1 = (boxes[:, 1] - boxes[:, 3] / 2) * sy
-        w  = boxes[:, 2] * sx
-        h  = boxes[:, 3] * sy
+        
+        bboxes_for_nms = []
+        import math
+        for i in range(len(boxes)):
+            cx = boxes[i, 0] * sx
+            cy = boxes[i, 1] * sy
+            bw  = boxes[i, 2] * sx
+            bh  = boxes[i, 3] * sy
+            angle_deg = angles_rad[i] * 180.0 / math.pi
+            bboxes_for_nms.append(((float(cx), float(cy)), (float(bw), float(bh)), float(angle_deg)))
 
-        indices = cv2.dnn.NMSBoxes(
-            np.stack([x1, y1, w, h], 1).tolist(),
-            scores.tolist(), self.conf, self.iou)
+        indices = cv2.dnn.NMSBoxesRotated(bboxes_for_nms, scores.tolist(), self.conf, self.iou)
 
         results = []
         if len(indices) > 0:
             for i in indices.flatten():
-                bx1, by1 = max(0, int(x1[i])), max(0, int(y1[i]))
-                bx2, by2 = min(w0, int(x1[i]+w[i])), min(h0, int(y1[i]+h[i]))
-                results.append((bx1, by1, bx2, by2, float(scores[i]), int(class_ids[i])))
+                cx, cy = bboxes_for_nms[i][0]
+                bw, bh = bboxes_for_nms[i][1]
+                angle_rad = angles_rad[i]
+                results.append((cx, cy, bw, bh, angle_rad, float(scores[i]), int(class_ids[i])))
         return results
 
 # ---------- 主程序 ----------
@@ -219,19 +222,19 @@ def main():
             print(f"  📊 首次检测到 {len(dets)} 个目标")
             first = False
 
-        for (x1, y1, x2, y2, conf, cls_id) in dets:
-            u_roi, v_roi = (x1+x2)//2, (y1+y2)//2
+        import math
+        for (cx_roi, cy_roi, w_roi, h_roi, angle_rad, conf, cls_id) in dets:
+            u_roi, v_roi = int(cx_roi), int(cy_roi)
             Z = 0
             for hw in [8, 15, 25, 40]:  # 水波纹式扩大搜索区域
-                roi = aligned_roi[max(0,v_roi-hw):min(ROI_SIZE,v_roi+hw+1), max(0,u_roi-hw):min(ROI_SIZE,u_roi+hw+1)]
-                vd = roi[roi > 0]
+                roi_patch = aligned_roi[max(0,v_roi-hw):min(ROI_SIZE,v_roi+hw+1), max(0,u_roi-hw):min(ROI_SIZE,u_roi+hw+1)]
+                vd = roi_patch[roi_patch > 0]
                 if len(vd) > (hw * hw * 0.1):
                     Z = float(np.median(vd))
                     break
             
-            g_x1, g_y1 = x1 + start_x, y1 + start_y
-            g_x2, g_y2 = x2 + start_x, y2 + start_y
-            g_u, g_v = u_roi + start_x, v_roi + start_y
+            g_u = u_roi + start_x
+            g_v = v_roi + start_y
 
             # --- 类别到颜色和名称的映射 ---
             CLASS_NAMES = {0: "RIPE", 1: "UNRIPE"}
@@ -240,20 +243,32 @@ def main():
             cls_name = CLASS_NAMES.get(cls_id, f"C{cls_id}")
             box_color = COLORS.get(cls_id, (0, 255, 255))
 
-            # 画极细的框和中心点
-            cv2.rectangle(frame, (g_x1, g_y1), (g_x2, g_y2), box_color, 2)
-            cv2.circle(frame, (g_u, g_v), 4, (0,0,255), -1)
+            # 画旋转框 (直接画在 frame_roi 上)
+            angle_deg = angle_rad * 180.0 / math.pi
+            rect_roi = ((float(cx_roi), float(cy_roi)), (w_roi, h_roi), angle_deg)
+            box_points = cv2.boxPoints(rect_roi)
+            box_points = np.int32(box_points)
+            cv2.drawContours(frame_roi, [box_points], 0, box_color, 2)
+            cv2.circle(frame_roi, (u_roi, v_roi), 4, (0,0,255), -1)
             
-            # 极简文本展示
+            # 长短轴与偏航角对齐计算 (仅供显示参考)
+            yaw_deg = angle_deg
+            if h_roi > w_roi:
+                yaw_deg += 90
+            yaw_deg = (yaw_deg + 90) % 180 - 90
+            
+            # 文本展示位置 (取最上方的点)
+            top_pt = tuple(box_points[box_points[:, 1].argmin()])
+            txt_pos = (top_pt[0], max(15, top_pt[1] - 10))
+
             if Z > 0:
                 X = (g_u - cx) * Z / fx
                 Y = (g_v - cy) * Z / fy
-                txt = f"{cls_name} Z:{Z:.0f} ({conf:.0%})"
+                txt = f"{cls_name} Z:{Z:.0f} Yaw:{yaw_deg:.0f} ({conf:.0%})"
             else:
-                txt = f"{cls_name} NO-Z ({conf:.0%})"
+                txt = f"{cls_name} NO-Z Yaw:{yaw_deg:.0f} ({conf:.0%})"
                 
-            # 直接把字写在框上
-            cv2.putText(frame, txt, (g_x1, max(15, g_y1-5)), cv2.FONT_HERSHEY_SIMPLEX, 0.6, box_color, 2)
+            cv2.putText(frame_roi, txt, txt_pos, cv2.FONT_HERSHEY_SIMPLEX, 0.6, box_color, 2)
 
         # FPS 计算与显示
         fps_count += 1
@@ -262,10 +277,10 @@ def main():
             fps_display = fps_count / elapsed
             fps_count = 0
             fps_t0 = time.time()
-        cv2.putText(frame, f"FPS: {fps_display:.1f}", (10, 30),
+        cv2.putText(frame_roi, f"FPS: {fps_display:.1f}", (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
 
-        cv2.imshow('NPU 3D Tracking', frame)
+        cv2.imshow('NPU 3D Tracking', frame_roi)
         key = cv2.waitKey(1) & 0xFF
         if key in [27, ord('q'), ord('Q')]: 
             break
@@ -275,9 +290,9 @@ def main():
             if len(dets) == 0:
                 print("[系统] 警告：当前视野中未识别到任何目标")
             else:
-                best_target = sorted(dets, key=lambda x: x[4], reverse=True)[0]
-                tx1, ty1, tx2, ty2, tconf, tcls_id = best_target
-                tu_roi, tv_roi = (tx1+tx2)//2, (ty1+ty2)//2
+                best_target = sorted(dets, key=lambda x: x[5], reverse=True)[0]
+                tcx_roi, tcy_roi, tw_roi, th_roi, tangle_rad, tconf, tcls_id = best_target
+                tu_roi, tv_roi = int(tcx_roi), int(tcy_roi)
                 
                 tZ = 0
                 for thw in [8, 15, 25, 40]:
@@ -289,24 +304,41 @@ def main():
                 
                 tgrade = "RIPE" if tcls_id == 0 else "UNRIPE"
                 
-                tg_x1, tg_y1 = tx1 + start_x, ty1 + start_y
-                tg_x2, tg_y2 = tx2 + start_x, ty2 + start_y
-                tg_u, tg_v = tu_roi + start_x, tv_roi + start_y
-                
                 if tZ == 0:
                     print(f"[系统] 警告：最优目标 [{tgrade}] 无有效深度信息")
                 else:
-                    tX = (tg_u - cx) * tZ / fx
-                    tY = (tg_v - cy) * tZ / fy
-                    print("[系统] 成功生成 VisionInterface 模拟数据:")
-                    print(f"  ├─ position : [{tX:.1f}, {tY:.1f}, {tZ:.1f}] mm")
-                    print(f"  ├─ yaw_deg  : 0.0")
-                    print(f"  └─ grade    : {tgrade}")
+                    tX = (tu_roi + start_x - cx) * tZ / fx
+                    tY = (tv_roi + start_y - cy) * tZ / fy
                     
-                    snap = frame.copy()
-                    cv2.rectangle(snap, (tg_x1, tg_y1), (tg_x2, tg_y2), (0, 0, 255), 2)
-                    cv2.circle(snap, (tg_u, tg_v), 4, (0, 0, 255), -1)
-                    cv2.putText(snap, "TARGET", (tg_x1, max(15, tg_y1-10)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
+                    # 计算物理尺寸和最终 Yaw
+                    physical_tw = tw_roi * tZ / fx
+                    physical_th = th_roi * tZ / fy
+                    tangle_deg = tangle_rad * 180.0 / math.pi
+                    if physical_th > physical_tw:
+                        tlen_m = physical_th / 1000.0
+                        twid_m = physical_tw / 1000.0
+                        tyaw_deg = tangle_deg + 90
+                    else:
+                        tlen_m = physical_tw / 1000.0
+                        twid_m = physical_th / 1000.0
+                        tyaw_deg = tangle_deg
+                    tyaw_deg = (tyaw_deg + 90) % 180 - 90
+                    
+                    print("[系统] 成功生成 VisionInterface 模拟数据:")
+                    print(f"  ├─ position : [{tX/1000.0:.3f}, {tY/1000.0:.3f}, {tZ/1000.0:.3f}] m")
+                    print(f"  ├─ yaw_deg  : {tyaw_deg:.1f}")
+                    print(f"  ├─ length_m : {tlen_m:.3f} m")
+                    print(f"  ├─ width_m  : {twid_m:.3f} m")
+                    print(f"  └─ ripe     : {tcls_id == 0}")
+                    
+                    snap = frame_roi.copy()
+                    rect = ((tcx_roi, tcy_roi), (tw_roi, th_roi), tangle_deg)
+                    box_points = cv2.boxPoints(rect)
+                    box_points = np.int32(box_points)
+                    cv2.drawContours(snap, [box_points], 0, (0, 0, 255), 2)
+                    cv2.circle(snap, (tu_roi, tv_roi), 4, (0, 0, 255), -1)
+                    top_pt = tuple(box_points[box_points[:, 1].argmin()])
+                    cv2.putText(snap, "TARGET", (top_pt[0], max(15, top_pt[1]-10)), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
                     cv2.imwrite("manual_snapshot.jpg", snap)
                     print("[系统] 快照已保存为: manual_snapshot.jpg")
             print("="*40 + "\n")
