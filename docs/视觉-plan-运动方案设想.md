@@ -2,6 +2,8 @@
 
 > 2026-09-21 视觉接口 grill 评审结论。与 [上层任务编排模块技术文档](上层任务编排模块技术文档.md) §2/§5/§6/§11 同步；运动侧行为以 [机械臂运动控制模块技术文档](机械臂运动控制模块技术文档.md) 为准。
 > 相机：RGB-D，眼在手外固定安装，home 位姿不遮挡抓取 ROI；相机→基座变换在视觉内部完成（CAL-040/041 归视觉验收）。
+> 2026-09-22 D02/D03：连续失败预算统一为 10；保留临时 skip-ahead，成功/NoTarget 后允许失败目标重新入选，不增加任务内永久排除列表。后续决定见 [实施决策记录](实施文档/README.md)。
+> 2026-09-22 D14：ignore 封顶改为 terminate("NO_GRASPABLE_TARGET")（判定无可抓取目标、臂冻结），不再解锁复位正常返回；§五已同步。
 
 ## 一、公共接口改造（common_interface.py，动工前先行 commit）
 
@@ -16,7 +18,7 @@ class VisionInterface:
     valid_count: int      # 当次视野合法候选总数（ignore 封顶判据，§五）
 ```
 
-- grade 字段删除：运动侧运行代码零引用（仅 tests 构造点与文档锁场），grade 完全 plans 内部化，place_id 是唯一放置可观测。
+- grade 字段删除：目标为运动侧运行代码零引用（当前 `arm_control._validate_target` 仍引用 grade，P0 移除后成立），grade 完全 plans 内部化，place_id 是唯一放置可观测。
 - 连带机械修订：motion 文档 §1.1 字段表；tests/test_grasp_flow.py、tests/support.py 构造点。
 - grasp_and_place 对 length/width/ripe/valid_count 零消费，只验 position/yaw；五项可抓性保证语义挂在 get_target 返回值上（运动文档 §1.1 不变）。
 
@@ -81,14 +83,14 @@ def get_target(ignore: int = 0) -> VisionInterface
 ## 五、ignore 封顶与失败兜底（重试 skip-ahead）
 
 - 触发：重试类失败（上层文档 §6 分发表）→ ignore+1，下次 `get_target(ignore)`。
-- 封顶（任务完成判据，主出口）：失败递增后 `ignore ≥ 当次 target.valid_count` → 视野中所有合法目标已各失败一次、无处可跳 → 解锁复位后正常返回（任务完成，回 WAITING）。判定先于失败预算——穷尽是正常出口。
-- 失败预算（兜底）：连续 N 次重试类失败 → `terminate`（不再解锁复位）；计数**仅成功抓取清零**（NoTarget 不清零）；正常路径均被封顶先拦截，预算只兜 NoTarget 归零绕路（场景变化致 valid_count 波动的循环）；N 为 plan 常量（默认 3），实例状态、新任务归零。
+- 封顶（**D14 修订**）：失败递增后 `ignore ≥ 当次 target.valid_count` → 判定无可抓取目标 → **terminate("NO_GRASPABLE_TARGET")：不恢复、不人工确认、臂冻结于当次失败位**（原"解锁复位后正常返回"已废止）。重新扫描可能改变排名，该判据不证明每个物理目标均已恰好尝试一次。
+- 失败预算：连续 N 次重试类失败且未先触发穷尽 → `terminate`（不再解锁复位）；计数**仅成功抓取清零**（NoTarget 不清零）。N 为 plan 常量，D02 已确认 **10**，实例状态、新任务归零。候选数超过 N 时预算也可能先触发，并非只用于 NoTarget 归零绕路。
 - ignore 归零：任一次成功抓取；任一次 NoTarget。
 - 语义：episode 级弃权非拉黑——被跳过物体若仍在 ROI，归零后按当次排名重新入选；ignore 跳的是当次排名（每次调用重新扫描，失败可能已碰歪物体）。
 
 ## 六、plans（以草莓方案为例）
 
-- grade 判定（阈值常量 K 在 plan 文件内）：
+- grade 判定（D05：两种果品分别标定 K，阈值常量放在各自 plan 文件，单位 m²；分级公式共用）：
 
 ```py
 grade = "C" if not target.ripe else ("A" if target.length_m * target.width_m >= K else "B")
