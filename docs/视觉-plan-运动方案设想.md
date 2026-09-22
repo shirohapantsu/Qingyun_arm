@@ -22,6 +22,8 @@ class VisionInterface:
 - 连带机械修订：motion 文档 §1.1 字段表；tests/test_grasp_flow.py、tests/support.py 构造点。
 - grasp_and_place 对 length/width/ripe/valid_count 零消费，只验 position/yaw；五项可抓性保证语义挂在 get_target 返回值上（运动文档 §1.1 不变）。
 
+> 2026-09-23 D18/D19：用户保证本期实物长宽高均在固定运动包络内；视觉采用OBB区域深度点、剔除桌面、base系测量。完整配准/点集/日志/回放定义以[P3](实施文档/P3_视觉检测与目标选择技术文档.md)为准，不从图像角或像素边长直接生成真实yaw/尺寸。
+
 ## 二、vision.py 单体（import 同进程）
 
 - 依赖方向：只准 import common_interface（类型）与自身模型栈；不 import 上层/运动任何东西。
@@ -118,14 +120,14 @@ def next_place_id(self, grade: str) -> str:
 
 ## 七、验收项（demo 前）
 
-- CAL-040/041：base 系位置误差 ≤5mm（实测）。
+- CAL-040：base位置三维欧氏误差逐样本≤4mm；CAL-041：yaw模180°最小角差逐样本≤5°。
 - yaw 测量误差 ≤5°（实测）。
 - YOLO unripe 误判率：混绿果场景人工验收。
 - 审计日志抽查：候选数 + 逐项拒绝原因可回溯每一次"任务完成"。
 
 ## 八、已知风险（显式接受）
 
-- 过小目标不设下限 → 逐个 GRASP_MISS → ignore 封顶穷尽（§五）→ 任务完成（失败码日志可审计；摆桌不混入过小果）。
+- 过小目标不设下限 → 逐个 GRASP_MISS → ignore 封顶（§五）→ terminate(NO_GRASPABLE_TARGET)（失败码日志可审计；摆桌不混入过小果）。
 - YOLO ripe/unripe 误判 → 放错堆，无任何一层拦截。
-- 矩形足迹近似 vs 真实轮廓的邻距误差，由 clearance 余量吸收。
+- 邻距使用P3定义的测量足迹及P4标定padding，不能把clearance当任意测量误差的兜底。
 - GRIP_SLIP 物体去向不明（上层文档 §10 既有）。
