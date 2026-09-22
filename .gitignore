@@ -1,0 +1,25 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Virtual Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Large data/temp files (optional - uncomment if you don't want to track these)
+# mark_img/
+# *.jpg
+# *.png
+# *.rknn
+# *.so
+
