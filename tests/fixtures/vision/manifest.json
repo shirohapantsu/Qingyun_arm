@@ -1,0 +1,1 @@
+{"schema_version": 1, "frames": [{"id": "0001", "color": "0001_color.npy", "depth": "0001_depth.npy", "rgb_time_s": 1.0, "depth_time_s": 1.0, "detections": "0001_detections.json"}]}

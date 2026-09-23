@@ -1,0 +1,32 @@
+{
+  "camera": {
+    "type": "orbbec_astra_pro",
+    "depth_mode": "640x480@30",
+    "rgb_device": null,
+    "rgb_size": null,
+    "max_pair_delta_s": null,
+    "acquire_timeout_s": null
+  },
+  "model": {
+    "backend": "yolo",
+    "path": "../YOLO/11l_berry_best-rk3588.rknn",
+    "detection_floor": 0.05,
+    "conf_threshold": 0.5,
+    "class_ripe": ["RIPE"],
+    "class_unripe": ["UNRIPE"]
+  },
+  "calibration": {
+    "intrinsics_path": "vision/camera_intrinsics.json",
+    "extrinsic_base_camera_path": "vision/T_base_camera.json"
+  },
+  "geometry": {
+    "min_points": 32,
+    "inner_scale": 0.8,
+    "depth_neighbor_jump_m": 0.02,
+    "footprint_padding_m": 0.01
+  },
+  "source": {
+    "mode": "live",
+    "replay_dir": null
+  }
+}
