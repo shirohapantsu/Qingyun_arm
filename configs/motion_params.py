@@ -13,7 +13,11 @@
     * real 模式要求 status=verified、全部运行期字段非 null、模型与电机校准
       文件哈希与验收报告匹配；mock 模式使用独立 status=simulation 配置。
     * draft（未测物理值为 null 的骨架配置）只能由 scripts/calibrate.py init
-      生成，不能用本模块加载：两种模式都要求运行期字段完整。
+      生成，不能用本模块的 real/mock 入口加载：两种模式都要求运行期字段完整。
+    * 标定链工具入口 load_calibration_motion_params（P4 §2.8.1）加载 draft/verified
+      真机 profile 的完整 MotionParams，校验强度与 real 同款，唯一豁免"必须 verified
+      及已完成验收报告绑定"，用于在 draft 候选上产生首次 verified 所需的抓放证据。
+      它与只读的 load_calibration_profile（采集总线最小参数集）用途不同，不可混用。
 """
 
 from __future__ import annotations
@@ -51,6 +55,43 @@ LOAD_LIMIT_TOL_DEG = 1e-6
 LOAD_AXIS_SPAN_M = 1e-9
 
 STATUSES = ("draft", "verified", "simulation")
+
+# 模块对外公开的名字。三个 profile 加载入口按用途区分：
+#   * load_motion_params            —— 生产运行（mode="real"/"mock"）。
+#   * load_calibration_motion_params—— 标定工具：draft/verified 完整 MotionParams（P4 §2.8.1）。
+#   * load_calibration_profile      —— 采集总线：draft/verified 的最小参数集（CalibrationProfile）。
+__all__ = [
+    "ParamsError",
+    "SCHEMA_VERSION",
+    "STATUSES",
+    "ModelParams",
+    "MotorParams",
+    "JointsParams",
+    "ToolTranslationSample",
+    "GapSample",
+    "AngleSample",
+    "ToolParams",
+    "Obstacle",
+    "WorkspaceParams",
+    "LinkCapsule",
+    "CollisionParams",
+    "TimingParams",
+    "MotionConstraints",
+    "IkParams",
+    "GraspParams",
+    "GripperParams",
+    "AcceptanceParams",
+    "VerificationParams",
+    "MotionParams",
+    "CalibrationProfile",
+    "read_urdf_joint_limits_deg",
+    "effective_joint_limits",
+    "wrap180",
+    "parameter_sha256",
+    "load_motion_params",
+    "load_calibration_motion_params",
+    "load_calibration_profile",
+]
 
 
 class ParamsError(ValueError):
@@ -1159,13 +1200,12 @@ def _sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
-def load_motion_params(profile_path: Path, *, mode: Literal["real", "mock"]) -> MotionParams:
-    """加载并校验 profile.json。
+def _read_profile_json(profile_path: Path) -> tuple[dict, dict]:
+    """读取并做顶层键校验，返回 (raw, d)。三个公开加载入口共用同一份读盘/键校验语义。
 
-    mode="real"  ：要求 status=verified、运行期字段全部测完、资源文件哈希与
-                   验收报告匹配，任何一项不满足都拒绝启动（标定指南 1.1）。
-    mode="mock"  ：用于仿真与单元测试，要求 status=simulation，跳过哈希与
-                   报告匹配，但结构、shape、单调性、限位交集等全部照查。
+    raw 是原始 JSON 对象（real 的报告绑定要对它求 parameter_sha256），d 是做完
+    顶层键存在性检查后的 dict。此处只负责"能不能读进来、顶层键对不对"，不判断
+    status 合法与否——状态门槛由各入口自己决定，从而保持对外行为逐字不变。
     """
     profile_path = Path(profile_path)
     if not profile_path.is_file():
@@ -1183,17 +1223,23 @@ def load_motion_params(profile_path: Path, *, mode: Literal["real", "mock"]) -> 
         "gripper", "acceptance", "verification",
     }
     d = _require_keys(raw, expected_top, str(profile_path))
+    return raw, d
 
-    status = _str("status", d["status"])
-    if status not in STATUSES:
-        raise ParamsError("status", f"只能是 {STATUSES}，实际 {status!r}")
 
-    # 加载模式与配置状态必须配套：draft 还没测完，real/mock 都不接受。
-    if mode == "real" and status != "verified":
-        raise ParamsError("status", f"mode=real 要求 status=verified，实际 {status!r}")
-    if mode == "mock" and status != "simulation":
-        raise ParamsError("status", f"mode=mock 要求独立配置 status=simulation，实际 {status!r}")
+def _parse_and_validate(
+    profile_path: Path, d: Mapping[str, Any], status: str, *, check_hashes: bool
+) -> MotionParams:
+    """加载主体：分组解析 + 资源存在性/（可选）哈希 + 限位交集 + 表覆盖。
 
+    这里是 real / mock / 标定三个入口共享的解析与校验核心，校验强度完全一致：
+    全部运行期字段非 null（null 由各 _parse_* 里的 _null_check 拒绝）、表共同
+    覆盖区间、URDF∩实测∩应用限位交集、URDF 存在性，以及 check_hashes=True 时的
+    URDF/电机校准文件存在性与 profile 内两项哈希匹配。
+
+    本函数**不**判断 status 是否满足某个模式，也**不**做验收报告绑定——那两项
+    门槛（"必须 verified"与"_check_report_binding"）由具体公开入口自行决定，
+    以保证各入口的对外语义可独立演化。status 原样写进返回对象，不改写、不落盘。
+    """
     model = _parse_model("model", d["model"])
     collision = _parse_collision("collision", d["collision"])
     base_dir = profile_path.parent
@@ -1203,7 +1249,7 @@ def load_motion_params(profile_path: Path, *, mode: Literal["real", "mock"]) -> 
     if not urdf_file.is_file():
         raise ParamsError("model.urdf_path", f"文件不存在：{urdf_file}")
     urdf_limits = read_urdf_joint_limits_deg(urdf_file, JOINT_NAMES)
-    if mode == "real":
+    if check_hashes:
         actual = _sha256_file(urdf_file)
         if actual != model.urdf_sha256:
             raise ParamsError("model.urdf_sha256", f"与实算哈希不一致：{actual}")
@@ -1244,10 +1290,70 @@ def load_motion_params(profile_path: Path, *, mode: Literal["real", "mock"]) -> 
 
     # --- 跨字段一致性 ---
     _check_gripper_table_coverage("", params)
+    return params
+
+
+def load_motion_params(profile_path: Path, *, mode: Literal["real", "mock"]) -> MotionParams:
+    """加载并校验 profile.json。
+
+    mode="real"  ：要求 status=verified、运行期字段全部测完、资源文件哈希与
+                   验收报告匹配，任何一项不满足都拒绝启动（标定指南 1.1）。
+    mode="mock"  ：用于仿真与单元测试，要求 status=simulation，跳过哈希与
+                   报告匹配，但结构、shape、单调性、限位交集等全部照查。
+    """
+    raw, d = _read_profile_json(profile_path)
+
+    status = _str("status", d["status"])
+    if status not in STATUSES:
+        raise ParamsError("status", f"只能是 {STATUSES}，实际 {status!r}")
+
+    # 加载模式与配置状态必须配套：draft 还没测完，real/mock 都不接受。
+    if mode == "real" and status != "verified":
+        raise ParamsError("status", f"mode=real 要求 status=verified，实际 {status!r}")
+    if mode == "mock" and status != "simulation":
+        raise ParamsError("status", f"mode=mock 要求独立配置 status=simulation，实际 {status!r}")
+
+    # real 才核对资源哈希；mock 只要求 URDF 存在以读限位（与抽取前的分支完全一致）。
+    params = _parse_and_validate(Path(profile_path), d, status, check_hashes=(mode == "real"))
 
     if mode == "real":
-        _check_report_binding(profile_path, params, raw)
+        _check_report_binding(Path(profile_path), params, raw)
     return params
+
+
+def load_calibration_motion_params(profile_path: Path) -> MotionParams:
+    """标定工具专用：加载 draft/verified 真机 profile 的**完整** MotionParams（P4 §2.8.1）。
+
+    与生产 real 入口共享同一套内部解析/校验（_parse_and_validate，check_hashes=True）：
+    全部运行期字段非 null、三张夹爪表共同覆盖区间、URDF∩实测∩应用限位交集、URDF/
+    电机校准文件存在性与 profile 内两项哈希匹配、其余全部结构/shape/单调性校验。
+
+    唯一豁免：**不要求 status=verified，也不校验已完成验收报告的哈希绑定**
+    （draft 阶段本就没有已通过验收的报告，_check_report_binding 无从谈起）。这
+    是为了补上"首次 verified 所需的抓放真实证据此前没有产生路径"的缺口——采集
+    发生在 draft 上（P4 §2.8）。null/未测物理字段仍然一律拒绝：缺值只阻止真机
+    验收，不阻止工具编码，但加载器绝不放行 null。
+
+    只接受 status ∈ {draft, verified}。simulation 配置属于仿真/生产 mock 链路，
+    不是标定对象；生产运行请走 load_motion_params(mode=...)，二者互不越权。返回
+    对象保留原始 status（draft 仍为 draft）与原始 profile_dir，绝不改写文件、
+    不升级状态、不伪装成 simulation。
+
+    注意：这是"完整 MotionParams"，与只读的 load_calibration_profile（返回采集总线
+    所需最小字段集 CalibrationProfile）用途不同，不可混用或相互替代。
+    """
+    _raw, d = _read_profile_json(profile_path)
+
+    status = _str("status", d["status"])
+    if status not in ("draft", "verified"):
+        raise ParamsError(
+            "status",
+            f"标定完整加载要求 status 为 draft 或 verified，实际 {status!r}"
+            "（simulation 配置不属于标定链；生产运行请用 load_motion_params 的 real/mock 模式）",
+        )
+
+    # 校验强度与 real 同款（含资源哈希），唯一差别即上面不强制 verified、下面不绑定报告。
+    return _parse_and_validate(Path(profile_path), d, status, check_hashes=True)
 
 
 def _check_report_binding(profile_path: Path, params: MotionParams, raw: Mapping[str, Any]) -> None:

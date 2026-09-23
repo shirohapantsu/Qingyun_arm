@@ -8,22 +8,22 @@
 > **本工程目前还不能端到端运行。** `python main.py` 不会有任何输出且退出码为 0——
 > `main.py` 是 0 字节占位文件，**程序入口尚未实现**。
 >
-> 按实际文件行数核对（`wc -l`，2026-09-09）：
+> 按实际文件行数核对（`wc -l`，2026-09-23 重新核对）：
 >
 > | 模块 | 状态 | 行数 |
 > |---|---|---|
-> | `qingyun/grabbing/motor_control.py` | 已实现 | 1966 |
-> | `qingyun/grabbing/arm_control.py` | 已实现 | 949 |
-> | `qingyun/grabbing/safety.py` | 已实现 | 711 |
+> | `qingyun/grabbing/motor_control.py` | 已实现 | 2104 |
+> | `qingyun/grabbing/arm_control.py` | 已实现 | 1015 |
+> | `qingyun/grabbing/safety.py` | 已实现 | 718 |
 > | `qingyun/grabbing/kinematics_ext.py` | 已实现 | 580 |
 > | `qingyun/grabbing/executor.py` | 已实现 | 379 |
 > | `qingyun/grabbing/trajectory.py` | 已实现 | 314 |
-> | `configs/common_interface.py`、`configs/motion_params.py` | 已实现 | — |
+> | `configs/common_interface.py`、`configs/motion_params.py` | 已实现 | 159 / 1441 |
 > | **`main.py`**（程序入口） | **待实现（0 字节）** | 0 |
 > | **`qingyun/grabbing/vision.py`**（1号：视觉） | **待实现（0 字节）** | 0 |
 > | **`qingyun/asr.py`**（语音转文字） | **待实现（0 字节）** | 0 |
 > | **`qingyun/cloud_model.py`**（云端大模型） | **待实现（0 字节）** | 0 |
-> | **`qingyun/watchdog.py`**（看门狗） | **待实现（0 字节）** | 0 |
+> | **`qingyun/shutdown.py`**（终止出口；P1 删除原 `watchdog.py` 新增本模块） | **待实现（0 字节）** | 0 |
 >
 > 另外，**真机标定尚未完成**：`calibration/` 下目前只有仿真配置可用，真机参数仍在
 > 逐阶段测量中，进度与已知问题见
@@ -50,7 +50,7 @@ Qingyun_arm
 ├── qingyun                     # 核心功能包
 │   ├── asr.py                  # 语音转文字模块      ⚠️ 待实现（0 字节）
 │   ├── cloud_model.py          # 云端大模型模块      ⚠️ 待实现（0 字节）
-│   ├── watchdog.py             # 看门狗              ⚠️ 待实现（0 字节）
+│   ├── shutdown.py             # 终止出口（P1 替换原 watchdog）⚠️ 待实现
 │   └── grabbing                # 抓取模块（本期主要交付）
 │       ├── arm_control.py      # 入口与编排（已实现）
 │       ├── motor_control.py    # STS3215 驱动与换算（已实现）
@@ -61,7 +61,7 @@ Qingyun_arm
 │       └── vision.py           # 视觉接口            ⚠️ 待实现（0 字节）
 └── readme.md
 ```
-> 上表为 2026-09-09 的实际状态。标 **⚠️ 待实现** 的文件都是 0 字节占位，
+> 上表为 2026-09-23 的实际状态。标 **⚠️ 待实现** 的文件当前无有效代码（0 字节占位或待新增），
 > 里面没有任何代码；导入或执行它们不会报错，只会静默什么都不做。
 
 ### 2. 任务说明与分工
@@ -112,16 +112,16 @@ Qingyun_arm
 
 ---
 **视觉与算法接口约定：**
-|     | 目标位置 | 目标角度 | 目标品级 |
+|     | 目标位置 | 目标角度 | 视觉附加元数据 |
 |:---:|:-------:|:------:|:-------:|
-| 物理含义 | 基座系中的目标三维几何中心 | 目标长轴在基座 XY 平面内相对 +X 的角度，绕 +Z 右手为正 | 记录用元数据 |
-| 物理单位 | 米（m） | deg，模 180°，范围 `[-90, 90)` | A+、A、B、C（不合格） |
-| 数据类型 | `np.float64` 的 `np.array`，shape `(3,)` | float | 字符串 |
-| 举例 | `np.array([x,y,z], dtype=np.float64)` | `12.3` | `"A+"` |
+| 物理含义 | 基座系中的目标三维几何中心 | 目标长轴在基座 XY 平面内相对 +X 的角度，绕 +Z 右手为正 | 长/短轴尺寸、成熟度、当次合法候选数，供 plans 分级与 ignore 封顶使用，运动不读取 |
+| 物理单位 | 米（m） | deg，模 180°，范围 `[-90, 90)` | m / m / 布尔 / 计数 |
+| 数据类型 | `np.float64` 的 `np.array`，shape `(3,)` | float | `float` / `float` / `bool` / `int` |
+| 举例 | `np.array([x,y,z], dtype=np.float64)` | `12.3` | `length_m=0.05, width_m=0.04, ripe=true, valid_count=3` |
 
-视觉负责确定可抓取目标，使用 `VisionInterface(position, yaw_deg, grade)` 下发。通过 `ArmController.grasp_and_place(target, place_id="default")` 开始一次同步抓取—放置，调用返回后再进入下一次视觉检测。程序单线程顺序执行，控制不向视觉查询数据。
+视觉负责确定可抓取目标，使用 `VisionInterface(position, yaw_deg, length_m, width_m, ripe, valid_count)` 下发（六字段现行契约；运动仅消费 `position`/`yaw_deg`，其余 `length_m/width_m/ripe/valid_count` 是由视觉与 plans 使用的元数据）。通过 `ArmController.grasp_and_place(target, place_id="default")` 开始一次同步抓取—放置，调用返回后再进入下一次视觉检测。程序单线程顺序执行，控制不向视觉查询数据。
 
-放置位置和角度保存在配置 `places[place_id]` 中，加载为 `PlacePose(position, yaw_deg)`；position 为释放时物体中心，yaw_deg 为物体长轴相对基座 +X 的角度。控制按指定 place_id 读取，不根据 grade 选择放置位置。
+放置位置和角度保存在配置 `places[place_id]` 中，加载为 `PlacePose(position, yaw_deg)`；position 为释放时物体中心，yaw_deg 为物体长轴相对基座 +X 的角度。控制按指定 place_id 读取，不因视觉元数据（length/width/ripe/valid_count）改变放置选择。
 
 完整字段见 [common_interface.py](configs/common_interface.py) 和 [运动控制文档](docs/机械臂运动控制模块技术文档.md)。
 

@@ -1,0 +1,14 @@
+{
+  "utterances": [
+    "分拣草莓"
+  ],
+  "attempts": [
+    {
+      "contact": "absent"
+    },
+    {
+      "contact": "present"
+    }
+  ],
+  "_comment": "P5 §3 E2E-10 场景资产（simulation，非实测）。第 1 次 absent→object_gap_m=None（真实空抓 GRASP_MISS→自动恢复），第 2 次 present→object_gap_m=0.026（真实成功路径），两次之间目标按 R04 保留在同一帧序列里（FakeVision 事件脚本编排，不做耗尽冒充）。"
+}

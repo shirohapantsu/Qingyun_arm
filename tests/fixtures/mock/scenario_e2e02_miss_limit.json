@@ -1,0 +1,14 @@
+{
+  "utterances": [
+    "分拣草莓"
+  ],
+  "attempts": [
+    {
+      "contact": "absent"
+    },
+    {
+      "contact": "absent"
+    }
+  ],
+  "_comment": "P5 §3 E2E-02 场景资产（simulation，非实测）。两次 absent→object_gap_m=None（空夹可一路闭合到空闭合端 → 运动侧真实返回 GRASP_MISS），用于演练 ignore 递增+逐次自动恢复与第 V 次 D14 封顶 terminate；除 absent 之外无其他 MockMotor 故障开关。"
+}

@@ -34,19 +34,92 @@ def run(*args: str, expect_ok: bool = True) -> str:
     return out
 
 
-def _mark_records_physical(jsonl_path: Path) -> None:
+def _mark_records_physical(jsonl_path: Path, candidate_path: Path) -> None:
     """把验证样本的 metadata.source 改成 hardware：模拟"这组验收数据来自真机"。
 
     纯模拟链路的证据全是 mock/offline，P2-6 之后 real 加载会直接拒绝它——那条
     防线由 test_pure_mock证据的配置禁止real加载 单独钉住；本 fixture 需要走完
     哈希绑定链路，所以必须带上 physical 证据。
+
+    P4 §2.8.3 之后，hardware pick_place 记录要通过完整性关卡，光把 source 改成
+    hardware 不再够（模拟样本的 "not-bound-here" 参数哈希、缺失的资源哈希与
+    trace_ref、误差不可复算都会被拒——这正是"手工 JSONL 绕过"被堵住的体现）。
+    因此本 fixture 为 pick_place 阶段重建一份**真正合规**的 hardware 记录：绑定
+    当前候选的 parameter_sha256 与 URDF/电机校准实算资源哈希、观察字段齐备、落点
+    误差可由 target/actual 复算、损伤观察时长达标、trial_id/sample_id 唯一。
+    阈值一律沿用配置，不放宽。
     """
-    rows = [json.loads(line) for line in jsonl_path.read_text(encoding="utf-8").splitlines()]
-    for r in rows:
+    import hashlib
+
+    from configs.motion_params import parameter_sha256
+
+    def _sha(path: Path) -> str:
+        h = hashlib.sha256()
+        with path.open("rb") as fh:
+            for chunk in iter(lambda: fh.read(1 << 16), b""):
+                h.update(chunk)
+        return h.hexdigest()
+
+    cand = json.loads(candidate_path.read_text(encoding="utf-8"))
+    cand_dir = candidate_path.parent
+    param_sha = parameter_sha256(cand)
+    urdf = cand_dir / cand["model"]["urdf_path"]
+    motor_calib = cand_dir / cand["model"]["motor_calibration_path"]
+    resource_sha = {"urdf": _sha(urdf), "motor_calibration": _sha(motor_calib)}
+    place_id = sorted(cand["places"])[0]
+    observe_min = float(cand["acceptance"]["damage_observe_minutes"])
+
+    rows = [json.loads(line) for line in
+            jsonl_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    non_pp = [r for r in rows if r.get("stage") != "pick_place"]
+    for r in non_pp:
         if r.get("payload", {}).get("record_type") == "metadata":
             r["payload"]["source"] = "hardware"
-    jsonl_path.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows),
-                          encoding="utf-8")
+
+    run = "pp-hw-fixture"
+    pp_rows: list[dict] = [{
+        "stage": "pick_place", "run_id": run, "sample_id": "pp-meta", "captured_at_ns": 1,
+        "payload": {"record_type": "metadata", "source": "hardware", "operator": "tester",
+                    "profile_path": str(candidate_path), "profile_parameter_sha256": param_sha,
+                    "resource_sha256": resource_sha, "code_commit": "test-fixture"},
+    }]
+    # 32 次独立试验：30 成功、2 失败（其中 1 次掉落）。成功率 0.9375、掉落率 0.03125、
+    # 损伤率 0，均在配置阈值内；每次损伤观察时长取配置下限（>= 判通过）。
+    for k in range(32):
+        success = k < 30
+        drop = k == 30
+        tx, ty, tz = 0.35, 0.001 * (k % 3), 0.020
+        if success:
+            ax, ay, az = tx + 0.002, ty + 0.001, tz + 0.0005   # 中心误差 ~2.3mm
+            t_yaw, a_yaw = 0.0, 1.0                            # yaw 误差 1.0°
+            cerr = round(((ax - tx) ** 2 + (ay - ty) ** 2 + (az - tz) ** 2) ** 0.5, 9)
+            yerr = round(abs(t_yaw - a_yaw), 9)
+        else:
+            ax = ay = az = t_yaw = a_yaw = cerr = yerr = None
+        pp_rows.append({
+            "stage": "pick_place", "run_id": run, "sample_id": f"pp-{k}",
+            "captured_at_ns": 2 + k,
+            "payload": {
+                "record_type": "sample", "trial_id": f"pp-{k}",
+                "profile_parameter_sha256": param_sha,
+                "target_position_m": [tx, ty, tz], "target_yaw_deg": t_yaw if success else 0.0,
+                "grade": "B", "place_id": place_id,
+                "start_ns": 2 + k, "end_ns": 2 + k + 1,
+                "software_status": "SUCCESS" if success else "GRASP_MISS",
+                "software_stage": "DONE" if success else "CLOSE",
+                "holding": "EMPTY", "recovery_required": False,
+                "began_descend": True, "descent_evidence": "submitted",
+                "actual_success": success, "actual_drop": drop,
+                "actual_place_position_m": [ax, ay, az] if success else None,
+                "actual_place_yaw_deg": a_yaw if success else None,
+                "place_error_center_m": cerr, "place_error_yaw_deg": yerr,
+                "feedback_span_s": None, "stop_latency_s": None,
+                "damage_label": "none", "damage_observe_minutes": observe_min,
+                "image_refs": [f"pp-{k}.jpg"], "trace_ref": f"pp-{k}.trace.json",
+            }})
+
+    lines = [json.dumps(r, ensure_ascii=False) + "\n" for r in non_pp + pp_rows]
+    jsonl_path.write_text("".join(lines), encoding="utf-8")
 
 
 @pytest.fixture(scope="module")
@@ -81,7 +154,7 @@ def pipeline(tmp_path_factory) -> dict[str, Path]:
             v = d / f"val_{stage}.jsonl"
             run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
             fh.writelines(v.read_text(encoding="utf-8"))
-    _mark_records_physical(val)
+    _mark_records_physical(val, prev)
     report = d / "report.json"
     run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
         "--report", str(report), "--operator", "tester", "--operator-reviewed")

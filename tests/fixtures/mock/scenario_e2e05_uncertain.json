@@ -1,0 +1,11 @@
+{
+  "utterances": [
+    "分拣草莓"
+  ],
+  "attempts": [
+    {
+      "contact": "present"
+    }
+  ],
+  "_comment": "P5 §3 E2E-05 场景资产（simulation，非实测）。MockMotor 真实故障开关注册：object_gap_m 在闭爪阶段（首次命令开度 <13% 时）被改为 0.011m —— 开口落在 contact_gap_range_m 下限之下、又高于 empty_closed_pct+empty_tol_pct，因此既不判接触也不判空闭合，闭爪超时 gripper.close_timeout_s=6.0s（仿真时钟）后返回 holding=UNKNOWN → GRASP_UNCERTAIN。"
+}

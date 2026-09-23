@@ -1,0 +1,8 @@
+{
+  "profile_path": "../calibration/REAL_ARM/PC/profile.json",
+  "vision_config_path": "vision.local.json",
+  "prompt_path": "../prompt.md",
+  "log_dir": "../logs",
+  "asr": {"model": "qwen-audio-3.1-asr-flash", "endpoint": "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation", "cloud_total_timeout_s": 30.0},
+  "llm": {"model": "deepseek-flash", "base_url": "https://api.deepseek.com", "total_timeout_s": 30.0}
+}

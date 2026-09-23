@@ -1,0 +1,11 @@
+{
+  "utterances": [
+    "分拣草莓"
+  ],
+  "attempts": [
+    {
+      "contact": "present"
+    }
+  ],
+  "_comment": "P5 §3 E2E-04 场景资产（simulation，非实测）。present 抓取闭爪成功后，在**运动已开始**的阶段制造规划失败：测试内 monkeypatch 该实例的 _replan_after_close 抛真实 IkNotConverged（有机构造不可行的原因见 P5-01 开发日志『跨界最小改动/自主决策』）。故障开关注册：无 MockMotor 开关，注入点=闭爪后的重规划调用，触发时刻=第 1 次 grasp_and_place。"
+}

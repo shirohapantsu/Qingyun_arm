@@ -11,6 +11,12 @@
 
 文档 6.3 状态表在本文件里体现为 grasp_and_place 里一段顺序执行的阶段，每进入
 一个阶段就把名字写进 self._stage；任何失败都随 GraspResult.stage 返回，不抛异常。
+
+P4 §2.8.2 在运动层另加一份**内存有界运动事件 trace**：``MotionTraceEvent`` 与本文件
+底部的收集器只记录"阶段首次进入 / 下降指令下发边界 / 失败原阶段 / 最终结果"这一小撮
+事件，通过 ``ArmController.get_last_motion_trace()`` 以不可变快照导出。它不写盘、不
+新增线程或舵机调用、不改变任何运动时序与返回值；标定工具只读这个公开方法，不访问
+``_stage``、不替换规划器。
 """
 
 from __future__ import annotations
@@ -33,7 +39,14 @@ from configs.common_interface import (
     VisionInterface,
 )
 from configs.motion_params import MotionParams, ParamsError, wrap180
-from qingyun.grabbing.executor import ExecutionError, SyncExecutor
+from qingyun.grabbing.executor import (
+    DESCENT_REJECTED,
+    DESCENT_SUBMITTED,
+    DESCENT_UNKNOWN,
+    ExecutionError,
+    MotionTraceSink,
+    SyncExecutor,
+)
 from qingyun.grabbing.kinematics_ext import (
     ArmModel,
     IkNotConverged,
@@ -85,6 +98,137 @@ STAGE_DONE = "DONE"
 STAGE_FAULT_HOLD = "FAULT_HOLD"
 STAGE_FAULT_UNCONTROLLED = "FAULT_UNCONTROLLED"
 
+# 文档 6.3 状态表的全部阶段名，trace 的事件数上限按这张表封顶。
+ALL_STAGES: tuple[str, ...] = (
+    STAGE_CHECK, STAGE_OPEN, STAGE_APPROACH, STAGE_DESCEND, STAGE_CLOSE, STAGE_LIFT,
+    STAGE_TRANSFER, STAGE_LOWER, STAGE_RELEASE, STAGE_RETREAT, STAGE_RETURN,
+    STAGE_DONE, STAGE_FAULT_HOLD, STAGE_FAULT_UNCONTROLLED,
+)
+
+# ---------------------------------------------------------------------------
+# 内存有界运动事件 trace（P4 §2.8.2）
+# ---------------------------------------------------------------------------
+
+# trace 事件 kind 词表。descent_submit 的三态 outcome 由 executor 侧常量给出
+# （DESCENT_SUBMITTED / DESCENT_REJECTED / DESCENT_UNKNOWN），两层共用一份定义。
+TRACE_STAGE_ENTER = "stage_enter"      # 阶段首次进入：outcome=None，stage=变更后的阶段名
+TRACE_DESCENT_SUBMIT = "descent_submit"  # 首个非零下降节点的提交边界：outcome=三态之一
+TRACE_FAILURE = "failure"              # 失败：在故障保持改写 stage 之前记，stage=原始阶段
+TRACE_RESULT = "result"                # grasp_and_place 结束：outcome=最终 GraspStatus 值
+
+# descent_submit 允许的三态取值：随事件类型一起在控制层导出，供标定工具与测试引用。
+# 运动层不自行拼装这些字符串——它们只有 executor 在提交边界上才可能写出来。
+TRACE_DESCENT_OUTCOMES: tuple[str, ...] = (
+    DESCENT_SUBMITTED, DESCENT_REJECTED, DESCENT_UNKNOWN,
+)
+
+
+@dataclass(frozen=True)
+class MotionTraceEvent:
+    """一条运动事件（P4 §2.8.2）。
+
+    字段语义：
+      * ``sequence``  本次调用内从 0 起单调递增的事件号（每次 grasp_and_place 重置）。
+      * ``time_ns``   事件发生时刻，取控制器注入的 ``clock_ns``，不引入第二个时间源，
+        因此读它不会推进仿真时钟。
+      * ``stage``     事件所属阶段名（文档 6.3 状态表取值）。stage_enter 是变更**后**的
+        名字；failure 是故障保持改写之前的原始阶段；result 是最终阶段。
+      * ``kind``      上面 TRACE_* 词表之一。
+      * ``outcome``   按 kind 的语义取值：stage_enter 为 None；descent_submit 为
+        submitted/rejected/unknown；failure 与 result 为 GraspStatus 的字符串值。
+    """
+
+    sequence: int
+    time_ns: int
+    stage: str
+    kind: str
+    outcome: str | None
+
+
+class _MotionTraceCollector:
+    """ArmController 内部的事件收集器：只在内存里追加，且每次调用有界。
+
+    有界性来源（P4 §2.8.2"事件仅内存追加且有界"）：stage_enter 每个阶段名在一次调用内
+    最多一条，descent_submit 最多一条，failure 最多一条，result 一条，因此上限是
+    ``len(ALL_STAGES) + 3 = 17`` 条，与轨迹长度、tick 数无关。不逐 tick 追加、不写盘。
+
+    "关闭时零事件收集、不占内存"由控制器实现：trace 关闭时根本不会创建本对象，
+    执行器拿到的是 None，回放路径一次额外判断都不做。
+    """
+
+    __slots__ = ("_clock_ns", "_events", "_sequence", "_armed", "_entered",
+                 "_descent_done", "_failure_done", "_current_stage")
+
+    def __init__(self, clock_ns: Callable[[], int]) -> None:
+        self._clock_ns = clock_ns
+        self._events: list[MotionTraceEvent] = []
+        self._sequence = 0
+        # 未武装（调用之外）时不收集：公开原语改写阶段名不会污染上一次调用的快照。
+        self._armed = False
+        self._entered: set[str] = set()
+        self._descent_done = False
+        self._failure_done = False
+        self._current_stage = STAGE_CHECK
+
+    # ---- 调用生命周期 ----
+
+    def begin_call(self) -> None:
+        """每次 grasp_and_place 开始：清空上一轮事件并重新武装。"""
+        self._events.clear()
+        self._entered.clear()
+        self._sequence = 0
+        self._descent_done = False
+        self._failure_done = False
+        self._current_stage = STAGE_CHECK
+        self._armed = True
+
+    def snapshot(self) -> tuple[MotionTraceEvent, ...]:
+        """不可变快照：每次新建 tuple，事件本身是 frozen dataclass，内部列表不外泄。"""
+        return tuple(self._events)
+
+    # ---- 控制层事件写入（未武装即空操作） ----
+
+    def note_stage(self, stage: str) -> None:
+        self._current_stage = stage
+        if not self._armed or stage in self._entered:
+            return
+        self._entered.add(stage)
+        self._append(TRACE_STAGE_ENTER, stage, None)
+
+    def note_failure(self, status: str) -> None:
+        if not self._armed or self._failure_done:
+            return
+        self._failure_done = True
+        self._append(TRACE_FAILURE, self._current_stage, status)
+
+    def note_result(self, status: str) -> None:
+        if not self._armed:
+            return
+        self._armed = False          # 一次调用一条 result；此后任何写入都不再收集
+        self._append(TRACE_RESULT, self._current_stage, status)
+
+    # ---- executor 的下降边界钩子（MotionTraceSink 协议） ----
+
+    def watches_descent(self) -> bool:
+        """仅在本次调用进行中、当前阶段是 DESCEND 且还没记过下降边界时观察。"""
+        return (self._armed and not self._descent_done
+                and self._current_stage == STAGE_DESCEND)
+
+    def note_descent_submit(self, outcome: str) -> None:
+        if not self._armed or self._descent_done:
+            return
+        self._descent_done = True
+        self._append(TRACE_DESCENT_SUBMIT, STAGE_DESCEND, outcome)
+
+    # ---- 追加 ----
+
+    def _append(self, kind: str, stage: str, outcome: str | None) -> None:
+        self._events.append(MotionTraceEvent(
+            sequence=self._sequence, time_ns=self._clock_ns(),
+            stage=stage, kind=kind, outcome=outcome,
+        ))
+        self._sequence += 1
+
 
 @dataclass
 class PlanStep:
@@ -127,6 +271,7 @@ class ArmController:
         clock: Callable[[], float] = time.monotonic,
         sleep: Callable[[float], None] = time.sleep,
         clock_ns: Callable[[], int] = time.monotonic_ns,
+        enable_motion_trace: bool = True,
     ) -> None:
         self.motor = motor
         self.params = params
@@ -136,14 +281,24 @@ class ArmController:
         self.sleep = sleep
         self.clock_ns = clock_ns
 
+        # 运动事件 trace 开关（P4 §2.8.2）：默认开启，标定工具因此无需特殊装配。
+        # 关闭时**不创建收集器**——既没有事件列表，也不给执行器传钩子，回放路径与
+        # 从未有过 trace 时逐字节相同；get_last_motion_trace() 恒返回空元组。
+        self.motion_trace_enabled = bool(enable_motion_trace)
+        self._motion_trace: _MotionTraceCollector | None = (
+            _MotionTraceCollector(clock_ns) if self.motion_trace_enabled else None
+        )
+
         self.model = ArmModel(params)
         self.limits = JointLimits.from_params(params)
         self.envelope: ErrorEnvelope = build_error_envelope(
             params, params.collision.max_joint_substep_deg
         )
         self.checker = CollisionChecker(params, self.model, self.envelope)
+        # 执行器只看到 MotionTraceSink 协议；trace 关闭时传入的是 None。
+        sink: MotionTraceSink | None = self._motion_trace
         self.executor = SyncExecutor(motor, params, should_stop, clock=clock, sleep=sleep,
-                                     clock_ns=clock_ns)
+                                     clock_ns=clock_ns, motion_trace=sink)
         # IK 在规划检查点里复用同一个执行器：停止与反馈巡检逻辑只有一份实现。
         self.ik = IkSolver(self.model, params, self.executor.planning_checkpoint)
 
@@ -226,7 +381,7 @@ class ArmController:
         self._enter("open_gripper")
         try:
             self._motion_started = True
-            self._stage = STAGE_OPEN
+            self._set_stage(STAGE_OPEN)
             self._step_gripper_open(self.params.gripper.preopen_pct, STAGE_OPEN,
                                     self.params.gripper.open_timeout_s)
         except (MotionError, KeyboardInterrupt) as exc:
@@ -244,7 +399,7 @@ class ArmController:
         """
         self._enter("close_gripper")
         try:
-            self._stage = STAGE_CLOSE
+            self._set_stage(STAGE_CLOSE)
             self._motion_started = True
             return self._close_until_contact()
         except (MotionError, KeyboardInterrupt) as exc:
@@ -287,8 +442,25 @@ class ArmController:
         self._holding = HoldingState.EMPTY
         self._hold_pct = None
         self._motion_started = False
-        self._stage = STAGE_CHECK
+        self._set_stage(STAGE_CHECK)
         self.executor.slip_reference_pct = None
+
+    def get_last_motion_trace(self) -> tuple[MotionTraceEvent, ...]:
+        """返回上一次 grasp_and_place 的运动事件快照（P4 §2.8.2 唯一公开出口）。
+
+        语义（逐条对应规格）：
+
+        * 每次 ``grasp_and_place`` 开始时清空，调用返回后事件保留到下一次调用为止——
+          标定工具在调用返回后一次性导出，不需要与运动并发读取。
+        * 返回**不可变快照**：新构造的 tuple，元素是 frozen dataclass。控制器内部的
+          列表不会以可变形式外泄，外部拿到的对象改动不了后续事件。
+        * trace 关闭（``enable_motion_trace=False``）时恒为空元组，且没有事件列表存在。
+        * 事件只覆盖"每阶段首次进入 / 首次下降发送 / 失败原阶段 / 结果"，条数有界；
+          不逐 tick 追加、不写盘、不新增线程或舵机调用。
+        """
+        if self._motion_trace is None:
+            return ()
+        return self._motion_trace.snapshot()
 
     # ==================================================================
     # 2. 技能入口
@@ -301,7 +473,10 @@ class ArmController:
         if self._in_call:
             raise RuntimeError("grasp_and_place 不接受重入调用；上一次调用尚未返回")
         self._in_call = True
-        self._stage = STAGE_CHECK
+        # 每次调用清空上一轮运动事件再开始收集（P4 §2.8.2）；trace 关闭时没有收集器。
+        if self._motion_trace is not None:
+            self._motion_trace.begin_call()
+        self._set_stage(STAGE_CHECK)
         self._motion_started = False
         self._holding = HoldingState.UNKNOWN
         self._hold_pct = None
@@ -336,18 +511,18 @@ class ArmController:
                 # 预规划失败且臂未动：不锁存（文档 4.3）。
                 return self._early_fail(exc, place_id)
 
-            self._stage = STAGE_OPEN
+            self._set_stage(STAGE_OPEN)
             self._motion_started = True
             self._step_gripper_open(self.params.gripper.preopen_pct, STAGE_OPEN,
                                     self.params.gripper.open_timeout_s)
 
-            self._stage = STAGE_APPROACH
+            self._set_stage(STAGE_APPROACH)
             self._execute_step(pre.approach)
-            self._stage = STAGE_DESCEND
+            self._set_stage(STAGE_DESCEND)
             self._execute_step(pre.descend)
 
             # ---- CLOSE：五关节保持，小步闭合，接触判据通过后保持实际开度 ----
-            self._stage = STAGE_CLOSE
+            self._set_stage(STAGE_CLOSE)
             holding = self._close_until_contact()
             if holding is HoldingState.EMPTY:
                 self._latch()
@@ -363,21 +538,21 @@ class ArmController:
             post = self._replan_after_close(position, yaw_deg, place, q_close,
                                             float(self._hold_pct))
 
-            self._stage = STAGE_LIFT
+            self._set_stage(STAGE_LIFT)
             self._execute_step(post.lift)
-            self._stage = STAGE_TRANSFER
+            self._set_stage(STAGE_TRANSFER)
             self._execute_step(post.transfer)
-            self._stage = STAGE_LOWER
+            self._set_stage(STAGE_LOWER)
             self._execute_step(post.lower)
 
-            self._stage = STAGE_RELEASE
+            self._set_stage(STAGE_RELEASE)
             self._release()
-            self._stage = STAGE_RETREAT
+            self._set_stage(STAGE_RETREAT)
             self._execute_step(post.retreat)
-            self._stage = STAGE_RETURN
+            self._set_stage(STAGE_RETURN)
             self._execute_step(post.return_home)
 
-            self._stage = STAGE_DONE
+            self._set_stage(STAGE_DONE)
             self._holding = HoldingState.EMPTY
             return self._result(GraspStatus.SUCCESS, "抓取—放置完成", place_id,
                                HoldingState.EMPTY)
@@ -404,12 +579,14 @@ class ArmController:
     # ------------------------------------------------------------------
 
     def _validate_target(self, target: VisionInterface) -> tuple[FloatArray, float]:
-        """检查 shape (3,)、float64、有限值、角度范围与字段类型，然后复制 position。
+        """检查 position 的 shape (3,)、float64、有限值，yaw 的数值类型与角度范围，
+        然后复制 position。
 
-        数据类冻结不等于 ndarray 内存只读，所以必须复制一份作为本次调用的固定输入，
-        否则调用方可以在阻塞期间改写数组（文档 3.2）。
+        运动只消费 position/yaw；length/width/ripe/valid_count 等元数据由视觉与 plans
+        使用，运动不读取也不校验。数据类冻结不等于 ndarray 内存只读，所以必须复制一份
+        作为本次调用的固定输入，否则调用方可以在阻塞期间改写数组（文档 3.2）。
         """
-        for name in ("position", "yaw_deg", "grade"):
+        for name in ("position", "yaw_deg"):
             if not hasattr(target, name):
                 raise MotionError("INVALID_INPUT", f"目标缺少字段 {name}")
         raw_pos = getattr(target, "position")
@@ -435,9 +612,6 @@ class ArmController:
                 "INVALID_INPUT",
                 f"yaw_deg={yaw} 不在 [-90,90)，请先用 wrap180() 归一化（文档 3.2）",
             )
-        if not isinstance(getattr(target, "grade"), str):
-            raise MotionError("INVALID_INPUT",
-                              f"grade 应为字符串，实际 {type(getattr(target, 'grade')).__name__}")
         return pos.copy(), float(yaw)
 
     def _as_joint_vector(self, name: str, value: Any) -> FloatArray:
@@ -899,6 +1073,28 @@ class ArmController:
     def _exit(self) -> None:
         self._in_call = False
 
+    # ---- 运动事件 trace 写入点（P4 §2.8.2）----
+    #
+    # 三个 helper 都是"先做原来那件事，再顺路记一条内存事件"：trace 关闭时
+    # self._motion_trace 是 None，等价于原来的裸赋值/裸返回，不产生任何额外调用。
+
+    def _set_stage(self, stage: str) -> None:
+        """阶段改写的唯一入口：写 self._stage 并记 stage_enter（首次进入才记）。"""
+        self._stage = stage
+        if self._motion_trace is not None:
+            self._motion_trace.note_stage(stage)
+
+    def _note_failure(self, status: GraspStatus) -> None:
+        """记录失败事件；调用点保证它在故障保持改写 stage **之前**，事件因此带原始阶段。"""
+        if self._motion_trace is not None:
+            self._motion_trace.note_failure(status.value)
+
+    def _note_result(self, result: GraspResult) -> GraspResult:
+        """记录本次调用的最终结果事件（outcome=最终 status 值），并原样返回同一对象。"""
+        if self._motion_trace is not None:
+            self._motion_trace.note_result(result.status.value)
+        return result
+
     def _measured_joints(self) -> FloatArray:
         fb = self.executor.read_feedback()
         return np.asarray(fb.angles_deg, float).copy()
@@ -956,30 +1152,38 @@ class ArmController:
             return GraspStatus.TRACKING_ERROR
 
     # ---- 结果构造 ----
+    #
+    # 四条返回路径（拒绝/成功/未动即失败/运动后失败）都在构造处记一条 result 事件，
+    # 因此"每次调用恰好一条结果、outcome=最终 status 值"不依赖调用点的写法。事件记录函数
+    # 原样返回同一个 GraspResult 对象，不复制、不改字段。
 
     def _refuse(self, status: GraspStatus, reason: str, place_id: str) -> GraspResult:
         """臂完全没动时的拒绝返回：recovery_required=False（文档 4.3）。"""
-        return GraspResult(
+        return self._note_result(GraspResult(
             status=status, stage=self._stage, reason=reason, place_id=place_id,
             holding=HoldingState.UNKNOWN, recovery_required=False,
-        )
+        ))
 
     def _result(self, status: GraspStatus, reason: str, place_id: str,
                 holding: HoldingState) -> GraspResult:
-        return GraspResult(
+        return self._note_result(GraspResult(
             status=status, stage=self._stage, reason=reason, place_id=place_id,
             holding=holding, recovery_required=False,
-        )
+        ))
 
     def _early_fail(self, exc: MotionError, place_id: str) -> GraspResult:
         """配置/格式/预规划失败：臂没动就不锁存，动了才锁存（文档 4.3）。"""
         if self._motion_started:
             self._latch()
             return self._fault_result(self._status_of(exc), exc.reason, place_id)
-        return GraspResult(
-            status=self._status_of(exc), stage=self._stage, reason=exc.reason,
+        # 臂未动的预规划/配置失败同样记 failure：trace 必须能说明"失败发生在哪个阶段、
+        # 原始状态是什么"，只是这条路径不锁存、不保持（stage 不被改写）。
+        status = self._status_of(exc)
+        self._note_failure(status)
+        return self._note_result(GraspResult(
+            status=status, stage=self._stage, reason=exc.reason,
             place_id=place_id, holding=self._holding, recovery_required=False,
-        )
+        ))
 
     def _fault_result(self, status: GraspStatus, reason: str, place_id: str) -> GraspResult:
         """运动已开始后的失败：锁存实例、做一次保持提交，再返回结果（文档 4.3/6.4）。
@@ -991,14 +1195,19 @@ class ArmController:
         通信正常时 hold_current 提交固定保持目标 → stage=FAULT_HOLD；
         拿不到可靠反馈或提交失败 → FAULT_UNCONTROLLED，明确告诉调用方"没有保持"，
         不把返回错误当成已经物理静止（标定指南 8.7）。
+
+        trace（P4 §2.8.2）：failure 事件必须在改写 stage 之前记录，事件里的 stage 才是
+        **原始阶段**（DESCEND/CLOSE/…），不是被覆盖后的 FAULT_HOLD；最终 GraspResult 的字段
+        契约与此完全不变。保持提交之后再记一次 stage_enter，快照因此同时留下原始阶段与最终阶段。
         """
         self._latch()
+        self._note_failure(status)
         held = self.executor.hold_position()
-        self._stage = STAGE_FAULT_HOLD if held is not None else STAGE_FAULT_UNCONTROLLED
-        return GraspResult(
+        self._set_stage(STAGE_FAULT_HOLD if held is not None else STAGE_FAULT_UNCONTROLLED)
+        return self._note_result(GraspResult(
             status=status, stage=self._stage, reason=reason, place_id=place_id,
             holding=self._holding, recovery_required=True,
-        )
+        ))
 
 
 @dataclass

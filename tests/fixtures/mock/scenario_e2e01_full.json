@@ -1,0 +1,20 @@
+{
+  "utterances": [
+    "分拣草莓"
+  ],
+  "attempts": [
+    {
+      "contact": "present"
+    },
+    {
+      "contact": "present"
+    },
+    {
+      "contact": "present"
+    },
+    {
+      "contact": "present"
+    }
+  ],
+  "_comment": "P5 §3 E2E-01 场景资产（simulation，非实测）。utterances 每次取一条；attempts 按真实 grasp_and_place 调用顺序消费：present→object_gap_m=float(mean(contact_gap_range_m))=0.026（MockMotor 真实字段，非虚构开关）。本场景四个目标全部为 present，即 MockMotor 无额外故障注入；目标/落点坐标可达性由 tests/test_integration_mock.py 的 IK 验证用例钉住。"
+}

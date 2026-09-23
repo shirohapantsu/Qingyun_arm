@@ -22,5 +22,83 @@ cmeel-tinyxml2==10.0.0
 # import（串口对象在构造真机驱动时才延迟导入）。
 pyserial>=3.5
 
+# --- P2 语音与云模型（docs/实施文档/P2_语音与云模型接入技术文档.md §2、§6 步骤 4） ---
+# 用途：真实麦克风录音 + silero VAD 起止 + DashScope/DeepSeek 显式 REST 适配。
+#
+# 惰性导入（与上面的 pyserial 同理，但更彻底）：qingyun/asr.py 与
+# qingyun/cloud_model.py 的模块顶层**只有** __future__/typing，本节的四个包
+# 全部在 init() 之后的私有工厂内部经 __import__ 动态载入——import 零副作用：
+# 不开麦克风、不加载 VAD 权重、不发任何网络请求（P2 §2、P2-T11）。
+# 因此**运动与离线测试在缺少本节全部包的环境下也能全绿**：P2-01/02/03 的测试
+# 全程注入替身（假音频源 + 假时钟 + 本地 stub transport + 固定 VAD 概率序列），
+# 从未 import 过它们。只有真实麦克风/真实账号的烟雾测试（P5 部署验收）才需要。
+#
+# 增补条目 ≠ 已安装 ≠ 已验证。P2 §2 明写"版本在目标机验证后锁定"，故此处逐包
+# 标注状态；开发机（x86_64 / conda Qingyun / Python 3.10.21，2026-09-23 实测）与
+# 目标机（Ubuntu 22.04 arm64 / 香橙派 5）的核验情况：
+#     httpx        0.28.1   开发机已安装并已验证（全量 pytest 966 passed 即在该环境）
+#     sounddevice  —        开发机未安装（import 即 ModuleNotFoundError）
+#     silero-vad   —        开发机未安装（同上）
+#     onnxruntime  —        开发机未安装（同上）
+#     torch        —        开发机未安装（同上）；由 silero-vad 的依赖解析带入，
+#                           故不单独钉条目（见下面 silero-vad 段的说明）
+# 缺包时的**代码路径**是抛对应的 HardError（asr/cloud_model 的默认工厂把 ImportError
+# 归入硬故障，不静默降级、不换库），但要注意口径：pytest 全程把这些默认工厂
+# monkeypatch 成替身，"缺包 → HardError"这条分支**没有被任何测试执行过**，属代码阅读
+# 证据而非测试结果。装齐后仍须 P5 目标机烟雾实测才能声明功能可用。
+#
+# 另有一条**弱**证据：开发机 `pip install --dry-run -r requirements.txt`（只解析、
+# 不下载安装，跑完再 import 仍全部 ModuleNotFoundError）可解析出完整依赖树，
+# 解析结果 sounddevice 0.5.6 / silero-vad 5.1.2 / onnxruntime 1.19.2 / torch 2.14.0。
+# 这只说明"约束之间不与既有运动学/numpy 冲突"，**不说明** arm64 轮子可得、装得上、
+# 麦克风能用或 VAD 精度达标——那些仍是 P5 目标机项。下面的逐条说明按此口径书写。
+#
+# P3 的视觉依赖（相机 SDK/OpenCV/YOLO 推理栈等）**不在本期条目内**：视觉归队友，
+# 由 P3 交付时另行增补，避免本阶段提前绑定与 silero 冲突的 torch/onnxruntime 组合。
+
+# 云 REST 适配（DashScope ASR 与 DeepSeek LLM 两家用的是**显式 httpx 同步 POST**，
+# 不引入官方 SDK）。关闭自动重试是**代码层**约定而非配置项：两处私有的
+# _new_http_client 都显式 `httpx.HTTPTransport(retries=0, http2=False)` 且
+# `follow_redirects=False`（P2 §3.1/§3.2/§4），不依赖库默认值；换大版本时这两个名字
+# 与 Timeout(connect/read/write/pool) 形态必须重新核对，不能假定向后兼容——P2-T19 的
+# 白盒断言还读了 `client._transport._pool._retries` 这类**私有属性**，正是上限 <0.29
+# 的原因之一。端到端墙钟 deadline 另由 signal.setitimer(ITIMER_REAL) 实现，httpx 的
+# 分项超时不构成整次调用上限（R05）。
+# 状态：开发机已装 0.28.1 且**已验证**——P2-T17/T19 用真实 HTTPTransport 客户端连
+# 127.0.0.1 本地服务子进程做 wire 级慢响应测试（零外网、零云账号）。约束基于该实测，
+# 目标机仍须复验同版本行为后才算部署级确认。
+httpx>=0.28,<0.29
+
+# 录音输入：PortAudio 绑定（cffi），asr.py 的 _open_input_stream /
+# _enumerate_input_devices 使用（阻塞式按块读取，P2 §3）。系统依赖提示：开发机
+# dry-run 解析到 sounddevice 0.5.6 的 `py3-none-any` 纯 Python 轮子，即 **Linux 上
+# PortAudio 由系统提供**（Debian/Ubuntu：`apt install libportaudio2`；若需自编译还
+# 要 `portaudio19-dev`），另需确实存在可用输入设备。目标机（香橙派 5 / arm64）上的
+# 设备名、采样率/声道能力与 cffi 轮子匹配**均未验证**，属首装项；若不可用，按 P2 §3
+# 换等价库并封装在私有工厂内（公开签名不变）。开发机未安装、未验证。
+sounddevice>=0.4.6,<0.6
+
+# VAD 运行时（官方 silero-vad 入口）：asr.py 的 _load_vad 优先
+# `load_silero_vad(onnx=True)`，失败回退 `onnx=False`；帧长 512@16k、阈值取官方示例
+# 默认 0.5，不臆调（P2 §3）。下限 4.5 是按"该版本线起提供 load_silero_vad 入口"做的
+# 保守估计，**未在开发机验证**；上限 <6 防官方 6.x 的 API 变更。目标机实测后须收窄为
+# 精确版本，两点是 P5 的锁定项：
+#   1) 该包把 torch 列为依赖（开发机 dry-run：silero-vad 5.1.2 → torch>=1.12.0 解析到
+#      torch 2.14.0 + torchaudio 2.11.0 + 一批 nvidia-*/cuda-* 轮子），而
+#      _SileroVad.probability 逐帧以 `torch.FloatTensor` 作为输入容器——即 ONNX 与
+#      torch 两条路径实际都会拉进 torch。arm64 目标机宜用 CPU-only 轮子（必要时按
+#      PyTorch 官方索引手工指定），避免无谓的 CUDA 依赖树；
+#   2) numpy：开发机 dry-run 未要求降级 numpy（现装 2.2.6 与 `numpy>=1.26,<3` 共存），
+#      但那只是 x86_64 上的解析结果，**不构成安装或运行验证**；目标机若解析出 `numpy<2`
+#      则与上面的 numpy 约束冲突，届时以实测组合回填两处，不臆定"已验证"。
+silero-vad>=4.5,<6
+
+# VAD 首选推理后端（onnx=True 分支）：只经官方 silero-vad 入口间接使用，本模块不
+# 自行构造 InferenceSession、也不臆造 ONNX 状态张量形状（P2 §3 末段：与视觉栈依赖
+# 解耦，目标机安装验证后锁定并回填）。开发机 dry-run 解析到 onnxruntime 1.19.2 的
+# `cp310-manylinux_2_27/2_28_x86_64` 轮子；arm64 侧同名 tag 是否可得、与 Ubuntu
+# 22.04 glibc 及 torch 的搭配、512 帧的实测延迟均为**待验证**项。开发机未安装、未验证。
+onnxruntime>=1.16,<1.20
+
 # --- 开发期测试 ---
 pytest>=8

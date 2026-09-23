@@ -9,6 +9,9 @@
     * MockMotorController 实现同一个 MotorController Protocol，用一阶滞后模型
       模拟舵机跟随，用"闭到物体标定开口就停住 + 电流上升"模拟接触，并且可以
       逐项注入故障。
+    * ``initialize()`` 是 P1-03 补的**协议对等记录桩**（P1 §2 文件责任表 / §8 步骤 3）：
+      签名形态与真机 ``Sts3215MotorController.initialize`` 一致，只登记调用参数，
+      不做任何总线动作，也不在构造时被自动调用。
     * 所有故障都是显式开关，绝不在正常路径里偷偷放宽判据。
 """
 
@@ -26,6 +29,13 @@ from configs.common_interface import (
     MotorStateError,
 )
 from configs.motion_params import MotionParams, effective_joint_limits
+
+# MockMotorController.initialize 的 timeout_s 名义默认（P1-03）。真机默认值沿用驱动
+# 私有常量 _INIT_TIMEOUT_S=2.0 作为"待实测"预算（P1 §4.1 末段）；mock 不发任何总线
+# 事务，超时只被记录、不被消费，因此这里取一个明确的名义值，并且**不 import 驱动的
+# 私有常量**——私有名不是契约，把它固化进 mock 反而会让两边的默认值互相牵制。
+# 用例要断言的是"参数被原样记录"，与默认值的具体数值无关。
+MOCK_INITIALIZE_TIMEOUT_S = 5.0
 
 
 class SimTime:
@@ -108,8 +118,54 @@ class MockMotorController:
         self._slip_offset_pct: float = 0.0
         self.command_count = 0
         self.read_count = 0
+        # initialize() 协议对等记录桩的调用台账：每次显式调用追加一条参数快照
+        # （dict：verify_identity / enable_torque / timeout_s），len 即调用次数。
+        # 构造不自动调用，因此新建实例时恒为 []。
+        self.initialize_calls: list[dict] = []
         self._sequence = 0
         self._last_write_s: float | None = None
+
+    # ------------------------------------------------------------------
+    # 生命周期（P1-03 协议对等记录桩）
+    # ------------------------------------------------------------------
+
+    def initialize(
+        self,
+        *,
+        verify_identity: bool = True,
+        enable_torque: bool = True,
+        timeout_s: float = MOCK_INITIALIZE_TIMEOUT_S,
+    ) -> None:
+        """与真机 ``Sts3215MotorController.initialize`` **协议对等的记录桩**（P1 §2 表、§4.1、§8 步骤 3）。
+
+        签名形态逐字对齐公开接口：三个参数全部 keyword-only、默认 ``True`` /
+        ``True`` / 浮点超时预算、返回 ``None``——所以 P1-05 的装配代码与 P1-06 的
+        握手用例可以用与真机完全相同的调用方式对待 mock（例如标定脚本里的
+        ``initialize(verify_identity=True, enable_torque=False)`` 只读路径）。
+
+        行为：本 mock 本来就是仿真、没有总线，所以**只登记不动作**——
+            * 往 ``self.initialize_calls`` 追加一条参数快照（调用次数 = 列表长度）；
+            * 不发任何寄存器读写：``command_count`` / ``read_count`` 不变，
+              ``q`` / ``q_cmd`` / ``g`` / ``g_cmd`` 不变（真机的"零舵机写入"不变量在
+              mock 侧天然成立，用例可直接断言）；
+            * 不推进虚拟时钟：绝不 sleep、``time.now_s`` 不变；
+            * 不校验参数、不改任何故障注入开关——真机在此处做的身份核验/力矩配置
+              属 §4.1 握手（P1-06），mock 侧只提供调用台账。
+
+        **构造不自动调用本方法**（与真机 §4.1"默认构造调用它一次"有意不同）：
+            ``MockMotorController.__init__`` 的现状是构造即得到一个可用仿真体，既有
+            运动回归（tests/test_grasp_flow.py）全部依赖该现状，加自动调用会牵动
+            整批复用同一构造的断言。P1-05 若要演练"构造/初始化异常 →
+            terminate(MOTOR_INIT_FAILED)"，显式调用本方法即可，失败注入由
+            monkeypatch 覆盖本方法完成，不为此改构造语义。
+        """
+        self.initialize_calls.append(
+            {
+                "verify_identity": verify_identity,
+                "enable_torque": enable_torque,
+                "timeout_s": timeout_s,
+            }
+        )
 
     # ------------------------------------------------------------------
     # MotorController 协议

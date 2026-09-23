@@ -29,6 +29,45 @@ class VisionInterface:
     ripe: bool            # YOLO 成熟度判定，C 级唯一来源
     valid_count: int      # 当次视野合法候选总数（ignore 封顶判据）
 
+
+@dataclass(frozen=True)
+class VisionThresholds:
+    """从已加载 motion profile 提取的视觉可抓性阈值快照。
+
+    这是 P1 组装注入、P3 消费的共享边界契约（决策 D13）：P1 的 main 在加载并校验
+    profile 后组装本类型，经 vision.configure() 注入；视觉模块只导入本类型，不导入
+    motion_params/plans/main，从而解耦 P1/P3 的并行开发。
+
+    字段逐一从 ``MotionParams`` 复制，不做单位换算，与运动 profile 同源同值：
+        target_bounds_m   <- workspace.target_bounds_m
+        object_envelope_m <- grasp.object_envelope_m
+        clearance_m       <- collision.clearance_m
+        approach_height_m <- grasp.approach_height_m
+        table_z_m         <- workspace.table_z_m
+        table_flatness_m  <- workspace.table_flatness_m
+
+    数组字段在构造时统一转为 float64 并复制为独立缓冲，避免与来源 MotionParams 的
+    数组共享内存（本类冻结，归一化通过 object.__setattr__ 完成）。
+    """
+
+    target_bounds_m: FloatArray    # (2,3) [min,max]，合法候选中心判定域，base_link，m
+    object_envelope_m: FloatArray  # (3,)   物体长、宽、高，m；与运动 profile 同源同值
+    clearance_m: float             # 邻物最小净距，m
+    approach_height_m: float       # 接近高度，m（头顶净空检查推导用）
+    table_z_m: float               # 桌面平面高度，base_link，m（几何中心估计用）
+    table_flatness_m: float        # 桌面平整度容差，m
+
+    def __post_init__(self) -> None:
+        # 冻结类不能直接赋值，用 object.__setattr__ 完成 dtype 归一与深拷贝，
+        # 使快照与来源 profile 的数组彻底解耦（调用方后续改写来源不影响本快照）。
+        object.__setattr__(
+            self, "target_bounds_m", np.asarray(self.target_bounds_m, dtype=np.float64).copy()
+        )
+        object.__setattr__(
+            self, "object_envelope_m", np.asarray(self.object_envelope_m, dtype=np.float64).copy()
+        )
+
+
 @dataclass(frozen=True)
 class PlacePose:
     """从配置 places[place_id] 加载的释放位姿。"""

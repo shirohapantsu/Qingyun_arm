@@ -4,3 +4,13 @@ __pycache__/
 /tmp/
 .vscode/
 .qoder/
+
+# 本地实际运行配置与密钥（D16：仓库只提交说明模板 configs/app.json 与
+# configs/secrets.json（configs/vision.json 由 P3 交付），*.local.json 一律不入库）
+configs/app.local.json
+configs/secrets.local.json
+configs/vision.local.json
+
+# 运行期日志与本地 mock 装配产物（JSONL 冒烟输出，不入库）
+logs/
+configs/demo_acceptance.local.json

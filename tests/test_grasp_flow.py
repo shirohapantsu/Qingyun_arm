@@ -2,7 +2,7 @@
 
 覆盖技术文档第八节必测项：
     1 一次视觉下发对应一次同步调用，原始目标在整个调用内不被改写；place_id 只读取
-      配置，不根据 grade 选择
+      配置，不因视觉元数据（length/width/ripe/valid_count）而改变
     2 输入格式错误、缺失放置配置和越限命令在运动前拒绝
     5 Mock 覆盖滞后、过流、空闭合端电流、抓空、开合超时、通信失败、过期反馈和 CPU 迟到
     6 各动作、sleep 和规划检查点可响应 should_stop；函数返回后无隐藏执行任务
@@ -33,6 +33,7 @@ from qingyun.grabbing.executor import ExecutionError, SyncExecutor
 from qingyun.grabbing.kinematics_ext import StoppedByRequest
 from qingyun.grabbing.trajectory import make_joint_segment
 from tests.mock_motor import MockMotorController, SimTime
+from tests.support import make_target
 
 
 def make_arm(params, *, joints=None, gripper_pct=50.0, should_stop=None, **mock_kwargs):
@@ -49,9 +50,13 @@ def make_arm(params, *, joints=None, gripper_pct=50.0, should_stop=None, **mock_
     return arm, st, motor
 
 
-def graspable(params, x, y, z=0.022, grade="A"):
-    yaw = math.degrees(math.atan2(y, x))
-    return VisionInterface(position=np.array([x, y, z]), yaw_deg=yaw, grade=grade)
+def graspable(params, x, y, z=0.022, **meta):
+    """这台 5 自由度臂真能顶抓的六字段目标，yaw 取可达流形上的 atan2(y,x)。
+
+    元数据默认值取自 tests.support.make_target，调用方可用 **meta 覆盖以做
+    元数据独立性测试；运动只读取 position/yaw。
+    """
+    return make_target((x, y, z), math.degrees(math.atan2(y, x)), **meta)
 
 
 # ---------------------------------------------------------------------------
@@ -79,24 +84,35 @@ def test_原始目标数组在调用期间不被改写(params):
     motor.place_object(0.022)
     pos = np.array([0.34, 0.04, 0.022])
     target = VisionInterface(position=pos, yaw_deg=math.degrees(math.atan2(0.04, 0.34)),
-                             grade="A+")
+                             length_m=0.05, width_m=0.04, ripe=True, valid_count=1)
     snapshot = pos.copy()
     arm.grasp_and_place(target, place_id="default")
     assert np.array_equal(pos, snapshot), "入口把调用方的数组改了或没有复制"
 
 
-def test_grade不参与放置点选择(params):
-    """文档 3.2/4.1：grade 只是记录用元数据，place_id 只从参数读取。"""
-    for grade in ("A+", "A", "B", "C", "不合格"):
+def test_元数据不参与放置点选择(params):
+    """文档 3.2/4.1：length/width/ripe/valid_count 只是视觉与 plans 的元数据，
+    place_id 只从配置读取，运动不开始读取这些字段——落点选择与指令序列不因元数据变化。
+    """
+    baseline = None
+    for meta in (
+        {"length_m": 0.05, "width_m": 0.04, "ripe": True, "valid_count": 1},
+        {"length_m": 0.061, "width_m": 0.039, "ripe": False, "valid_count": 7},
+        {"length_m": 0.048, "width_m": 0.05, "ripe": True, "valid_count": 12},
+        {"length_m": 0.055, "width_m": 0.041, "ripe": False, "valid_count": 3},
+    ):
         arm, st, motor = make_arm(params)
         motor.place_object(0.022)
-        r = arm.grasp_and_place(graspable(params, 0.35, 0.0, grade=grade), place_id="bin")
-        assert r.place_id == "bin"
-        # 同一下发位置、不同品级，提交的指令序列长度一致（没有走不同分支）。
-        if grade == "A+":
-            baseline = motor.command_count
+        # 固定 position/yaw/place_id，只变化元数据四字段。
+        r = arm.grasp_and_place(
+            graspable(params, 0.35, 0.0, **meta), place_id="bin")
+        assert r.place_id == "bin", meta
+        observed = (r.status, motor.command_count)
+        if baseline is None:
+            baseline = observed
         else:
-            assert abs(motor.command_count - baseline) <= 40, grade
+            # 同一下发位置、不同元数据，运动结果状态与指令序列长度一致（没走不同分支）。
+            assert observed == baseline, (meta, observed, baseline)
 
 
 def test_同一控制器连续两次调用都成功(params):
@@ -142,7 +158,9 @@ def test_调用进行中拒绝重入(params):
 ])
 def test_非法position在运动前被拒绝(params, bad):
     arm, st, motor = make_arm(params)
-    target = VisionInterface(position=bad, yaw_deg=0.0, grade="A")
+    # 保留原始故障 position（含 float32/shape/NaN），只给新增元数据补合法值。
+    target = VisionInterface(position=bad, yaw_deg=0.0,
+                             length_m=0.05, width_m=0.04, ripe=True, valid_count=1)
     r = arm.grasp_and_place(target)
     assert r.status is GraspStatus.INVALID_INPUT
     assert r.recovery_required is False
@@ -154,16 +172,10 @@ def test_yaw超出约定区间被拒绝(params):
     arm, st, motor = make_arm(params)
     for yaw in (90.0, 120.0, -91.0):
         r = arm.grasp_and_place(VisionInterface(
-            position=np.array([0.34, 0.0, 0.022]), yaw_deg=yaw, grade="A"))
+            position=np.array([0.34, 0.0, 0.022]), yaw_deg=yaw,
+            length_m=0.05, width_m=0.04, ripe=True, valid_count=1))
         assert r.status is GraspStatus.INVALID_INPUT, yaw
     assert motor.command_count == 0
-
-
-def test_grade类型不对被拒绝(params):
-    arm, st, motor = make_arm(params)
-    r = arm.grasp_and_place(VisionInterface(
-        position=np.array([0.34, 0.0, 0.022]), yaw_deg=0.0, grade=3))
-    assert r.status is GraspStatus.INVALID_INPUT
 
 
 def test_未知place_id时臂不动(params):
@@ -779,3 +791,93 @@ def test_原语失败抛出带status的内部错误(params):
     with pytest.raises(MotionError) as exc:
         arm.move_cartesian_top_down(np.array([0.10, 0.20, 0.02]), 0.0)
     assert exc.value.status in {"PLAN_INVALID", "IK_FAILED", "COLLISION", "CONFIG_INVALID"}
+
+
+# ---------------------------------------------------------------------------
+# 7. trace 开关前后的运动不变性（P4-02 追加，不改上面任何既有用例）
+# ---------------------------------------------------------------------------
+
+
+def make_arm_with_trace(params, *, enable_trace: bool, joints=None, gripper_pct=50.0,
+                        should_stop=None, **mock_kwargs):
+    """与 make_arm 同构，只多一个 trace 开关（P4 §2.8.2 不变性断言专用）。
+
+    单独一个函数而不是给 make_arm 加参数：既有用例与它们的构造路径逐字保持原样，
+    开关前后的对照完全由本节的追加用例承担。
+    """
+    st = SimTime()
+    motor = MockMotorController(
+        params, st,
+        joints_deg=joints if joints is not None else params.workspace.home_joints_deg,
+        gripper_pct=gripper_pct, **mock_kwargs,
+    )
+    motor.settle_instantly()
+    arm = ArmController(motor, params, should_stop,
+                        clock=st.monotonic, sleep=st.sleep, clock_ns=st.monotonic_ns,
+                        enable_motion_trace=enable_trace)
+    return arm, st, motor
+
+
+def _trace_run(params, *, enable_trace: bool, mode: str):
+    """同一套 Mock 脚本跑一次调用，返回 (结果, 写次数, 读次数, 虚拟时刻, trace)。"""
+    fired = {"n": 0}
+
+    def should_stop():
+        fired["n"] += 1
+        return mode == "abort" and fired["n"] > 40   # 预规划检查点若干次之后停止
+
+    arm, st, motor = make_arm_with_trace(params, enable_trace=enable_trace,
+                                        should_stop=should_stop)
+    motor.place_object(0.022)
+    if mode == "feedback_expired":
+        motor.expire_feedback = True
+    if mode == "invalid_target":
+        target = VisionInterface(position=np.array([0.34, 0.04]), yaw_deg=0.0,
+                                 length_m=0.05, width_m=0.04, ripe=True, valid_count=1)
+    else:
+        target = graspable(params, 0.34, 0.04)
+    result = arm.grasp_and_place(target, place_id="default")
+    return (result, motor.command_count, motor.read_count, st.now_s,
+            arm.get_last_motion_trace())
+
+
+@pytest.mark.parametrize("mode", ["invalid_target", "feedback_expired"])
+def test_trace开关前后运动指令与返回值完全一致(params, mode):
+    """P4 §2.8.2："对原运动测试增加 trace 开关前后运动指令/返回值不变的断言"。
+
+    同一段 MockMotor 脚本、同一虚拟时钟下开/关各跑一次：写次数、读次数、返回的
+    GraspResult 六个字段、以及模拟时钟的推进量必须逐项相等——trace 只往内存里追加有界
+    事件，不多发一条指令、不多读一次反馈、不额外推进时钟；关闭时更是零收集、零占用。
+    """
+    r_on, cmd_on, read_on, now_on, trace_on = _trace_run(params, enable_trace=True,
+                                                        mode=mode)
+    r_off, cmd_off, read_off, now_off, trace_off = _trace_run(params, enable_trace=False,
+                                                             mode=mode)
+    assert (cmd_on, read_on) == (cmd_off, read_off), "trace 改变了舵机写入或反馈读取次数"
+    assert now_on == now_off, "模拟时钟被 trace 额外推进了"
+    assert r_on == r_off
+    for field in ("status", "stage", "reason", "place_id", "holding", "recovery_required"):
+        assert getattr(r_on, field) == getattr(r_off, field), field
+    assert trace_off == (), "trace 关闭时不得收集任何事件"
+    assert trace_on and all(isinstance(e, AC.MotionTraceEvent) for e in trace_on)
+    assert [e.sequence for e in trace_on] == list(range(len(trace_on)))
+    assert trace_on[-1].kind == AC.TRACE_RESULT
+    assert trace_on[-1].outcome == r_on.status.value
+
+
+def test_trace开关不改变停止与故障保持行为(params):
+    """故障保持契约不变：should_stop 中止时开关两侧的返回契约与写读次数一致。"""
+    r_on, cmd_on, read_on, now_on, trace_on = _trace_run(params, enable_trace=True,
+                                                        mode="abort")
+    r_off, cmd_off, read_off, now_off, trace_off = _trace_run(params, enable_trace=False,
+                                                             mode="abort")
+    assert (r_on.status, r_on.stage, r_on.recovery_required) == \
+        (r_off.status, r_off.stage, r_off.recovery_required)
+    assert (cmd_on, read_on, now_on) == (cmd_off, read_off, now_off)
+    assert r_on.status is GraspStatus.ABORTED
+    assert trace_off == ()
+    failures = [e for e in trace_on if e.kind == AC.TRACE_FAILURE]
+    assert [e.outcome for e in failures] == [GraspStatus.ABORTED.value]
+    assert failures[0].stage == AC.STAGE_CHECK, "failure 记的是被改写前的原始阶段"
+    assert [e.stage for e in trace_on if e.kind == AC.TRACE_STAGE_ENTER][-1] == \
+        AC.STAGE_FAULT_HOLD

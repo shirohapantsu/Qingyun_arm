@@ -60,6 +60,15 @@ VENDOR_INST_ACTION = 0x05
 VENDOR_INST_SYNC_WRITE = 0x83
 VENDOR_BROADCAST_ID = 0xFE
 
+# STS3215 vendor 控制表里、启动握手要碰的寄存器地址（独立于被测实现，按厂商手册
+# 硬编码，供假总线判断"隐式上力/清理读回"发生在哪个寄存器上）。
+STS_TORQUE_ENABLE = 40
+STS_GOAL_POSITION = 42
+STS_PRESENT_POSITION = 56
+STS_RESPONSE_STATUS_LEVEL = 8
+# EEPROM/配置类寄存器：初始化任何路径都不得写入（prompt §5.1、标定指南 4.1）。
+STS_EEPROM_ADDRS = frozenset({5, 6, 8, 9, 11, 31})  # ID/CW_Ang/RLS_Ang/RRL/RLR/Homing
+
 
 def vendor_checksum(body) -> int:
     """CHECKSUM = ~(ID..最后参数之和) & 0xFF（手册第 3 节）。"""
@@ -309,6 +318,188 @@ class Clock:
 
     def pair(self):
         return self, self.sleep
+
+
+class StartupBus(FakeBus):
+    """FakeBus + P1 §4.1 启动握手专用故障/行为钩子（CAL-052 隐式上力等）。
+
+    所有钩子默认关闭，绝不改变基类（既有 60 余条用例）的行为。只在握手事务里
+    触发对应现象，让 T28–T30 能对"事务序列 + 有界清理"逐项断言：
+
+      goal_write_torque_effect  None | 'all' | {servo_id,...}：广播 Goal_Position
+          （CAL-052）后把这些轴的 Torque_Enable 置 1，模拟"写目标即可能上力"。
+      goal_write_present_shift  {servo_id: delta_raw}：广播目标时把该轴
+          Present_Position(56) 平移 delta_raw，模拟上力后的重力下落/位姿跳变。
+      read_error_by_addr        {addr: error_byte}：读该地址回 ERROR 位（设备故障）。
+      corrupt_goal_read_ids     {servo_id}：读回 Goal_Position 时翻转字节（读回不匹配）。
+      cleanup_write_fail_ids    {servo_id}：清理阶段失能写(Torque_Enable=0)失败。
+      cleanup_read_fail_ids     {servo_id}：清理阶段读回 Torque_Enable 失败（仅在该轴
+          已发生过一次 Torque_Enable=0 写之后生效，用于区分握手期的正常力矩读）。
+      explode_sync_write        True：广播 Goal_Position 时串口层直接抛错（写失败）。
+      cleanup_write_delay_s + clock：只有进入清理（已出现 Torque_Enable=0 写）后每次
+          事务推进假时钟，用于验证清理预算独立且有界（握手期不被拖慢）。
+    """
+
+    def __init__(
+        self,
+        *,
+        clock=None,
+        goal_write_torque_effect=None,
+        goal_write_present_shift=None,
+        cleanup_write_delay_s: float = 0.0,
+        **kw,
+    ) -> None:
+        super().__init__(**kw)
+        self._clock = clock
+        self.goal_write_torque_effect = goal_write_torque_effect
+        self.goal_write_present_shift = dict(goal_write_present_shift or {})
+        self.read_error_by_addr: dict[int, int] = {}
+        self.corrupt_goal_read_ids: set[int] = set()
+        self.cleanup_write_fail_ids: set[int] = set()
+        self.cleanup_read_fail_ids: set[int] = set()
+        self.explode_sync_write = False
+        self._cleanup_write_delay_s = cleanup_write_delay_s
+        self._disable_attempt: set[int] = set()
+        self.closed = False
+
+    def close(self) -> None:
+        self.closed = True
+
+    def set_torque(self, servo_id: int, value: int) -> None:
+        self.registers.setdefault(servo_id, {})[STS_TORQUE_ENABLE] = value & 0xFF
+
+    def set_goal(self, servo_id: int, raw: int) -> None:
+        self.set_u16(servo_id, STS_GOAL_POSITION, raw)
+
+    def _apply_goal_effect(self) -> None:
+        if self.goal_write_torque_effect is not None:
+            affected = (
+                list(self.registers)
+                if self.goal_write_torque_effect == "all"
+                else list(self.goal_write_torque_effect)
+            )
+            for sid in affected:
+                self.registers.setdefault(sid, {})[STS_TORQUE_ENABLE] = 1
+        for sid, delta in self.goal_write_present_shift.items():
+            regs = self.registers.setdefault(sid, {})
+            cur = (regs.get(STS_PRESENT_POSITION, 0) | (regs.get(STS_PRESENT_POSITION + 1, 0) << 8))
+            new = (cur + int(delta)) & 0xFFFF
+            regs[STS_PRESENT_POSITION] = new & 0xFF
+            regs[STS_PRESENT_POSITION + 1] = (new >> 8) & 0xFF
+
+    def write(self, data: bytes, timeout_s: float | None = None) -> int:
+        data = bytes(data)
+        servo_id, length, inst = data[2], data[3], data[4]
+        params = list(data[5 : 5 + length - 2])
+
+        # 清理阶段才推进时钟（模拟只有卸力事务变慢），验证清理预算独立且有界。
+        if self._clock is not None and self._disable_attempt and self._cleanup_write_delay_s:
+            self._clock.t += self._cleanup_write_delay_s
+
+        # 广播目标失败：串口层直接抛错（不写寄存器）。
+        if inst == VENDOR_INST_SYNC_WRITE and self.explode_sync_write:
+            raise OSError("模拟：目标广播 SYNC_WRITE TX 失败")
+
+        # 读事务的三种注入：按地址回 ERROR、目标读回破坏、清理读回失败。
+        if inst == VENDOR_INST_READ and params:
+            addr = params[0]
+            if addr in self.read_error_by_addr:
+                saved = self.fail_error_bit
+                self.fail_error_bit = self.read_error_by_addr[addr]
+                try:
+                    return super().write(data, timeout_s=timeout_s)
+                finally:
+                    self.fail_error_bit = saved
+            if addr == STS_GOAL_POSITION and servo_id in self.corrupt_goal_read_ids:
+                regs = self.registers.setdefault(servo_id, {})
+                regs[STS_GOAL_POSITION] = (regs.get(STS_GOAL_POSITION, 0) ^ 0xFF) & 0xFF
+                return super().write(data, timeout_s=timeout_s)
+            if (
+                addr == STS_TORQUE_ENABLE
+                and servo_id in self.cleanup_read_fail_ids
+                and servo_id in self._disable_attempt
+            ):
+                raise OSError("模拟：清理阶段 Torque_Enable 读回失败")
+
+        # 清理失能写：记录尝试、可选失败。
+        if inst == VENDOR_INST_WRITE and params:
+            addr = params[0]
+            value = params[1] if len(params) > 1 else 0
+            if addr == STS_TORQUE_ENABLE and value == 0:
+                self._disable_attempt.add(servo_id)
+                if servo_id in self.cleanup_write_fail_ids:
+                    raise OSError("模拟：清理阶段 Torque_Enable=0 写失败")
+
+        n = super().write(data, timeout_s=timeout_s)
+        if inst == VENDOR_INST_SYNC_WRITE and params and params[0] == STS_GOAL_POSITION:
+            self._apply_goal_effect()
+        return n
+
+
+# ---------------------------------------------------------------------------
+# 启动握手事务分析辅助（供 T28–T30 断言"序列 + 零写入 + 清理调用顺序"）
+# ---------------------------------------------------------------------------
+
+# 事务分类：(kind, addr_or_None, value_or_None, servo_id_or_None)。
+# kind ∈ {'read','ping','write','sync_write','reset'}。写帧按寄存器地址区分，
+# 力矩写再按值（0=卸力 / 1=使能）区分。
+
+
+def startup_tx(bus) -> list[tuple]:
+    """把假总线的 tx_log 解析成结构化事务序列（独立于被测实现的字节真值）。"""
+    out: list[tuple] = []
+    for frame in bus.tx_log:
+        inst = frame[4]
+        if inst == VENDOR_INST_RESET:
+            out.append(("reset", None, None, None))
+            continue
+        if inst == VENDOR_INST_PING:
+            out.append(("ping", None, None, frame[2]))
+            continue
+        params = list(frame[5 : 5 + frame[3] - 2])
+        if inst == VENDOR_INST_READ:
+            out.append(("read", params[0], None, frame[2]))
+        elif inst == VENDOR_INST_WRITE:
+            addr = params[0]
+            value = params[1] if len(params) > 1 else None
+            out.append(("write", addr, value, frame[2]))
+        elif inst == VENDOR_INST_SYNC_WRITE:
+            out.append(("sync_write", params[0], None, None))
+        else:
+            raise AssertionError(f"未知指令 0x{inst:02X}")
+    return out
+
+
+def assert_no_torque_or_goal_write(tx) -> None:
+    """零 Goal_Position 广播、零 Torque_Enable 单播写（含卸载/使能）。"""
+    for kind, addr, value, sid in tx:
+        assert kind not in ("reset",), "启动路径禁止 RESET"
+        if kind == "sync_write":
+            assert addr != STS_GOAL_POSITION, "握手准入阶段不得广播 Goal_Position"
+        if kind == "write":
+            assert addr != STS_TORQUE_ENABLE, "握手准入阶段不得写 Torque_Enable"
+            assert addr not in STS_EEPROM_ADDRS, f"禁止写 EEPROM/配置寄存器 {addr}"
+
+
+def assert_no_eeprom_write(tx) -> None:
+    for kind, addr, value, sid in tx:
+        assert kind != "reset", "启动路径禁止 RESET"
+        assert not (kind == "write" and addr in STS_EEPROM_ADDRS), f"禁止写 EEPROM {addr}"
+
+
+class SleepInterruptClock(Clock):
+    """在第 nth 次 sleep 时抛 KeyboardInterrupt，注入"上力后 Ctrl-C"。"""
+
+    def __init__(self, interrupt_on_sleep: int, **kw) -> None:
+        super().__init__(**kw)
+        self._interrupt_on = interrupt_on_sleep
+        self._sleep_calls = 0
+
+    def sleep(self, dt: float) -> None:
+        self._sleep_calls += 1
+        if self._sleep_calls == self._interrupt_on:
+            raise KeyboardInterrupt("模拟：使能/预置窗口内按下 Ctrl-C")
+        super().sleep(dt)
 
 
 # ---------------------------------------------------------------------------
@@ -771,6 +962,26 @@ def _seed_feedback(bus, params, mapping):
     bus.set_u16(6, 69, 0)
 
 
+def _startup_controller(params, bus, *, clock=None, sleep=None, initialize=True):
+    """构造一个走 §4.1 默认握手路径的驱动：seed 反馈（当前在 home）+ 注入时钟。
+
+    返回 (ctl, bus, mapping, clock)。默认 ``initialize=True`` 让构造即握手；
+    需要注入异常/在握手前改总线状态时传 ``initialize=False`` 再手动 initialize()。
+    """
+    calib = load_motor_calibration(SIM_PROFILE.parent / params.model.motor_calibration_path)
+    mapping = MC.MotorMapping.from_params(params, calib)
+    _seed_feedback(bus, params, mapping)
+    clock = clock if clock is not None else Clock()
+    ctl = Sts3215MotorController(
+        params, mapping, transport=bus, clock=clock,
+        sleep=sleep if sleep is not None else clock.sleep,
+        monotonic_ns=lambda: int(clock.t * 1e9),
+        initialize=initialize,
+    )
+    ctl._clock_obj = clock
+    return ctl, bus, mapping, clock
+
+
 def test_未初始化时三个方法都拒绝(params):
     """文档 4.2：设备未就绪或报告硬件故障抛 MotorStateError。
 
@@ -798,46 +1009,348 @@ def test_未初始化时三个方法都拒绝(params):
 
 
 def test_初始化链路_读应答配置核对身份能力矩_不碰EEPROM(params):
-    """initialize() 走完整链路：应答配置(READ)+身份(PING/READ)+力矩(WRITE)。
+    """默认握手成功路径（§4.1）：准入卸力→预置→隐式核对→位移检查→READY。
 
-    除 Torque_Enable 外不得有任何 WRITE，尤其禁止 Homing_Offset(31)、
-    Min/Max 行程限位(9/11) 或 Response_Status_Level(8) 被写（技术文档 4.2、
-    标定指南 4.1：不隐藏自动回零 / EEPROM 写入）。
+    修订说明（P1-06）：旧断言"6+6+6+12+6=36 帧、写帧只有 Torque_Enable"是**旧
+    initialize**（读应答配置→身份→直接 configure_torque(True)）的形态。§4.1 现在
+    要求先核对六轴全 0、以当前反馈预置 Goal_Position、再按 CAL-052 处理隐式上力，
+    因此本用例覆盖面**提升**：新增"预置广播 1 帧 SYNC_WRITE(Goal)"与"仅对力矩=0 的
+    轴显式使能"，同时保留原有的两条底线——EEPROM/行程限位/Response_Status_Level 一次
+    都不写、无 RESET、应答策略确实来自寄存器读回。
     """
-    bus = FakeBus()                     # 默认全应答等级 0，固件 2.54，型号 777
-    calib = load_motor_calibration(SIM_PROFILE.parent / params.model.motor_calibration_path)
-    mapping = MC.MotorMapping.from_params(params, calib)
-    clock, nap = Clock().pair()
-    ctl = Sts3215MotorController(params, mapping, transport=bus, clock=clock,
-                                 sleep=nap, initialize=True)
-    # 应答策略真的来自寄存器读回：默认等级 0 → 写要等应答
+    bus = StartupBus()                   # 默认全应答等级 0、无隐式上力：广播后仍需显式使能
+    ctl, bus, mapping, clock = _startup_controller(params, bus)
+    tx = startup_tx(bus)
+
+    # 底线一：没有任何 EEPROM/行程限位/应答配置写，也没有 RESET。
+    assert_no_eeprom_write(tx)
+    # 底线二：Goal_Position 广播恰好 1 帧（一次 sync_write 六轴），力矩写只允许 =1。
+    goal_syncs = [t for t in tx if t[0] == "sync_write" and t[1] == STS_GOAL_POSITION]
+    torque_writes = [t for t in tx if t[0] == "write" and t[1] == STS_TORQUE_ENABLE]
+    assert len(goal_syncs) == 1, "目标预置必须是恰好一次六轴广播"
+    assert torque_writes and all(v == 1 for _, _, v, _ in torque_writes), "只允许使能写，不得写卸力"
+    # 应答策略来自寄存器读回：默认等级 0 → 写要等应答。
     assert all(ctl._protocol.write_expects_ack(sid) for sid in range(1, 7))
-    # 六台力矩都已打开
+    # 六轴最终都打开；内部状态兼容 _require_actuating_ready（READY）。
     addr, _ = mapping.common_register("Torque_Enable")
     assert all(bus.registers[sid][addr] == 1 for sid in range(1, 7))
-    # 全部 WRITE 帧只允许写 Torque_Enable；也没有 RESET 指令帧
-    for frame in bus.tx_log:
-        inst = frame[4]
-        assert inst != VENDOR_INST_RESET
-        if inst == VENDOR_INST_WRITE:
-            assert frame[5] == addr, f"初始化写出了预期外的寄存器 {frame[5]}"
-    # 事务数固定：6 应答配置 + 6 PING + 6 型号 + 12 固件 + 6 力矩 = 36
-    assert len(bus.tx_log) == 36
+    report = ctl.startup_report
+    assert report["result"] == "ready"
+    assert report["failed_phase"] is None
+    assert report["torque_initial"] == [0] * 6
+    assert ctl._torque_enabled is True and ctl._startup_ready is True
 
 
 def test_初始化按等级1配置后力矩写不等应答(params):
-    """等级 1（出厂常见"只回读"）下若硬等应答，初始化会超时；必须按配置跳过。"""
-    bus = FakeBus()
+    """等级 1（出厂常见"只回读"）下若硬等应答，握手会超时；必须按配置跳过。
+
+    修订说明（P1-06）：默认路径现在在广播目标后需要对力矩=0 的轴**逐轴显式使能**，
+    本用例即验证这些力矩写在等级 1 设备上不等待应答、从而整条握手按时完成并置 READY。
+    """
+    bus = StartupBus()
     for sid in range(1, 7):
         bus.set_write_level(sid, 1)
-    calib = load_motor_calibration(SIM_PROFILE.parent / params.model.motor_calibration_path)
-    mapping = MC.MotorMapping.from_params(params, calib)
-    clock, nap = Clock().pair()
-    ctl = Sts3215MotorController(params, mapping, transport=bus, clock=clock,
-                                 sleep=nap, initialize=True)
+    ctl, bus, mapping, clock = _startup_controller(params, bus)
     assert all(not ctl._protocol.write_expects_ack(sid) for sid in range(1, 7))
     addr, _ = mapping.common_register("Torque_Enable")
     assert all(bus.registers[sid][addr] == 1 for sid in range(1, 7))
+    assert ctl.startup_report["result"] == "ready"
+    # 广播后读回全 0 → 显式使能全部六轴（无隐式上力时），逐轴写、每轴一帧。
+    assert ctl.startup_report["torque_enable_source"] == "explicit_enable_zero_axes"
+    assert len(ctl.startup_report["explicitly_enabled_axes"]) == 6
+
+
+def test_只读路径_enable_torque_False_全程零WRITE(params):
+    """enable_torque=False 是标定工具在用的只读路径：锁定"该路径零 WRITE"。
+
+    既有脚本（validate_home_waypoint_motion / calibrate_joint_velocity /
+    calibrate_joint_acceleration）都用 ``initialize(verify_identity=True,
+    enable_torque=False)`` 只读握手，随后自行预置。这条断言保证新流程不会给
+    它们追加任何 Goal_Position/Torque_Enable 写入。
+    """
+    bus = StartupBus()
+    ctl, bus, mapping, clock = _startup_controller(params, bus, initialize=False)
+    ctl.initialize(verify_identity=True, enable_torque=False)
+    tx = startup_tx(bus)
+    assert_no_torque_or_goal_write(tx)
+    # 只读路径不预置、不核对位移、不置 READY。
+    report = ctl.startup_report
+    assert report["result"] == "read_only"
+    assert ctl._torque_enabled is False and ctl._startup_ready is False
+    # 身份核对仍在只读路径里执行：应能读到型号/固件（有 PING）。
+    assert any(t[0] == "ping" for t in tx)
+
+
+# ---------------------------------------------------------------------------
+# 4b. P1 §4.1 驱动启动握手（P1-T28 / T29 / T30）
+# ---------------------------------------------------------------------------
+
+
+def _startup_raises(params, bus, *, clock=None, sleep=None):
+    """构造 initialize=False 的驱动并让握手跑起来，返回 (exc, ctl)。"""
+    ctl, bus, mapping, clock = _startup_controller(
+        params, bus, initialize=False, clock=clock, sleep=sleep
+    )
+    with pytest.raises(MC.MotorStartupError) as ei:
+        ctl.initialize()
+    return ei.value, ctl
+
+
+# --- P1-T28：任一轴已上力 / (a) 阶段读失败 → MOTOR_INIT_FAILED，零写入 ---
+
+
+def test_T28_任一轴已上力_拒绝启动且零目标力矩写入(params):
+    # 轴 3（elbow_flex）启动前就已 Torque_Enable=1，D17 要求不得由启动自动卸力。
+    bus = StartupBus()
+    ctl, bus, mapping, clock = _startup_controller(params, bus, initialize=False)
+    bus.set_torque(3, 1)
+    with pytest.raises(MC.MotorStartupError) as ei:
+        ctl.initialize()
+    assert_no_torque_or_goal_write(startup_tx(bus))     # 一条 Goal/Torque 写都没有
+    report = ei.value.report
+    assert report["result"] == "error"
+    assert "卸力" in report["failed_phase"]
+    assert report["torque_initial"][2] == 1
+
+
+def test_T28_构造即握手失败也抛MotorStartupError供main捕获(params):
+    """生产 main 走 ``Sts3215MotorController(params)``（构造即 initialize=True）；
+    已上力时构造本身必须抛出可取的 MotorStartupError，且零目标/力矩写入。"""
+    bus = StartupBus()
+    calib = load_motor_calibration(SIM_PROFILE.parent / params.model.motor_calibration_path)
+    mapping = MC.MotorMapping.from_params(params, calib)
+    _seed_feedback(bus, params, mapping)
+    bus.set_torque(6, 1)                                 # 夹爪轴启动前已上力
+    clock = Clock()
+    with pytest.raises(MC.MotorStartupError) as ei:
+        Sts3215MotorController(
+            params, mapping, transport=bus, clock=clock, sleep=clock.sleep,
+            monotonic_ns=lambda: int(clock.t * 1e9), initialize=True,
+        )
+    assert_no_torque_or_goal_write(startup_tx(bus))
+    assert ei.value.report["failed_phase"]
+    assert bus.closed is True                            # 构造失败也不泄漏传输句柄
+
+
+def test_T28_准入阶段力矩读失败_拒绝启动且零写入(params):
+    # (a) 逐轴读 Torque_Enable 时设备报硬件故障（ERROR 位）→ 立即失败，零写入。
+    bus = StartupBus()
+    bus.read_error_by_addr[STS_TORQUE_ENABLE] = 0x02
+    exc, ctl = _startup_raises(params, bus)
+    assert_no_torque_or_goal_write(startup_tx(bus))
+    assert exc.report["result"] == "error"
+    assert "卸力" in exc.report["failed_phase"]
+    assert ctl._connected is False                      # 失败关闭传输
+
+
+# --- P1-T29：旧目标不一致 / 隐式全上力 / 部分上力 / 成功不额外写 / 全0+位移OK ---
+
+
+def test_T29_旧目标不一致_只登记不先写力矩_随后以当前反馈预置(params):
+    # 把轴 1 的旧 Goal_Position 灌成一个与当前反馈编码目标不同的值。
+    bus = StartupBus()
+    ctl, bus, mapping, clock = _startup_controller(params, bus, initialize=False)
+    home0_raw = int(mapping.degrees_to_raw("shoulder_pan", 0.0))
+    bus.set_goal(1, (home0_raw + 700) & 0xFFFF)         # 制造旧目标≠当前反馈
+    ctl.initialize()
+    report = ctl.startup_report
+    mismatch = {m["axis"] for m in report["old_target_mismatch"]}
+    assert "shoulder_pan" in mismatch
+    # 预置以"当前反馈"为准：广播后读回必须等于编码当前反馈的目标，而不是旧的 +700 偏移。
+    assert report["goal_readback_raw"] == report["seeded_goal_positions_raw"]
+    # 关键：绝不先写 Torque_Enable=1 —— 第一条写事务必须是 Goal 广播。
+    tx = startup_tx(bus)
+    first_write_kind = next(
+        (t[0] for t in tx if t[0] in ("write", "sync_write")), None
+    )
+    assert first_write_kind == "sync_write"
+    assert report["result"] == "ready"
+
+
+def test_T29_广播后隐式全上力_读回全1不重复写力矩(params):
+    # CAL-052：广播 Goal_Position 使六轴隐式上力 → 读回全 1 → 不得再逐轴写 Torque_Enable=1。
+    bus = StartupBus(goal_write_torque_effect="all")
+    ctl, bus, mapping, clock = _startup_controller(params, bus, initialize=False)
+    ctl.initialize()
+    report = ctl.startup_report
+    assert report["torque_enable_source"] == "goal_broadcast_implicit_all_verified"
+    assert report["explicitly_enabled_axes"] == []
+    assert report["torque_final_readback"] == [1] * 6
+    assert report["result"] == "ready"
+    tx = startup_tx(bus)
+    # 只有一帧 Goal 广播；没有任何 Torque_Enable 单播写（既不使能也不卸力）。
+    assert sum(1 for t in tx if t[0] == "sync_write" and t[1] == STS_GOAL_POSITION) == 1
+    assert [t for t in tx if t[0] == "write" and t[1] == STS_TORQUE_ENABLE] == []
+
+
+def test_T29_部分上力_只对为0轴显式使能再读回(params):
+    # 广播后只有轴 1/3/5 隐式上力，轴 2/4/6 仍为 0 → 只对这 3 个轴显式使能。
+    bus = StartupBus(goal_write_torque_effect={1, 3, 5})
+    ctl, bus, mapping, clock = _startup_controller(params, bus, initialize=False)
+    ctl.initialize()
+    report = ctl.startup_report
+    assert report["torque_after_broadcast"] == [1, 0, 1, 0, 1, 0]
+    assert report["explicitly_enabled_axes"] == ["shoulder_lift", "wrist_flex", "gripper"]
+    assert report["torque_final_readback"] == [1] * 6
+    assert report["result"] == "ready"
+    tx = startup_tx(bus)
+    enable_writes = [t for t in tx if t[0] == "write" and t[1] == STS_TORQUE_ENABLE]
+    assert all(v == 1 for _, _, v, _ in enable_writes)
+    assert {sid for _, _, _, sid in enable_writes} == {2, 4, 6}   # 只使能为 0 的轴
+
+
+def test_T29_全0且位移OK成功路径不追加多余初始化写入(params):
+    # 无隐式上力 → 广播后需显式使能全部六轴；成功路径写入集合必须精确，不夹带多余写。
+    bus = StartupBus()
+    ctl, bus, mapping, clock = _startup_controller(params, bus, initialize=False)
+    ctl.initialize()
+    report = ctl.startup_report
+    assert report["result"] == "ready"
+    assert ctl._startup_ready is True and ctl._torque_enabled is True
+    assert report["torque_initial"] == [0] * 6
+    assert report["position_change_deg"] == pytest.approx([0.0] * 5)
+    assert report["gripper_change_pct"] == pytest.approx(0.0)
+    # 精确写事务：1 帧 Goal 广播 + 6 帧 Torque_Enable=1；除此之外零 WRITE、零卸力、无 EEPROM/RESET。
+    tx = startup_tx(bus)
+    from collections import Counter
+    writes = Counter(
+        (kind, addr, val) for kind, addr, val, _ in tx if kind in ("write", "sync_write")
+    )
+    assert writes == Counter({
+        ("sync_write", STS_GOAL_POSITION, None): 1,
+        ("write", STS_TORQUE_ENABLE, 1): 6,
+    })
+    assert_no_eeprom_write(tx)
+
+
+def test_T29_预置前速度未静止_拒绝且零写入(params):
+    """(b) 要求五关节速度逐轴 ≤ motion.settle_velocity_tol_deg_s；未静止时零写入退出。"""
+    bus = StartupBus()
+    ctl, bus, mapping, clock = _startup_controller(params, bus, initialize=False)
+    tol = float(params.motion.settle_velocity_tol_deg_s[0])
+    # 找一个换算后 deg/s 明确超过容差的原始速度值灌进轴 1 的 Present_Velocity。
+    probe = 1
+    while abs(mapping.raw_velocity_to_deg_s(0, probe)) <= tol and probe < 0x7FFF:
+        probe = probe * 2 + 1
+    assert abs(mapping.raw_velocity_to_deg_s(0, probe)) > tol, "假速度未越容差，测试构造失败"
+    bus.set_u16(1, 58, probe)
+    with pytest.raises(MC.MotorStartupError) as ei:
+        ctl.initialize()
+    assert_no_torque_or_goal_write(startup_tx(bus))       # 预置阶段就失败 → 零写入
+    assert ei.value.report["failed_phase"] == "反馈预置"
+    assert ei.value.report["result"] == "error"
+    assert ei.value.report["cleanup"]["attempted"] is False
+
+
+
+
+def _cleanup_states(report):
+    return {ax["axis"]: ax["state"] for ax in report["cleanup"]["axes"]}
+
+
+def test_T30_目标广播写失败_进入有界清理并卸力关闭(params):
+    bus = StartupBus()
+    bus.explode_sync_write = True                        # 广播帧 TX 失败
+    exc, ctl = _startup_raises(params, bus)
+    report = exc.report
+    assert report["result"] == "error"
+    assert report["cleanup"]["attempted"] is True        # 从首次可能上力的写入起
+    states = _cleanup_states(report)
+    assert set(states) == set(MOTOR_NAMES)
+    # 广播从未落地、也没上力 → 清理逐轴失能写后读回 0 → 全 off。
+    assert all(v == "off" for v in states.values())
+    tx = startup_tx(bus)
+    disable = [t for t in tx if t[0] == "write" and t[1] == STS_TORQUE_ENABLE and t[2] == 0]
+    assert len(disable) == 6
+    # 清理不得写 Goal_Position、不得 hold/reset/home。
+    assert [t for t in tx if t[0] == "sync_write"] == []
+    assert not any(t[0] == "reset" for t in tx)
+    assert ctl._connected is False and bus.closed is True
+
+
+def test_T30_目标读回不匹配_清理逐轴卸力(params):
+    bus = StartupBus()
+    bus.corrupt_goal_read_ids = {4}                      # 轴 4 Goal 读回被破坏
+    exc, ctl = _startup_raises(params, bus)
+    report = exc.report
+    assert report["goal_readback_raw"] != report["seeded_goal_positions_raw"]
+    assert report["cleanup"]["attempted"] is True
+    assert all(v == "off" for v in _cleanup_states(report).values())
+    assert ctl._connected is False and bus.closed is True
+
+
+def test_T30_位移超限_上力后失败仍完整清理(params):
+    # 广播时把轴 2 的 Present_Position 平移约 35°（> start_position_tol_deg=3°）。
+    bus = StartupBus(goal_write_present_shift={2: 400})
+    exc, ctl = _startup_raises(params, bus)
+    report = exc.report
+    assert report["failed_phase"] == "位移核对"
+    assert report["position_change_deg"][1] > 3.0
+    # 无隐式上力 → 曾显式使能六轴 → (d) 失败 → 清理必须把这六轴全部卸回。
+    assert report["cleanup"]["attempted"] is True
+    assert all(v == "off" for v in _cleanup_states(report).values())
+    tx = startup_tx(bus)
+    disable = [t for t in tx if t[0] == "write" and t[1] == STS_TORQUE_ENABLE and t[2] == 0]
+    assert len(disable) == 6
+    assert ctl._connected is False and bus.closed is True
+
+
+def test_T30_CtrlC在上力窗口_有界清理后抛MotorStartupError(params):
+    # 在 (d) 第一次等待（已广播+已上力）时注入 KeyboardInterrupt。
+    clock = SleepInterruptClock(interrupt_on_sleep=1)
+    bus = StartupBus(clock=clock)
+    exc, ctl = _startup_raises(params, bus, clock=clock)
+    report = exc.report
+    assert report["result"] == "interrupted"
+    assert report["cleanup"]["attempted"] is True
+    assert all(v == "off" for v in _cleanup_states(report).values())
+    assert ctl._connected is False and bus.closed is True
+    # MotorStartupError 仍是 MotorStateError（既有 MOTOR_INIT_FAILED 归类接得住）。
+    assert isinstance(exc, MC.MotorStateError)
+
+
+def test_T30_清理某轴读失败登记unknown_不得当作off(params):
+    # 位移失败触发清理；轴 5 的清理读回失败 → 只能记 unknown，其余 off。
+    bus = StartupBus(goal_write_present_shift={2: 400})
+    bus.cleanup_read_fail_ids = {5}
+    exc, ctl = _startup_raises(params, bus)
+    states = _cleanup_states(exc.report)
+    assert states["wrist_roll"] == "unknown"
+    # unknown ≠ off：只有轴 5 无法确认，其余成功读回 0。
+    off_axes = {a for a, s in states.items() if s == "off"}
+    assert off_axes == set(MOTOR_NAMES) - {"wrist_roll"}
+    assert "unknown" in states.values()
+    assert exc.report["cleanup"]["axes"][4]["servo_id"] == 5
+
+
+def test_T30_清理某轴失能写失败_仍继续其余轴并如实记录(params):
+    # 轴 2 失能写失败（寄存器仍停在 1）→ 读回 on；其余 off；循环不中断，六轴都有记录。
+    bus = StartupBus(goal_write_present_shift={3: 400})
+    bus.cleanup_write_fail_ids = {2}
+    exc, ctl = _startup_raises(params, bus)
+    report = exc.report
+    states = _cleanup_states(report)
+    assert len(states) == 6                              # 失败仍继续，逐轴都有条目
+    assert states["shoulder_lift"] == "on"               # 失能写没落地 → 读回 1
+    off_axes = {a for a, s in states.items() if s == "off"}
+    assert off_axes == set(MOTOR_NAMES) - {"shoulder_lift"}
+    axis2 = [ax for ax in report["cleanup"]["axes"] if ax["servo_id"] == 2][0]
+    assert axis2["disable_error"]                        # 记录了该轴失能写失败
+
+
+def test_T30_清理预算独立有界_慢总线尾部轴记unknown(params):
+    # 清理阶段每事务推进假时钟 1s，超过 STARTUP_CLEANUP_TIMEOUT_S 后剩余轴不再尝试 → unknown。
+    clock = Clock(step_s=0.0)
+    bus = StartupBus(clock=clock, goal_write_present_shift={2: 400}, cleanup_write_delay_s=1.0)
+    exc, ctl = _startup_raises(params, bus, clock=clock)
+    report = exc.report
+    assert report["cleanup"]["attempted"] is True
+    assert report["cleanup"]["deadline_exceeded"] is True
+    states = [ax["state"] for ax in report["cleanup"]["axes"]]
+    assert len(states) == 6
+    assert "off" in states and "unknown" in states       # 有界：早期卸成功、尾部超预算 unknown
+    assert states[0] == "off"                            # 第一轴一定在预算内先卸力
+    assert ctl._connected is False and bus.closed is True
 
 
 @pytest.mark.parametrize("bad_index", [0, 4])

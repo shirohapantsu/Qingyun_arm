@@ -21,10 +21,12 @@ from configs.motion_params import (
     read_urdf_joint_limits_deg,
     wrap180,
 )
+from configs.common_interface import VisionThresholds
 from tests.support import (
     DELETE,
     SIM_PROFILE,
     _set_path,
+    load_sim,
     motor_calibration_sha256,
     raw_profile,
     write_profile,
@@ -501,3 +503,83 @@ def test_URDF解析拒绝DTD实体(tmp_path):
     with pytest.raises(ParamsError) as exc:
         read_urdf_joint_limits_deg(evil, ("shoulder_pan",))
     assert "DTD" in str(exc.value)
+
+
+# ---------------------------------------------------------------------------
+# 6. VisionThresholds 组装（决策 D13；P0 §3/§6）
+# ---------------------------------------------------------------------------
+
+
+def _assemble_thresholds(params) -> tuple[VisionThresholds, dict]:
+    """按 P0 §3 字段来源逐一从 MotionParams 复制，返回快照与所用源数组。
+
+    源数组特意取本地可写副本，便于验证"数组为副本"而不触碰共享配置对象。
+    """
+    src = {
+        "target_bounds_m": np.array(params.workspace.target_bounds_m, dtype=np.float64),
+        "object_envelope_m": np.array(params.grasp.object_envelope_m, dtype=np.float64),
+    }
+    thresholds = VisionThresholds(
+        target_bounds_m=src["target_bounds_m"],
+        object_envelope_m=src["object_envelope_m"],
+        clearance_m=params.collision.clearance_m,
+        approach_height_m=params.grasp.approach_height_m,
+        table_z_m=params.workspace.table_z_m,
+        table_flatness_m=params.workspace.table_flatness_m,
+    )
+    return thresholds, src
+
+
+def test_vision_thresholds_可从仿真profile组装(tmp_path):
+    """P0 §6：VisionThresholds 可从 simulation profile 的 MotionParams 组装，
+    字段形状/dtype 正确、冻结且数组为副本。仅测类型/形状/复制级，不测阈值数值。"""
+    import dataclasses
+
+    params = load_sim()
+    thresholds, src = _assemble_thresholds(params)
+
+    # 形状与 dtype（数组字段一律归一为 float64）。
+    assert thresholds.target_bounds_m.dtype == np.float64
+    assert thresholds.target_bounds_m.shape == (2, 3)
+    assert thresholds.object_envelope_m.dtype == np.float64
+    assert thresholds.object_envelope_m.shape == (3,)
+
+    # 标量值与来源逐一一致，不做单位换算。
+    assert thresholds.clearance_m == params.collision.clearance_m
+    assert thresholds.approach_height_m == params.grasp.approach_height_m
+    assert thresholds.table_z_m == params.workspace.table_z_m
+    assert thresholds.table_flatness_m == params.workspace.table_flatness_m
+
+    # 数组为副本：与传入的源不是同一对象，改源数组后阈值快照不变。
+    assert thresholds.target_bounds_m is not src["target_bounds_m"]
+    assert thresholds.object_envelope_m is not src["object_envelope_m"]
+    assert np.array_equal(thresholds.target_bounds_m, src["target_bounds_m"])
+    assert np.array_equal(thresholds.object_envelope_m, src["object_envelope_m"])
+    src["target_bounds_m"][0, 0] += 1000.0
+    src["object_envelope_m"][0] += 1000.0
+    assert not np.array_equal(thresholds.target_bounds_m, src["target_bounds_m"])
+    assert not np.array_equal(thresholds.object_envelope_m, src["object_envelope_m"])
+
+    # 冻结：任何字段都不能被重新赋值。
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        thresholds.table_z_m = 0.0
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        thresholds.target_bounds_m = np.zeros((2, 3))
+
+
+def test_vision_thresholds_把非float64源数组归一(tmp_path):
+    """构造时对数组做 np.asarray(..., dtype=np.float64)：float32 源被升级为 float64。"""
+    params = load_sim()
+    thresholds = VisionThresholds(
+        target_bounds_m=np.array(params.workspace.target_bounds_m, dtype=np.float32),
+        object_envelope_m=np.array(params.grasp.object_envelope_m, dtype=np.float32),
+        clearance_m=params.collision.clearance_m,
+        approach_height_m=params.grasp.approach_height_m,
+        table_z_m=params.workspace.table_z_m,
+        table_flatness_m=params.workspace.table_flatness_m,
+    )
+    assert thresholds.target_bounds_m.dtype == np.float64
+    assert thresholds.object_envelope_m.dtype == np.float64
+    # float32 往返会丢精度，这里只验证数值近似一致（真正的深拷贝语义在主用例已测）。
+    assert np.allclose(thresholds.target_bounds_m, params.workspace.target_bounds_m)
+    assert np.allclose(thresholds.object_envelope_m, params.grasp.object_envelope_m)

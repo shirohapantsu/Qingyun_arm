@@ -18,7 +18,7 @@ class VisionInterface:
     valid_count: int      # 当次视野合法候选总数（ignore 封顶判据，§五）
 ```
 
-- grade 字段删除：目标为运动侧运行代码零引用（当前 `arm_control._validate_target` 仍引用 grade，P0 移除后成立），grade 完全 plans 内部化，place_id 是唯一放置可观测。
+- grade 字段删除：运动侧运行代码已零引用 grade（`arm_control._validate_target` 现只校验 position/yaw；2026-09-23 P0 完成），grade 完全 plans 内部化，place_id 是唯一放置可观测。
 - 连带机械修订：motion 文档 §1.1 字段表；tests/test_grasp_flow.py、tests/support.py 构造点。
 - grasp_and_place 对 length/width/ripe/valid_count 零消费，只验 position/yaw；五项可抓性保证语义挂在 get_target 返回值上（运动文档 §1.1 不变）。
 
@@ -72,7 +72,7 @@ def get_target(ignore: int = 0) -> VisionInterface
 | 接近空间 | 头顶净空防御性检查（深度图）；单层场景近乎恒真 | `approach_height_m` + envelope 推导，不新增配置 |
 | 邻物间距 | 边缘距 = 中心距 −（半长+半宽，矩形足迹近似）≥ 最小净距 | 复用 `collision.clearance_m` |
 
-不设下限的依据：夹爪可完全闭合——过小目标首次接触开度低于 `contact_gap_range_m`，被判空闭合（空爪确定）→ GRASP_MISS → skip-ahead，由 ignore 封顶穷尽兜底（§五）。后果：过小目标逐个 MISS → 封顶 → 任务完成（失败码日志可审计，优于伪"任务完成"；摆桌不混入过小果）。
+不设下限的依据：夹爪可完全闭合——过小目标首次接触开度低于 `contact_gap_range_m`，被判空闭合（空爪确定）→ GRASP_MISS → skip-ahead，由 ignore 封顶兜底（§五）。后果：过小目标逐个 MISS → 封顶 → **terminate("NO_GRASPABLE_TARGET")**（D14，2026-09-23；原"封顶→任务完成"已废止，见 §五/§八；失败码日志可审计；摆桌不混入过小果）。
 
 ## 四、确定性排名（可复现：同场景两次调用同一结果）
 

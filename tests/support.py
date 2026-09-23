@@ -72,22 +72,40 @@ def load_sim() -> MotionParams:
     return load_motion_params(SIM_PROFILE, mode="mock")
 
 
-def make_target(position=(0.34, 0.04, 0.022), yaw_deg=0.0, grade="A") -> VisionInterface:
-    """构造一个合法的视觉目标。position 必须是 np.float64 数组（文档 3.2）。"""
+def make_target(position=(0.34, 0.04, 0.022), yaw_deg=0.0, *,
+                length_m: float = 0.05, width_m: float = 0.04,
+                ripe: bool = True, valid_count: int = 1) -> VisionInterface:
+    """构造一个合法的六字段视觉目标。position 必须是 np.float64 数组（文档 3.2）。
+
+    length_m/width_m/ripe/valid_count 是运动不消费的元数据，这里只给出显式可读的
+    测试默认值，调用方可按需覆盖。这些值仅用于让测试对象字段完整，绝非真实标定，
+    也不得写入任何 profile。
+    """
     return VisionInterface(
-        position=np.asarray(position, dtype=np.float64), yaw_deg=float(yaw_deg), grade=grade
+        position=np.asarray(position, dtype=np.float64),
+        yaw_deg=float(yaw_deg),
+        length_m=float(length_m),
+        width_m=float(width_m),
+        ripe=bool(ripe),
+        valid_count=int(valid_count),
     )
 
 
-def graspable_target_at(x: float, y: float, z: float = 0.022,
-                        grade: str = "A") -> VisionInterface:
+def graspable_target_at(x: float, y: float, z: float = 0.022, *,
+                        length_m: float = 0.05, width_m: float = 0.04,
+                        ripe: bool = True, valid_count: int = 1) -> VisionInterface:
     """在 (x,y,z) 放一个"这台 5 自由度臂真的能顶抓"的目标。
 
     SO-ARM101 只有 5 个姿态关节，而顶抓位姿给出 3+2+1=6 个标量条件（姿态文档第 5
     节），因此抓取方向与目标方位角之间存在结构耦合。仿真实测表明只有
     yaw ≈ atan2(y,x) 的一族目标落在可达流形上；标定指南 7.4 也正是要求用扫描结果
     来确定 target_bounds_m、并由视觉只下发满足该条件的目标。
+
+    元数据默认值同 make_target，仅为字段完整性，运动不读取。
     """
     import math
 
-    return make_target((x, y, z), math.degrees(math.atan2(y, x)), grade)
+    return make_target(
+        (x, y, z), math.degrees(math.atan2(y, x)),
+        length_m=length_m, width_m=width_m, ripe=ripe, valid_count=valid_count,
+    )

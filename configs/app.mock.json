@@ -1,0 +1,10 @@
+{
+  "profile_path": "../tests/fixtures/mock/profile.json",
+  "vision_config_path": "../tests/fixtures/mock/vision.json",
+  "prompt_path": "../prompt.md",
+  "log_dir": "../logs/mock",
+  "asr": {"model": "mock", "endpoint": "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation", "cloud_total_timeout_s": 30.0},
+  "llm": {"model": "mock", "base_url": "https://api.deepseek.com", "total_timeout_s": 30.0},
+  "mock": {"asr_script_path": "../tests/fixtures/mock/scenario.json",
+           "vision_replay_dir": "../tests/fixtures/mock/frames"}
+}

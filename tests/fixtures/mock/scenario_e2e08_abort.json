@@ -1,0 +1,11 @@
+{
+  "utterances": [
+    "分拣草莓"
+  ],
+  "attempts": [
+    {
+      "contact": "present"
+    }
+  ],
+  "_comment": "P5 §3 E2E-08(b) 场景资产（simulation，非实测）。注入点=MockMotor.get_feedback 的第 N 次读（N 由测试登记），抛 KeyboardInterrupt，运动层按既定契约转成 ABORTED/FAULT_HOLD；object_gap_m 仍为 present 名义值。"
+}

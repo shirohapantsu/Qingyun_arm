@@ -1,0 +1,8 @@
+{
+  "utterances": ["分拣草莓", "分拣草莓"],
+  "attempts": [
+    {"contact": "present"},
+    {"contact": "absent"}
+  ],
+  "_comment": "P5 §2 形态的最小可装配样例（utterances 逐次消费、耗尽后替身按墙钟小段阻塞；attempts 按真实 grasp_and_place 调用顺序消费）。完整场景与帧编排归 P5。"
+}

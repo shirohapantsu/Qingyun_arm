@@ -8,6 +8,9 @@
 
 时钟与 sleep 都可注入，这样单元测试可以在不真等 30 秒的情况下驱动整条
 时序逻辑（包括"CPU 迟到"这类故障注入）。
+
+本模块另有一个只读旁路：运动层内存 trace 的下降指令下发边界（P4 §2.8.2）。它通过
+``MotionTraceSink`` 窄协议由上层注入，不新增线程、不新增舵机调用、不改变发送时序。
 """
 
 from __future__ import annotations
@@ -15,6 +18,7 @@ from __future__ import annotations
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from typing import Protocol, runtime_checkable
 
 import numpy as np
 from numpy.typing import NDArray
@@ -53,6 +57,97 @@ def _translate_motor_error(exc: Exception) -> ExecutionError:
     raise exc
 
 
+# ---------------------------------------------------------------------------
+# 0. 下降指令下发边界（P4 §2.8.2）
+#
+# 标定工具要区分"下降指令到底有没有下发"。这件事只有执行器知道：段节点是逐条
+# 提交给驱动的，驱动可能正常返回（已下发）、可能在写入前整条拒绝（明确没下发）、
+# 也可能抛通信异常（无法证明是否已写入）。控制层的事件类型 MotionTraceEvent 定义
+# 在 arm_control.py，本模块只负责"在正确的边界上把三态事实如实交出去"，
+# 不持有事件列表、不认识阶段名。
+# ---------------------------------------------------------------------------
+
+# descent_submit 事件的三态取值（与 arm_control.MotionTraceEvent.outcome 一致）。
+DESCENT_SUBMITTED = "submitted"    # 驱动调用正常返回：下降指令已下发
+DESCENT_REJECTED = "rejected"      # 驱动在写入前明确拒绝：可以证明没有下发
+DESCENT_UNKNOWN = "unknown"        # 通信异常/中断：不能证明是否写入
+
+# "非零下降"的位移阈值：与轨迹层"零位移段"的判定同源（trajectory 的
+# _ZERO_DISPLACEMENT_M/_DEG 是模块私有常量，不 import 私有名，这里同值并注明出处）。
+_DESCENT_ZERO_TOL_M = 1e-9
+_DESCENT_ZERO_TOL_DEG = 1e-9
+
+
+@runtime_checkable
+class MotionTraceSink(Protocol):
+    """执行器向运动层内存 trace 写入下降边界的窄协议（由 arm_control 的收集器实现）。
+
+    协议只有"要不要观察"和"把这一条提交的结果记下来"两个方法：执行器不认识阶段名、
+    不构造事件、不持有事件列表，标定工具也不通过本协议访问控制器的内部状态。
+    """
+
+    def watches_descent(self) -> bool:
+        """当前是否正在观察"首个非零下降节点"（不需要观察时执行器零额外计算）。"""
+        ...
+
+    def note_descent_submit(self, outcome: str) -> None:
+        """登记一次下降指令下发结果，取值为上面三个常量之一。"""
+        ...
+
+
+def first_descent_node_index(segment: MotionSegment) -> int | None:
+    """返回该段中"首个非零下降节点"的下标；该段不含下降节点时返回 None。
+
+    判定口径（P4 §2.8.2"首个非零下降节点"的实现，测试逐条钉住）：
+
+    1. **符号看 TCP 高度**：笛卡尔段的 ``tcp_targets[k][2,3]`` 是第 k 个节点命令的
+       基座 Z。以段起点节点 0 的高度为基准，首个满足 ``z0 - z_k > 1e-9 m`` 的节点就是
+       "开始下降"的那个节点。节点 0 自身位移为零，永远不算；因此"起点已经在目标高度
+       上"的段（轨迹层按零位移只出一个节点，``nodes <= 1``）没有下降节点。
+    2. **幅值看阈值**：位移不超过 ``_DESCENT_ZERO_TOL_M`` 的节点不计为下降。因为终点
+       相对起点的累计位移等于全长，任何真实下降段必然存在这样的节点（最迟是最后一个
+       节点），所以"找不到下降节点"只发生在零位移段与竖直向上段。
+    3. **上升段不算下降**：``dz > 0``（比如反常地把抓取点算到当前高度之上）时全部节点
+       都在基准之上，返回 None——不为"从未下发下降指令"伪造 submitted 事件。
+    4. **兜底（无 tcp_targets 的关节段）**：DESCEND 在控制层只由竖直笛卡尔段构造；若将来
+       某段没有 TCP 目标可看，退化为"相对段起点关节角变化首次超过 1e-9 deg 的节点"，
+       零位移段同样返回 None。
+    """
+    joints = np.asarray(segment.joints_deg, dtype=np.float64)
+    nodes = int(joints.shape[0])
+    if nodes <= 1:
+        return None
+    tcp = getattr(segment, "tcp_targets", None)
+    if tcp is not None:
+        arr = np.asarray(tcp, dtype=np.float64)
+        if arr.ndim == 3 and arr.shape[0] == nodes and arr.shape[1:] == (4, 4):
+            drop = arr[0, 2, 3] - arr[:, 2, 3]
+            below = np.nonzero(drop > _DESCENT_ZERO_TOL_M)[0]
+            return int(below[0]) if below.size else None
+    moved = np.max(np.abs(joints - joints[0]), axis=1)
+    over = np.nonzero(moved > _DESCENT_ZERO_TOL_DEG)[0]
+    return int(over[0]) if over.size else None
+
+
+def classify_descent_submit_error(exc: BaseException) -> str:
+    """把"下发边界抛出的异常"翻译成 rejected / unknown 两态之一。
+
+    规格只允许两种非成功结局：驱动在**写入前**明确拒绝（``MotorLimitError``：整条命令
+    被限位/合法性检查挡下，可以证明总线上没有下发过这条下降指令）记 rejected；其余一律
+    unknown——包括 ``MotorCommunicationError``（超时/部分写入）、``MotorStateError``
+    （设备未就绪，无法核对是否已经落笔）、以及任何未被翻译的异常与 KeyboardInterrupt
+    （中断点位置未知）。宁可把"不确定"记成 unknown 交给操作者补证，也不能把它当成
+    rejected/False，那等于悄悄把这条试验从下降分母里抹掉（P4 §2.8.2）。
+    """
+    cause = exc.__cause__
+    if isinstance(exc, MotorLimitError) or isinstance(cause, MotorLimitError):
+        return DESCENT_REJECTED
+    # _translate_motor_error 已把 MotorLimitError 归入 PLAN_INVALID，据此认出同一事实。
+    if isinstance(exc, ExecutionError) and exc.status == "PLAN_INVALID":
+        return DESCENT_REJECTED
+    return DESCENT_UNKNOWN
+
+
 @dataclass
 class ExecutorState:
     """执行器的可观测运行状态，供 arm_control 与标定工具记录。"""
@@ -78,6 +173,7 @@ class SyncExecutor:
         clock: _Clock = time.monotonic,
         sleep: _Sleep = time.sleep,
         clock_ns: Callable[[], int] = time.monotonic_ns,
+        motion_trace: MotionTraceSink | None = None,
     ) -> None:
         self.motor = motor
         self.params = params
@@ -86,6 +182,9 @@ class SyncExecutor:
         self.clock = clock
         self.sleep = sleep
         self.clock_ns = clock_ns
+        # 运动层内存 trace 的写入端（P4 §2.8.2）。None 表示不观察：回放路径一次额外的
+        # 时钟/总线调用都不会发生，运动指令与返回值与未接入 trace 时逐字节相同。
+        self.motion_trace = motion_trace
         self.tick_s = 1.0 / params.timing.fps
         self.state = ExecutorState()
         # 持物滑移基准：由上层在闭爪成功后写入实际保持开度，None 表示当前不持物。
@@ -293,9 +392,19 @@ class SyncExecutor:
             → 检查本次实际步长/速度 → 发送；
           * 轻微迟到就把本段后续时刻整体顺延，保证两次发送间隔不小于一个 tick；
           * 迟到超过 timing.max_tick_lateness_s 直接停止，不补发积压节点。
+
+        trace 钩子（P4 §2.8.2）：只有当上层收集器正在观察下降边界时才多做一次纯计算
+        的节点定位（``first_descent_node_index``），并在**那一个节点**的提交处记录
+        submitted/rejected/unknown。提交次数、发送时机、读回次数与不接 trace 时完全一致。
         """
         base = self.clock()
         prev_deg = segment.joints_deg[0]
+        sink = self.motion_trace
+        descent_node = -1
+        if sink is not None and sink.watches_descent():
+            idx = first_descent_node_index(segment)
+            if idx is not None:
+                descent_node = idx
         for k in range(segment.nodes):
             due = base + float(segment.time_s[k])
             self.sleep_until(due)
@@ -318,7 +427,10 @@ class SyncExecutor:
                 )
             # 发送前再次检查停止与超时（文档 6.1 末段）。
             self.check_stop()
-            self.submit(segment.joints_deg[k], segment.gripper_pct)
+            if k == descent_node:
+                self._submit_descent_node(sink, segment, k)
+            else:
+                self.submit(segment.joints_deg[k], segment.gripper_pct)
             prev_deg = segment.joints_deg[k]
             self.state.ticks_played += 1
 
@@ -330,6 +442,21 @@ class SyncExecutor:
                 f"{np.round(self.params.motion.settle_position_tol_deg, 2).tolist()}deg，"
                 f"时限 {self.params.motion.settle_timeout_s}s）",
             )
+
+    def _submit_descent_node(self, sink: MotionTraceSink, segment: MotionSegment,
+                             k: int) -> None:
+        """在下降边界的提交处如实登记三态，然后把结果原样交回原调用路径。
+
+        成功与异常都不改变控制层看到的行为：异常照旧向上抛，由技能入口按原契约转成
+        GraspResult；这里只是"顺路看一眼驱动的答复"。不重试、不改写、不吞异常，
+        因此 trace 开/关两种情况下的运动指令序列与返回值逐字段相同。
+        """
+        try:
+            self.submit(segment.joints_deg[k], segment.gripper_pct)
+        except BaseException as exc:                     # 记录后原样抛出，不吞任何异常
+            sink.note_descent_submit(classify_descent_submit_error(exc))
+            raise
+        sink.note_descent_submit(DESCENT_SUBMITTED)
 
     # ------------------------------------------------------------------
     # 5. 到位判断

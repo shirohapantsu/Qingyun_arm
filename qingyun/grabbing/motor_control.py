@@ -45,6 +45,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import math
 import time
@@ -97,6 +98,7 @@ __all__ = [
     "StsProtocol",
     "SerialTransport",
     "Sts3215MotorController",
+    "MotorStartupError",
     "CalibrationReader",
 ]
 
@@ -140,6 +142,26 @@ _POLL_SLEEP_S = 0.0002
 # 这里给一个明显宽松的保守值。
 _INIT_TIMEOUT_S = 2.0
 
+# --- 驱动启动握手（P1 §4.1，D17/R07）时间与清理预算常量 ------------------
+#
+# 下面两个等待值整理自 scripts/validate_home_waypoint_motion.py 已验证步骤：
+# 力矩显式使能后先等一小段并排空输入，再在提交运动反馈核对前把"写阶段"与
+# "读阶段"用第二次等待 + 排空彻底分开。0.10s/0.20s 是**当前实验值**，计入
+# 本次初始化的绝对 deadline（不是每台重新起表），真机回归后再锁定，
+# 不得据此宣称物理启动安全已验证。
+_STARTUP_DRAIN_AFTER_ENABLE_S = 0.10
+_STARTUP_SETTLE_BEFORE_FEEDBACK_S = 0.20
+
+# 启动失败清理的**独立有界**预算（秒）。它整体一次、不按轴重新起表（P1 §4.1
+# 第 5 步），必须与上面的握手 deadline 分开：清理不能因为握手已经耗尽预算就
+# 无法卸力，也不能无限期地拖住退出。真值同样要在目标机验证。
+STARTUP_CLEANUP_TIMEOUT_S = 5.0
+
+# 清理里每次失能写之间的短暂排空等待（来自 validate_home_waypoint_motion.py
+# 的逐台长预算读写；同样是实验值，计入 STARTUP_CLEANUP_TIMEOUT_S 的整体预算）。
+_STARTUP_CLEANUP_WAIT_S = 0.03
+
+
 # pyserial 适配器的阻塞读分片（秒）。为什么用一个很小的常数而不是
 # timing.read_timeout_s：总时限由协议层的"绝对 deadline + 每轮重新检查"保证，
 # 适配器只需要保证单次阻塞不会太久。取 1ms 时最坏情况是 deadline 到期后再等
@@ -153,6 +175,26 @@ _SERIAL_READ_SLICE_S = 0.001
 # 注意它限制的是把帧拷进操作系统发送缓冲的时间，不含 USB 实际排空；
 # 真实排空延迟无法由软件承诺，列为真机待测项（标定指南 8.2）。
 _SERIAL_WRITE_TIMEOUT_S = 0.1
+
+
+# ---------------------------------------------------------------------------
+# 1.5 启动握手错误类型（P1 §4.1，D17/R07）
+# ---------------------------------------------------------------------------
+
+
+class MotorStartupError(MotorStateError):
+    """驱动启动握手（P1 §4.1）失败时抛出的错误，携带同一份 startup_report 快照。
+
+    它是 ``MotorStateError`` 的子类，所以既有"未连接 / 未使能力矩 / 硬件故障"按
+    ``MotorStateError`` 归类的调用点（含 main 的 ``MOTOR_INIT_FAILED`` 捕获）仍然
+    接得住。``report`` 是失败当时 ``startup_report`` 的深拷贝：包含各阶段时间、
+    旧/预置目标、前后反馈、六轴力矩读回、失败阶段与清理结果，供构造失败时记录
+    （P1 §4.1：main 不访问驱动私有协议对象，只从异常或 ``startup_report`` 取值）。
+    """
+
+    def __init__(self, message: str, report: Mapping[str, object] | None = None) -> None:
+        super().__init__(message)
+        self.report: dict[str, object] = copy.deepcopy(dict(report)) if report else {}
 
 
 # ---------------------------------------------------------------------------
@@ -1459,6 +1501,12 @@ class Sts3215MotorController:
         self._connected = True
         self._torque_enabled = False
         self._sequence = 0
+        # 启动握手报告（P1 §4.1）：构造期先放一个空骨架，使 startup_report 在
+        # initialize 之前/只读路径也可安全读取；每次 initialize 会整体重置它。
+        self._startup_ready = False
+        self._startup_report: dict[str, object] = self._new_startup_report(
+            verify_identity=None, enable_torque=None
+        )
 
         # 批量读写用的寄存器地址：按 vendor 表解析一次，并要求 6 个通道一致
         # （MotorMapping.common_register 的理由）。
@@ -1497,41 +1545,406 @@ class Sts3215MotorController:
         enable_torque: bool = True,
         timeout_s: float = _INIT_TIMEOUT_S,
     ) -> None:
-        """连接与 Torque_Enable 配置。**不做**回零、复位或写行程限位。
+        """驱动启动生命周期握手（P1 §4.1，D17/R07）。**不做**回零/写 EEPROM/RESET。
 
-        技术文档 4.2 末段："连接和力矩配置由驱动的初始化流程完成，不能隐藏自动
-        回零动作"。官方 homing 与范围采集属于标定流程（标定指南 4.1 第 3 条），
-        由操作者在官方工具里完成，本项目只消费其结果，因此这里没有任何写
-        Homing_Offset / Min_Max_Position_Limit / RESET 的路径。
+        默认上力路径（enable_torque=True）按下面顺序执行，全部事务受本次
+        **一个绝对 deadline**（``timeout_s``，默认 ``_INIT_TIMEOUT_S`` 待实测值）约束：
 
-        verify_identity=True 时逐台 PING 并读回 Model_Number 与固件版本，与
-        profile 的 motor.models / motor.firmware 比对（标定指南 2.1：这两项的
-        测量来源就是"实际读回"）。比对的意义在于换算：current_ma_per_raw 与
-        velocity_deg_s_per_raw 是按型号/固件从厂商资料得到的（4.3），型号或固件
-        对不上就说明换算比例可能张冠李戴，宁可拒绝启动。
-        单元测试与离线只读核对可以用 verify_identity=False 跳过。
+          (a) 读应答配置 → 核验身份（verify_identity=True）→ 逐轴读 Torque_Enable。
+              **任一不为 0 或任一读失败：立即失败退出，零 Goal_Position/Torque_Enable
+              写入**（D17：已上力轴不得由启动自动卸力）。
+          (b) 六轴全 0 后：完整 get_feedback（有限 + 已标定范围 + 五关节速度逐轴
+              ≤ motion.settle_velocity_tol_deg_s + 夹爪速度绝对值 ≤ gripper.settle_speed_pct_s）
+              + 逐轴读旧 Goal_Position。旧目标与当前反馈不一致**只登记**（report），
+              随后以当前反馈预置，绝不先写 Torque_Enable=1。编码沿用 _validate_and_encode。
+          (c) 广播当前位置目标（一次 sync_write 六轴 Goal_Position）**前**把六轴全部
+              标记 ``torque_may_be_enabled``（CAL-052：该写入可能隐式上力）；写完逐轴读回
+              全部 Goal_Position 核对等于编码目标；再逐轴读全部 Torque_Enable：读回全 1
+              → 不重复写力矩；存在 0 → 只对为 0 的轴显式使能（逐轴单播），随后再次完整读回
+              六轴；任何读回非 0/1 值拒绝。
+          (d) 用实验值等待 + 排空输入分隔写/读阶段（``_STARTUP_*`` 常量，计入 deadline），
+              完整读回反馈：五关节位置逐轴相对 (b) 变化 ≤ motion.start_position_tol_deg，
+              夹爪开度变化 ≤ gripper.settle_tol_pct。全部通过才置 READY。
 
-        timeout_s：初始化不是周期调用，内部约有 36 次事务（每台应答配置读回 +
-        PING + 型号 + 固件×2 + 力矩），所以不用面向每个 tick 的 write_timeout_s，
-        而是用一个单独的
-        显式预算。原则不变——**一个绝对 deadline 覆盖本次调用里的全部事务**，
-        不会退化成"每台一个超时"。真值需要 timing 阶段实测（标定指南 8.2）。
+        任一步骤（从 (c) 首次可能上力的写入起）异常或 KeyboardInterrupt，都在**独立有界**
+        的 ``STARTUP_CLEANUP_TIMEOUT_S`` 预算内逐轴尝试失能本次可能上力的轴并读回
+        ``off/on/unknown``（见 §4.1 第 5 步），关闭传输后抛 ``MotorStartupError``（携带
+        ``startup_report``）。(a)/(b) 阶段从未可能上力，不触发卸力，但同样抛带报告的错误。
+
+        ``enable_torque=False`` 是标定工具在用的**只读路径**：只读应答配置与（可选）
+        身份，不写目标或力矩、不做上面的预置/核对，保持零 WRITE。生产不使用
+        ``verify_identity=False``。
+
+        整理自 ``scripts/validate_home_waypoint_motion.py`` 已验证步骤（目标预置、六轴
+        力矩读回、使能前后位移核对、CAL-052 隐式上力处理）。通过假总线测试不等于物理
+        启动安全已验证（P1 §4.1 末段）。
         """
         self._require_connected()
-        # 一个绝对 deadline 覆盖本次初始化里的全部寄存器访问（不按台数倍增）。
+        report = self._new_startup_report(
+            verify_identity=verify_identity, enable_torque=enable_torque
+        )
+        self._startup_report = report
+        self._startup_ready = False
+        # 一个绝对 deadline 覆盖 (a)–(d) 全部事务（不按台数倍增）。
         deadline_s = self._clock() + timeout_s
         self._protocol.reset_input()
-        # 先读回每台的**实际**应答配置，再做任何 WRITE（包括力矩）：
-        # WRITE 有没有状态帧由 Response_Status_Level 决定，等错方向要么耗光
-        # 预算、要么把迟到应答当成当前结果（prompt §5.2）。这是一次纯 READ
-        # 批量（6 事务），不做任何 EEPROM 写入。
-        self._configure_write_ack(deadline_s)
-        if verify_identity:
-            for ax in self.mapping.axes:
-                self._protocol.ping(ax.servo_id, deadline_s)
-                self._verify_identity(ax, deadline_s)
-        if enable_torque:
-            self.configure_torque(True, deadline_s=deadline_s)
+
+        # --- 只读路径：只读应答配置 +（可选）身份，零 WRITE ---
+        if not enable_torque:
+            report["phase"] = "只读身份与应答配置"
+            self._startup_begin_phase(report, "read_only")
+            self._configure_write_ack(deadline_s)
+            if verify_identity:
+                self._verify_all_identity(deadline_s)
+            self._startup_end_phase(report, "read_only")
+            report["result"] = "read_only"
+            report["phase"] = None
+            return
+
+        # --- 默认上力路径 ---
+        torque_may_be_enabled = False
+        try:
+            # (a) 准入卸力核对：读应答配置 → 身份 → 六轴 Torque_Enable。
+            report["phase"] = "卸力准入核对"
+            self._startup_begin_phase(report, "admission")
+            self._configure_write_ack(deadline_s)
+            if verify_identity:
+                self._verify_all_identity(deadline_s)
+            initial_torque = [
+                self._read_axis_raw_register(ax, "Torque_Enable", deadline_s)
+                for ax in self.mapping.axes
+            ]
+            report["torque_initial"] = initial_torque
+            self._startup_end_phase(report, "admission")
+            engaged = [
+                ax.name for ax, v in zip(self.mapping.axes, initial_torque) if v != 0
+            ]
+            if engaged:
+                # D17：已上力轴不得由启动自动卸力 → 零写入退出。
+                raise MotorStateError(
+                    "启动准入失败：以下轴 Torque_Enable 读回不为 0，拒绝且零目标/力矩写入："
+                    + ", ".join(engaged)
+                    + f"（读回={initial_torque}）"
+                )
+
+            # (b) 反馈预置：完整反馈 + 速度/范围校验 + 旧目标读回 + 编码当前反馈。
+            report["phase"] = "反馈预置"
+            self._startup_begin_phase(report, "seed")
+            fb_before = self.get_feedback()
+            self._startup_record_feedback(report, "feedback_before", fb_before)
+            self._startup_check_static(fb_before)
+            old_goal = [
+                self._read_axis_raw_register(ax, "Goal_Position", deadline_s)
+                for ax in self.mapping.axes
+            ]
+            # 位置转换/限位沿用驱动编码器（越出已标定范围会抛 MotorLimitError）。
+            raw_targets = self._validate_and_encode(
+                fb_before.angles_deg, fb_before.gripper_pct
+            )
+            report["old_goal_positions_raw"] = old_goal
+            report["seeded_goal_positions_raw"] = list(raw_targets)
+            report["old_target_mismatch"] = [
+                {"axis": ax.name, "servo_id": ax.servo_id,
+                 "old_raw": old, "seeded_raw": tgt}
+                for ax, old, tgt in zip(self.mapping.axes, old_goal, raw_targets)
+                if old != tgt
+            ]
+            self._startup_end_phase(report, "seed")
+
+            # (c) 广播目标 + 力矩核对。CAL-052：广播 Goal_Position 可能隐式上力，
+            #     因此**发送前**把六轴全部标记为可能上力。
+            torque_may_be_enabled = True
+            report["phase"] = "目标广播与力矩核对"
+            self._startup_begin_phase(report, "broadcast")
+            ids = [ax.servo_id for ax in self.mapping.axes]
+            values = [StsProtocol.split_u16(raw) for raw in raw_targets]
+            self._protocol.sync_write_targets(
+                ids, self._goal_addr, self._goal_len, values, deadline_s
+            )
+            goal_readback = [
+                self._read_axis_raw_register(ax, "Goal_Position", deadline_s)
+                for ax in self.mapping.axes
+            ]
+            report["goal_readback_raw"] = goal_readback
+            if goal_readback != raw_targets:
+                raise MotorStateError(
+                    f"目标预置读回不等于编码目标：target={raw_targets}, readback={goal_readback}"
+                )
+            torque_after_broadcast = [
+                self._read_axis_raw_register(ax, "Torque_Enable", deadline_s)
+                for ax in self.mapping.axes
+            ]
+            self._startup_validate_torque_values(torque_after_broadcast)
+            report["torque_after_broadcast"] = torque_after_broadcast
+            if all(v == 1 for v in torque_after_broadcast):
+                # 隐式全上力：不重复写力矩。
+                report["torque_enable_source"] = "goal_broadcast_implicit_all_verified"
+                report["torque_final_readback"] = torque_after_broadcast
+                report["explicitly_enabled_axes"] = []
+            else:
+                # 只对为 0 的轴显式使能（逐轴单播），随后再次完整读回六轴。
+                zero_axes = [
+                    ax for ax, v in zip(self.mapping.axes, torque_after_broadcast)
+                    if v == 0
+                ]
+                report["explicitly_enabled_axes"] = [ax.name for ax in zero_axes]
+                report["torque_enable_source"] = "explicit_enable_zero_axes"
+                self._enable_axes(zero_axes, deadline_s)
+                torque_final = [
+                    self._read_axis_raw_register(ax, "Torque_Enable", deadline_s)
+                    for ax in self.mapping.axes
+                ]
+                self._startup_validate_torque_values(torque_final)
+                report["torque_final_readback"] = torque_final
+                if not all(v == 1 for v in torque_final):
+                    raise MotorStateError(f"六轴力矩未全部使能：{torque_final}")
+            self._startup_end_phase(report, "broadcast")
+
+            # (d) 分隔写/读阶段：等待 + 排空输入，然后完整读回反馈做位移核对。
+            report["phase"] = "位移核对"
+            self._startup_begin_phase(report, "settle")
+            self._startup_wait(_STARTUP_DRAIN_AFTER_ENABLE_S, deadline_s)
+            self._protocol.reset_input()
+            self._startup_wait(_STARTUP_SETTLE_BEFORE_FEEDBACK_S, deadline_s)
+            self._protocol.reset_input()
+            fb_after = self.get_feedback()
+            self._startup_record_feedback(report, "feedback_after", fb_after)
+            pos_change = np.abs(fb_after.angles_deg - fb_before.angles_deg)
+            grip_change = abs(fb_after.gripper_pct - fb_before.gripper_pct)
+            report["position_change_deg"] = [float(v) for v in pos_change]
+            report["gripper_change_pct"] = float(grip_change)
+            tol = np.asarray(self.params.motion.start_position_tol_deg, dtype=float)
+            if np.any(pos_change > tol):
+                raise MotorStateError(
+                    "使能/预置后位置变化超限（相对预置前反馈）："
+                    + ", ".join(
+                        f"{name}={float(pos_change[i]):.3f}deg>{float(tol[i]):.3f}"
+                        for i, name in enumerate(JOINT_NAMES)
+                        if pos_change[i] > tol[i]
+                    )
+                )
+            if grip_change > float(self.params.gripper.settle_tol_pct):
+                raise MotorStateError(
+                    f"使能/预置后夹爪开度变化 {grip_change:.3f}% 超过 "
+                    f"gripper.settle_tol_pct={self.params.gripper.settle_tol_pct}"
+                )
+            self._startup_end_phase(report, "settle")
+
+            # 全部通过 → READY。
+            self._torque_enabled = True
+            self._startup_ready = True
+            report["result"] = "ready"
+            report["failed_phase"] = None
+            report["phase"] = None
+            return
+        except BaseException as exc:  # noqa: BLE001 - 含 KeyboardInterrupt（§4.1 第 5 步）
+            report["failed_phase"] = report.get("phase") or "未知"
+            report["phase"] = None
+            report["result"] = "interrupted" if isinstance(exc, KeyboardInterrupt) else "error"
+            # (e) 只有从首次可能上力的写入起才需要卸力清理。
+            self._startup_cleanup(report, torque_may_be_enabled)
+            # 失败路径确保关闭传输（close() 幂等，不泄漏句柄）。
+            self.close()
+            if isinstance(exc, MotorStartupError):
+                exc.report = self.startup_report
+                raise
+            raise MotorStartupError(
+                f"驱动启动握手失败于阶段 {report['failed_phase']!r}：{exc!r}",
+                self.startup_report,
+            ) from exc
+
+    # --- 启动握手辅助（P1 §4.1）---
+
+    def _new_startup_report(
+        self, *, verify_identity: bool | None, enable_torque: bool | None
+    ) -> dict[str, object]:
+        """构造一份空的 startup_report 骨架（全部值可 deepcopy / JSON 化）。"""
+        return {
+            "requested": {
+                "verify_identity": verify_identity,
+                "enable_torque": enable_torque,
+            },
+            "phase": None,
+            "failed_phase": None,
+            "result": None,
+            "phases": {},
+            "torque_initial": None,
+            "feedback_before": None,
+            "feedback_after": None,
+            "old_goal_positions_raw": None,
+            "seeded_goal_positions_raw": None,
+            "old_target_mismatch": [],
+            "goal_readback_raw": None,
+            "torque_after_broadcast": None,
+            "torque_final_readback": None,
+            "torque_enable_source": None,
+            "explicitly_enabled_axes": [],
+            "position_change_deg": None,
+            "gripper_change_pct": None,
+            "cleanup": {"attempted": False, "axes": [], "deadline_exceeded": False},
+        }
+
+    @property
+    def startup_report(self) -> dict[str, object]:
+        """公开只读启动快照（P1 §4.1）：返回 **深拷贝**，外部改动不影响驱动内部。"""
+        return copy.deepcopy(self._startup_report)
+
+    def _startup_begin_phase(self, report: dict[str, object], name: str) -> None:
+        report.setdefault("phases", {})[name] = {
+            "start_ns": int(self._monotonic_ns()),
+            "end_ns": None,
+            "elapsed_s": None,
+        }
+
+    def _startup_end_phase(self, report: dict[str, object], name: str) -> None:
+        phase = report["phases"].get(name)
+        if phase is None:
+            return
+        end_ns = int(self._monotonic_ns())
+        phase["end_ns"] = end_ns
+        phase["elapsed_s"] = (end_ns - phase["start_ns"]) / 1e9
+
+    def _startup_record_feedback(
+        self, report: dict[str, object], key: str, fb: JointFeedback
+    ) -> None:
+        report[key] = {
+            "angles_deg": [float(v) for v in fb.angles_deg],
+            "speeds_deg_s": [float(v) for v in fb.speeds_deg_s],
+            "gripper_pct": float(fb.gripper_pct),
+            "gripper_speed_pct_s": float(fb.gripper_speed_pct_s),
+            "sequence": int(fb.sequence),
+        }
+
+    def _startup_check_static(self, fb: JointFeedback) -> None:
+        """(b) 反馈有限性 + 静止速度核对（范围校验由随后的 _validate_and_encode 承担）。"""
+        if not (
+            np.all(np.isfinite(fb.angles_deg))
+            and np.all(np.isfinite(fb.speeds_deg_s))
+            and math.isfinite(fb.gripper_pct)
+            and math.isfinite(fb.gripper_speed_pct_s)
+        ):
+            raise MotorStateError("启动预置前反馈含非有限值，拒绝上力")
+        vel_tol = np.asarray(
+            self.params.motion.settle_velocity_tol_deg_s, dtype=float
+        )
+        if np.any(np.abs(fb.speeds_deg_s) > vel_tol):
+            raise MotorStateError(
+                "启动预置前五关节速度未落入 motion.settle_velocity_tol_deg_s："
+                + ", ".join(
+                    f"{JOINT_NAMES[i]}={float(fb.speeds_deg_s[i]):.3f}deg/s"
+                    for i in range(len(JOINT_NAMES))
+                    if abs(fb.speeds_deg_s[i]) > vel_tol[i]
+                )
+            )
+        if abs(fb.gripper_speed_pct_s) > float(self.params.gripper.settle_speed_pct_s):
+            raise MotorStateError(
+                f"启动预置前夹爪速度 {fb.gripper_speed_pct_s:.3f}%/s 超过 "
+                f"gripper.settle_speed_pct_s={self.params.gripper.settle_speed_pct_s}"
+            )
+
+    def _startup_validate_torque_values(self, values: list[int]) -> None:
+        """任何 Torque_Enable 读回不是 0/1 → 拒绝（值域之外即通信/设备异常）。"""
+        bad = [
+            (ax.name, v) for ax, v in zip(self.mapping.axes, values) if v not in (0, 1)
+        ]
+        if bad:
+            raise MotorStateError(
+                "Torque_Enable 读回出现非 0/1 值，拒绝继续："
+                + ", ".join(f"{n}={v}" for n, v in bad)
+            )
+
+    def _startup_wait(self, seconds: float, deadline_s: float) -> None:
+        """分隔等待：先确认 deadline 未到，再在剩余预算内 sleep（计入 deadline）。"""
+        remaining = deadline_s - self._clock()
+        if remaining <= 0.0:
+            raise MotorCommunicationError(
+                "启动握手等待前总时限已到期（运行期 I/O 不重试）"
+            )
+        self._sleep(min(seconds, remaining))
+
+    def _verify_all_identity(self, deadline_s: float) -> None:
+        for ax in self.mapping.axes:
+            self._protocol.ping(ax.servo_id, deadline_s)
+            self._verify_identity(ax, deadline_s)
+
+    def _read_axis_raw_register(self, ax: ServoAxis, reg_name: str, deadline_s: float) -> int:
+        """按 raw（未解码）读回某轴的单寄存器整数值，与 _validate_and_encode 同域。"""
+        addr, length = self.mapping.register(ax, reg_name)
+        data = self._protocol.read_registers(ax.servo_id, addr, length, deadline_s)
+        return int.from_bytes(bytes(data), byteorder="little", signed=False)
+
+    def _write_axis_raw_register(
+        self, ax: ServoAxis, reg_name: str, value: int, deadline_s: float
+    ) -> None:
+        addr, length = self.mapping.register(ax, reg_name)
+        payload = int(value).to_bytes(length, byteorder="little", signed=False)
+        self._protocol.write_registers(ax.servo_id, addr, list(payload), deadline_s)
+
+    def _enable_axes(self, axes: Sequence[ServoAxis], deadline_s: float) -> None:
+        """逐轴写 Torque_Enable=1（沿用单播路径），不触碰其它轴、不改 _torque_enabled。"""
+        for ax in axes:
+            self._write_axis_raw_register(ax, "Torque_Enable", 1, deadline_s)
+
+    def _startup_cleanup(self, report: dict[str, object], torque_may_be_enabled: bool) -> None:
+        """(e) 有界启动失败清理：逐轴失能 + 读回，仅针对本次可能上力的轴。
+
+        独立于握手 deadline 的 ``STARTUP_CLEANUP_TIMEOUT_S`` 整体预算（不按轴重新起表）。
+        某轴失能写或读回失败都继续尝试其余轴；每轴只按读回登记 off/on/unknown
+        （未成功读回 0 不得登记 off）。清理绝不写 Goal_Position、不 hold/reset/home。
+        """
+        cleanup: dict[str, object] = {
+            "attempted": False,
+            "reason": None,
+            "axes": [],
+            "deadline_exceeded": False,
+        }
+        report["cleanup"] = cleanup
+        if not torque_may_be_enabled:
+            cleanup["reason"] = "从未可能上力，无需卸力清理"
+            return
+        cleanup["attempted"] = True
+        cleanup_deadline = self._clock() + STARTUP_CLEANUP_TIMEOUT_S
+        for ax in self.mapping.axes:
+            disable_error: str | None = None
+            try:
+                if self._clock() < cleanup_deadline:
+                    self._write_axis_raw_register(ax, "Torque_Enable", 0, cleanup_deadline)
+                    self._startup_wait(_STARTUP_CLEANUP_WAIT_S, cleanup_deadline)
+                else:
+                    disable_error = "清理预算已到期，跳过失能写"
+            except BaseException as exc:  # noqa: BLE001 - 单轴失败不得中断其余轴
+                disable_error = f"失能写失败:{type(exc).__name__}"
+                cleanup["deadline_exceeded"] = (
+                    cleanup["deadline_exceeded"] or self._clock() >= cleanup_deadline
+                )
+            state = "unknown"
+            try:
+                if self._clock() < cleanup_deadline:
+                    raw = self._read_axis_raw_register(ax, "Torque_Enable", cleanup_deadline)
+                    if raw == 0:
+                        state = "off"
+                    elif raw == 1:
+                        state = "on"
+                    else:
+                        state = "unknown"
+                else:
+                    state = "unknown"
+                    cleanup["deadline_exceeded"] = True
+            except BaseException:  # noqa: BLE001 - 读回失败/中断一律 unknown
+                state = "unknown"
+                cleanup["deadline_exceeded"] = (
+                    cleanup["deadline_exceeded"] or self._clock() >= cleanup_deadline
+                )
+            cleanup["axes"].append({
+                "axis": ax.name,
+                "servo_id": ax.servo_id,
+                "state": state,
+                "disable_error": disable_error,
+            })
+        # 清理后控制器状态：不再宣称力矩已使能、启动未就绪。
+        self._torque_enabled = False
+        self._startup_ready = False
+
 
     def _configure_write_ack(self, deadline_s: float) -> None:
         """逐台读 Response_Status_Level（vendor 表地址 8），配置 WRITE 应答策略。

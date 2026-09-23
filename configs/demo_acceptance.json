@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "near_round_min_ratio": null,
+  "max_ripe_error_rate": null,
+  "reference_position_uncertainty_m": null,
+  "reference_yaw_uncertainty_deg": null
+}
