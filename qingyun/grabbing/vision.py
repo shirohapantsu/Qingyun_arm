@@ -376,9 +376,14 @@ def measure_geometry(detections, depth_raw):
             base_corners.append(p_base[:2])
             
         # Calculate physical dimensions and yaw based on YOLO OBB (matches legacy exactly)
-        tw_roi = det['bbox_w']
-        th_roi = det['bbox_h']
-        tangle_rad = det['angle_rad']
+        if 'bbox_w' in det and 'bbox_h' in det and 'angle_rad' in det:
+            tw_roi = det['bbox_w']
+            th_roi = det['bbox_h']
+            tangle_rad = det['angle_rad']
+        else:
+            rect = cv2.minAreaRect(np.array(corners, dtype=np.float32))
+            (tw_roi, th_roi) = rect[1]
+            tangle_rad = math.radians(rect[2])
         
         physical_tw = tw_roi * Z / fx
         physical_th = th_roi * Z / fy
