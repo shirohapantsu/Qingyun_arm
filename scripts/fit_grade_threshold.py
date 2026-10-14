@@ -655,8 +655,11 @@ def run(argv: Sequence[str] | None = None) -> int:
 
     # --- 1. 输入级校验（任一失败 → 退出码 2，绝不写文件）---
     try:
-        if output_path.resolve() == input_path.resolve():
-            raise InputError("--output 不得等于 --input（禁止改写输入样本 CSV）")
+        paths = (("--input", input_path), ("--output", output_path), ("--report", report_path))
+        for i, (left, lp) in enumerate(paths):
+            for right, rp in paths[i + 1:]:
+                if lp.resolve() == rp.resolve() or (lp.exists() and rp.exists() and lp.samefile(rp)):
+                    raise InputError(f"{left} 不得等于 {right}（禁止覆盖输入或另一输出）")
         samples = load_grade_samples(input_path)
         input_sha = sha256_file(input_path)
     except InputError as exc:

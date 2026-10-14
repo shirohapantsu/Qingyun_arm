@@ -58,6 +58,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 import subprocess
 import sys
 import uuid
@@ -89,6 +90,7 @@ from qingyun.grabbing.executor import (  # noqa: E402
 )
 from qingyun.grabbing.motor_control import Sts3215MotorController  # noqa: E402
 from qingyun.grabbing.vision import VisionHardError  # noqa: E402
+from qingyun import runlog  # noqa: E402
 
 # 与 validate 双侧共用的导出/校验器：同一份格式与完整性清单，避免手工 JSONL 绕过。
 from calibrate import (  # noqa: E402
@@ -256,7 +258,10 @@ def _ask_float(label: str) -> float | None:
     if raw == "":
         return None
     try:
-        return float(raw)
+        value = float(raw)
+        if not math.isfinite(value):
+            raise ValueError("非有限值")
+        return value
     except ValueError as exc:
         raise InputError(f"{label} 不是合法数值：{raw!r}") from exc
 
@@ -311,8 +316,9 @@ def _metadata_payload(*, operator: str, profile_path: Path, param_sha: str,
     }
 
 
-def _build_sample_payload(*, trial_row: dict, target, result, trace,
+def _build_sample_payload(*, trial_row: dict, target, result, trace, params,
                           observations: dict, param_sha: str) -> dict:
+    place = params.places[trial_row["place_id"].strip()]
     payload = {
         "record_type": "sample",
         "trial_id": trial_row["trial_id"].strip(),
@@ -320,6 +326,8 @@ def _build_sample_payload(*, trial_row: dict, target, result, trace,
         "target_position_m": (None if target is None
                               else [float(c) for c in target.position]),
         "target_yaw_deg": (None if target is None else float(target.yaw_deg)),
+        "planned_place_position_m": [float(c) for c in place.position],
+        "planned_place_yaw_deg": float(place.yaw_deg),
         "grade": trial_row["grade"].strip(),
         "place_id": trial_row["place_id"].strip(),
         "sample_truth": trial_row["sample_truth"].strip(),
@@ -341,12 +349,12 @@ def _build_sample_payload(*, trial_row: dict, target, result, trace,
     payload["place_error_yaw_deg"] = None
     if (payload["actual_success"] and payload["actual_place_position_m"] is not None
             and payload["actual_place_yaw_deg"] is not None
-            and payload["target_position_m"] is not None):
+            and payload["planned_place_position_m"] is not None):
         payload["place_error_center_m"] = round(
-            _place_center_error(payload["target_position_m"],
+            _place_center_error(payload["planned_place_position_m"],
                                 payload["actual_place_position_m"]), 9)
         payload["place_error_yaw_deg"] = round(
-            _place_yaw_error(payload["target_yaw_deg"],
+            _place_yaw_error(payload["planned_place_yaw_deg"],
                              payload["actual_place_yaw_deg"]), 9)
     return payload
 
@@ -396,10 +404,14 @@ def run(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     output_path = Path(args.output)
-    runlog_event = _noop_event
+    runlog_event = runlog.event
 
     # --- 1. 连接驱动之前的输入/配置校验（任一失败 → 退出码 2，绝不触碰硬件）---
     try:
+        for source in (Path(args.profile), Path(args.trials), Path(args.vision_config)):
+            if (source.resolve() == output_path.resolve() or
+                    (source.exists() and output_path.exists() and source.samefile(output_path))):
+                raise InputError("--output 不得覆盖 profile、trials 或 vision-config 输入")
         raw, params = _load_profile(Path(args.profile))
         known_places = list(params.places)
         trial_rows = load_trials(Path(args.trials), known_places)
@@ -422,16 +434,24 @@ def run(argv: Sequence[str] | None = None) -> int:
 
     # --- 2. 装配（硬件 / 视觉真实调用；桩环境如实抛 VisionHardError → 退出码 3）---
     try:
+        runlog.init(output_path.parent / f"{output_path.stem}.logs")
+        runlog.event("calibration_startup", operator=candidate["operator"],
+                     profile_path=str(args.profile), profile_parameter_sha256=param_sha,
+                     resource_sha256={"urdf": urdf_sha, "motor_calibration": motor_sha},
+                     code_commit=candidate["commit"])
         arm = _assemble(params, candidate["vision_config"])
     except VisionHardError as exc:
+        runlog.close()
         print(f"[{_TOOL_NAME}][视觉硬故障] 装配期 vision 真实失败（预期，无回退替身）：{exc}",
               file=sys.stderr, flush=True)
         return EXIT_RUNTIME
     except KeyboardInterrupt:
+        runlog.close()
         print(f"[{_TOOL_NAME}][终止] 装配期收到 Ctrl-C，不自动卸力，退出", file=sys.stderr,
               flush=True)
         return EXIT_RUNTIME
     except Exception as exc:  # noqa: BLE001 - 驱动/冷启动现场故障：不自动恢复
+        runlog.close()
         print(f"[{_TOOL_NAME}][运行故障] 装配失败（不自动恢复/不自动卸力）：{exc!r}",
               file=sys.stderr, flush=True)
         return EXIT_RUNTIME
@@ -442,6 +462,8 @@ def run(argv: Sequence[str] | None = None) -> int:
         print(f"[{_TOOL_NAME}][终止] 采集期收到 Ctrl-C，停止且不自动卸力", file=sys.stderr,
               flush=True)
         return EXIT_RUNTIME
+    finally:
+        runlog.close()
 
 
 def _noop_event(*_a, **_k) -> None:
@@ -481,7 +503,8 @@ def _collect_trials(arm, candidate: dict, runlog_event) -> int:
         trace: Sequence = ()
         multi_target = False
         try:
-            target = vision.get_target(0)
+            with runlog.context(trial_id=trial_row["trial_id"].strip(), scan_id=recorded + 1):
+                target = vision.get_target(0)
             # 单目标场景验收：本次视野合法候选必须恰为 1；违反记失败、不执行抓取。
             if int(target.valid_count) != 1:
                 multi_target = True
@@ -509,6 +532,10 @@ def _collect_trials(arm, candidate: dict, runlog_event) -> int:
 
         try:
             observations = _read_observations(placed=not multi_target)
+        except InputError as exc:
+            print(f"[{_TOOL_NAME}][输入错误] 观察值非法，本次未写入：{exc}",
+                  file=sys.stderr, flush=True)
+            return EXIT_INPUT
         except (EOFError, KeyboardInterrupt):
             print(f"\n[{_TOOL_NAME}] 观察录入被中断：本次 trial 不写入、结束采集",
                   flush=True)
@@ -529,7 +556,7 @@ def _collect_trials(arm, candidate: dict, runlog_event) -> int:
 
         payload = _build_sample_payload(
             trial_row=trial_row, target=target, result=result, trace=trace,
-            observations=observations, param_sha=candidate["param_sha"])
+            params=candidate["params"], observations=observations, param_sha=candidate["param_sha"])
         payload["trace_ref"] = trace_ref
         if multi_target:
             payload["software_status"] = "SKIPPED_MULTI_TARGET"
@@ -560,7 +587,8 @@ def _integrity_failures(meta: dict, sample_pairs: list[tuple[str, dict]],
                         candidate: dict) -> list[str]:
     results = pick_place_integrity_checks(
         meta, sample_pairs, candidate_param_sha=candidate["param_sha"],
-        urdf_sha=candidate["urdf_sha"], motor_sha=candidate["motor_sha"])
+        urdf_sha=candidate["urdf_sha"], motor_sha=candidate["motor_sha"],
+        places=candidate["raw"]["places"])
     return [f"{r['name']}：{r['detail']}" for r in results if not r["ok"]]
 
 

@@ -1,0 +1,2071 @@
+F....................................................................... [  5%]
+........................................................................ [ 11%]
+....................................................................EEEE [ 17%]
+EEEEEEEEEE.EEEEEEEEEEE.EEEEE............................................ [ 22%]
+........................................................................ [ 28%]
+........................................................................ [ 34%]
+........................................................................ [ 39%]
+........................................................................ [ 45%]
+.............F.
+==================================== ERRORS ====================================
+_____________ ERROR at setup of test_每条记录含必需字段且首条是metadata[motor] ______________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+_____________ ERROR at setup of test_每条记录含必需字段且首条是metadata[joints] _____________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+______________ ERROR at setup of test_每条记录含必需字段且首条是metadata[tool] ______________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+____________ ERROR at setup of test_每条记录含必需字段且首条是metadata[workcell] ____________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+_____________ ERROR at setup of test_每条记录含必需字段且首条是metadata[timing] _____________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+_____________ ERROR at setup of test_每条记录含必需字段且首条是metadata[motion] _____________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+_____________ ERROR at setup of test_每条记录含必需字段且首条是metadata[grasp] ______________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+___________ ERROR at setup of test_每条记录含必需字段且首条是metadata[pick_place] ___________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+_____________________ ERROR at setup of test_拟合样本与验证样本不重叠 ______________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+______________________ ERROR at setup of test_拟合与验证是离线动作 _______________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+________________________ ERROR at setup of test_未知阶段被拒绝 ________________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+________________ ERROR at setup of test_重复capture追加到同一文件形成多次实验 _________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+_____________________ ERROR at setup of test_fit产出可加载的候选配置 _____________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+______________________ ERROR at setup of test_fit不修改输入配置 _______________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+___________________ ERROR at setup of test_joints拟合能定出方向与零位 ____________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+_____________________ ERROR at setup of test_工具旋转拟合结果落在SO3 _____________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+_____________________ ERROR at setup of test_gap表拟合保持严格单调 ______________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+__________________ ERROR at setup of test_workcell拟合出放置位姿与胶囊体 __________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+___________________ ERROR at setup of test_fit在样本不足时拒绝而不是猜值 ____________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+_____________________ ERROR at setup of test_报告结构逐条符合指南1_3 _____________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+_____________________ ERROR at setup of test_validate是离线动作 _____________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+_____________________ ERROR at setup of test_限制不为了通过验收而被放宽 _____________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+____________________ ERROR at setup of test_sample_id重叠被拒绝 _____________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+__________________ ERROR at setup of test_stage_all需要每个阶段都有记录 __________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+__________________ ERROR at setup of test_promote产物可被real模式加载 __________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+___________________ ERROR at setup of test_promote拒绝未验收通过的报告 ___________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+___________________ ERROR at setup of test_promote拒绝缺人工复核的报告 ___________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+__________________ ERROR at setup of test_promote拒绝某阶段未通过的报告 ___________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+__________________ ERROR at setup of test_promote拒绝验收后被改动的配置 ___________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+__________________ ERROR at setup of test_验收后改一个字也让real模式拒绝加载 __________________
+
+tmp_path_factory = TempPathFactory(_given_basetemp=None, _trace=<pluggy._tracing.TagTracerSub object at 0x7269a0b6a2a0>, _basetemp=PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8'), _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def pipeline(tmp_path_factory) -> dict[str, Path]:
+        """跑一遍 init → 八阶段 capture+fit → validate → promote，返回关键产物路径。
+    
+        module 级共享：整条链路要跑十几秒，每个用例单独重跑会把测试时间拉长十几倍。
+        用例只读产物，不改写。
+        """
+        d = tmp_path_factory.mktemp("calib")
+        run("init", "--output", str(d), "--robot-id", "TEST", "--profile-id", "v0")
+        profile = d / "profile.json"
+        assert profile.is_file()
+        # 实机串口属于"操作者提供的已测参数"（指南 3.3）：fit 不再用猜测值填补
+        # （P2-3），所以真实流程里由操作者在这一步写入官方工具确认过的端口。
+        data = json.loads(profile.read_text(encoding="utf-8"))
+        data["motor"]["port"] = "/dev/ttyTEST-OPERATOR-CONFIRMED"
+        profile.write_text(json.dumps(data), encoding="utf-8")
+        prev = profile
+        for stage in STAGES:
+            fit = d / f"fit_{stage}.jsonl"
+            run("capture", "--stage", stage, "--profile", str(prev), "--output", str(fit))
+            out = d / f"c_{stage}.json"
+            run("fit", "--stage", stage, "--profile", str(prev), "--input", str(fit),
+                "--output", str(out))
+            prev = out
+        val = d / "val_all.jsonl"
+        with val.open("w", encoding="utf-8") as fh:
+            for stage in STAGES:
+                # 每个阶段单独 capture 到一个文件再合并：既满足"每次实验首条是 metadata"，
+                # 也让 --stage all 能拿到全部八个阶段的记录。
+                v = d / f"val_{stage}.jsonl"
+                run("capture", "--stage", stage, "--profile", str(prev), "--output", str(v))
+                fh.writelines(v.read_text(encoding="utf-8"))
+        _mark_records_physical(val, prev)
+        report = d / "report.json"
+>       run("validate", "--stage", "all", "--profile", str(prev), "--input", str(val),
+            "--report", str(report), "--operator", "tester", "--operator-reviewed")
+
+tests/test_calibration.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+expect_ok = True
+args = ('validate', '--stage', 'all', '--profile', '/tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json', '--input', ...)
+
+    def run(*args: str, expect_ok: bool = True) -> str:
+        proc = subprocess.run(
+            [str(PY), str(SCRIPT), *args], cwd=str(ROOT), capture_output=True, text=True)
+        out = proc.stdout + proc.stderr
+        if expect_ok and proc.returncode != 0:
+>           raise AssertionError(f"命令失败（{proc.returncode}）：calibrate {' '.join(args)}\n{out}")
+E           AssertionError: 命令失败（1）：calibrate validate --stage all --profile /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/c_pick_place.json --input /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/val_all.jsonl --report /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json --operator tester --operator-reviewed
+E           [motor] passed=True
+E           [joints] passed=True
+E           [tool] passed=True
+E           [workcell] passed=True
+E           [timing] passed=True
+E           [motion] passed=True
+E           [grasp] passed=True
+E           [pick_place] passed=False  未通过：完整性：观察/证据字段齐备、完整性：计划落点与当前配置一致、完整性：实际成功试验位置/yaw 与误差可复算一致
+E           报告 → /tmp/pytest-of-shiroha_pantsu/pytest-8/calib0/report.json（overall_pass=False）
+
+tests/test_calibration.py:31: AssertionError
+=================================== FAILURES ===================================
+_____________________________ test_生产模板可加载且字段与P1一致 _____________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-shiroha_pantsu/pytest-8/test_生产模板可加载且字段与P1一致0')
+
+    def test_生产模板可加载且字段与P1一致(tmp_path):
+        cfg = load_app_config(APP_TEMPLATE, entry="production")
+        assert cfg.mock is None
+>       assert cfg.asr.model == "qwen-audio-3.1-asr-flash"
+E       AssertionError: assert 'qwen3-asr-flash' == 'qwen-audio-3.1-asr-flash'
+E         
+E         - qwen-audio-3.1-asr-flash
+E         ?     ------- --
+E         + qwen3-asr-flash
+
+tests/test_app_config.py:180: AssertionError
+_______________________________ test_元数据不参与放置点选择 _______________________________
+
+params = MotionParams(schema_version=1, profile_id='sim_v0', robot_id='SIM_ROBOT', status='simulation', model=ModelParams(urdf_...
+       [ -96.82986738,   96.82986738],
+       [ -94.99984018,   94.99984018],
+       [-157.21102462,  162.78934171]]))
+
+    def test_元数据不参与放置点选择(params):
+        """文档 3.2/4.1：length/width/ripe/valid_count 只是视觉与 plans 的元数据，
+        place_id 只从配置读取，运动不开始读取这些字段——落点选择与指令序列不因元数据变化。
+        """
+        baseline = None
+        for meta in (
+            {"length_m": 0.05, "width_m": 0.04, "ripe": True, "valid_count": 1},
+            {"length_m": 0.061, "width_m": 0.039, "ripe": False, "valid_count": 7},
+            {"length_m": 0.048, "width_m": 0.05, "ripe": True, "valid_count": 12},
+            {"length_m": 0.055, "width_m": 0.041, "ripe": False, "valid_count": 3},
+        ):
+            arm, st, motor = make_arm(params)
+            motor.place_object(0.022)
+            # 固定 position/yaw/place_id，只变化元数据四字段。
+            r = arm.grasp_and_place(
+                graspable(params, 0.35, 0.0, **meta), place_id="bin")
+            assert r.place_id == "bin", meta
+            observed = (r.status, motor.command_count)
+            if baseline is None:
+                baseline = observed
+            else:
+                # 同一下发位置、不同元数据，运动结果状态与指令序列长度一致（没走不同分支）。
+>               assert observed == baseline, (meta, observed, baseline)
+E               AssertionError: ({'length_m': 0.061, 'width_m': 0.039, 'ripe': False, 'valid_count': 7}, (<GraspStatus.SUCCESS: 'SUCCESS'>, 648), (<GraspStatus.ABORTED: 'ABORTED'>, 272))
+E               assert (<GraspStatus...UCCESS'>, 648) == (<GraspStatus...BORTED'>, 272)
+E                 
+E                 At index 0 diff: <GraspStatus.SUCCESS: 'SUCCESS'> != <GraspStatus.ABORTED: 'ABORTED'>
+E                 Use -v to get more diff
+
+tests/test_grasp_flow.py:115: AssertionError
+----------------------------- Captured stderr call -----------------------------
+WARNING: Robot has the following self collisions in neutral position:
+  -base_link_2 collides with shoulder_link_2
+  -shoulder_link_0 collides with upper_arm_link_1
+  -upper_arm_link_0 collides with lower_arm_link_0
+  -lower_arm_link_2 collides with wrist_link_1
+  -wrist_link_0 collides with gripper_link_1
+  -gripper_link_0 collides with moving_jaw_so101_v1_link_0
+WARNING: Robot has the following self collisions in neutral position:
+  -base_link_2 collides with shoulder_link_2
+  -shoulder_link_0 collides with upper_arm_link_1
+  -upper_arm_link_0 collides with lower_arm_link_0
+  -lower_arm_link_2 collides with wrist_link_1
+  -wrist_link_0 collides with gripper_link_1
+  -gripper_link_0 collides with moving_jaw_so101_v1_link_0
+=============================== warnings summary ===============================
+tests/test_grasp_flow.py::test_一次下发对应一次完整同步调用
+  /home/shiroha_pantsu/miniconda3/envs/Qingyun/lib/python3.12/site-packages/cmeel.prefix/lib/python3.12/site-packages/hppfcl/__init__.py:3: DeprecationWarning: Please update your 'hppfcl' imports to 'coal'
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_app_config.py::test_生产模板可加载且字段与P1一致 - Assertio...
+FAILED tests/test_grasp_flow.py::test_元数据不参与放置点选择 - AssertionError...
+ERROR tests/test_calibration.py::test_每条记录含必需字段且首条是metadata[motor]
+ERROR tests/test_calibration.py::test_每条记录含必需字段且首条是metadata[joints]
+ERROR tests/test_calibration.py::test_每条记录含必需字段且首条是metadata[tool]
+ERROR tests/test_calibration.py::test_每条记录含必需字段且首条是metadata[workcell]
+ERROR tests/test_calibration.py::test_每条记录含必需字段且首条是metadata[timing]
+ERROR tests/test_calibration.py::test_每条记录含必需字段且首条是metadata[motion]
+ERROR tests/test_calibration.py::test_每条记录含必需字段且首条是metadata[grasp]
+ERROR tests/test_calibration.py::test_每条记录含必需字段且首条是metadata[pick_place]
+ERROR tests/test_calibration.py::test_拟合样本与验证样本不重叠 - AssertionErr...
+ERROR tests/test_calibration.py::test_拟合与验证是离线动作 - AssertionError: ...
+ERROR tests/test_calibration.py::test_未知阶段被拒绝 - AssertionError: 命令失...
+ERROR tests/test_calibration.py::test_重复capture追加到同一文件形成多次实验
+ERROR tests/test_calibration.py::test_fit产出可加载的候选配置 - AssertionErro...
+ERROR tests/test_calibration.py::test_fit不修改输入配置 - AssertionError: 命...
+ERROR tests/test_calibration.py::test_joints拟合能定出方向与零位 - AssertionE...
+ERROR tests/test_calibration.py::test_工具旋转拟合结果落在SO3 - AssertionErro...
+ERROR tests/test_calibration.py::test_gap表拟合保持严格单调 - AssertionError:...
+ERROR tests/test_calibration.py::test_workcell拟合出放置位姿与胶囊体 - Assert...
+ERROR tests/test_calibration.py::test_fit在样本不足时拒绝而不是猜值 - Asserti...
+ERROR tests/test_calibration.py::test_报告结构逐条符合指南1_3 - AssertionErro...
+ERROR tests/test_calibration.py::test_validate是离线动作 - AssertionError: 命...
+ERROR tests/test_calibration.py::test_限制不为了通过验收而被放宽 - AssertionE...
+ERROR tests/test_calibration.py::test_sample_id重叠被拒绝 - AssertionError: ...
+ERROR tests/test_calibration.py::test_stage_all需要每个阶段都有记录 - Asserti...
+ERROR tests/test_calibration.py::test_promote产物可被real模式加载 - Assertion...
+ERROR tests/test_calibration.py::test_promote拒绝未验收通过的报告 - Assertion...
+ERROR tests/test_calibration.py::test_promote拒绝缺人工复核的报告 - Assertion...
+ERROR tests/test_calibration.py::test_promote拒绝某阶段未通过的报告 - Asserti...
+ERROR tests/test_calibration.py::test_promote拒绝验收后被改动的配置 - Asserti...
+ERROR tests/test_calibration.py::test_验收后改一个字也让real模式拒绝加载 - As...
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! KeyboardInterrupt !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/home/shiroha_pantsu/learn/labroratry/Qingyun_arm/libs/so_arm_core/kinematics.py:43: KeyboardInterrupt
+(to show a full traceback on KeyboardInterrupt use --full-trace)
+2 failed, 559 passed, 1 warning, 30 errors in 167.48s (0:02:47)

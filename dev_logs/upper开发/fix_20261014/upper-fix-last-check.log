@@ -1,0 +1,9 @@
+........................................................................ [ 73%]
+..........................                                               [100%]
+=============================== warnings summary ===============================
+tests/test_place_calibration.py::test_T03_joints模式FK与运动链同一语义
+  /home/shiroha_pantsu/miniconda3/envs/Qingyun/lib/python3.12/site-packages/cmeel.prefix/lib/python3.12/site-packages/hppfcl/__init__.py:3: DeprecationWarning: Please update your 'hppfcl' imports to 'coal'
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+98 passed, 1 warning in 2.35s

@@ -23,6 +23,7 @@ import sys
 from dataclasses import asdict
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -50,7 +51,11 @@ from qingyun.grabbing.arm_control import MotionTraceEvent, TRACE_DESCENT_SUBMIT 
 def _no_real_thresholds(monkeypatch):
     """工具装配会调用 thresholds_from_params(完整 MotionParams)；测试用 FakeParams 时
     只需装配流程可跑通，视觉阈值构造不是被测对象，故整体打桩为 None。"""
+    from qingyun import runlog
+    runlog.reset_for_tests()
     monkeypatch.setattr(rppt, "thresholds_from_params", lambda params: None)
+    yield
+    runlog.reset_for_tests()
 
 _ACCEPTANCE = {
     "min_grasp_trials": 1, "min_grasp_success_rate": 0.5, "max_drop_rate": 0.5,
@@ -83,13 +88,15 @@ def _success_sample(trial_id: str, *, param_sha: str, grade: str = "B",
                     evidence: str = "submitted",
                     yaw_err: float = 1.0) -> dict:
     tx, ty, tz = 0.35, 0.0, 0.02
-    ax, ay, az = tx + 0.002, ty + 0.001, tz + 0.0005
-    center = round(calibrate._place_center_error_m([tx, ty, tz], [ax, ay, az]), 9)
+    px, py, pz = 0.32, 0.05, 0.02
+    ax, ay, az = px + 0.002, py + 0.001, pz + 0.0005
+    center = round(calibrate._place_center_error_m([px, py, pz], [ax, ay, az]), 9)
     yaw = round(calibrate._place_yaw_error_deg(0.0, yaw_err), 9)
     return {
         "record_type": "sample", "trial_id": trial_id,
         "profile_parameter_sha256": param_sha,
         "target_position_m": [tx, ty, tz], "target_yaw_deg": 0.0,
+        "planned_place_position_m": [px, py, pz], "planned_place_yaw_deg": 0.0,
         "grade": grade, "place_id": place_id, "start_ns": 1, "end_ns": 2,
         "software_status": "SUCCESS", "software_stage": "DONE", "holding": "EMPTY",
         "recovery_required": False, "began_descend": began_descend,
@@ -335,7 +342,9 @@ class _Probe:
 class FakeParams:
     def __init__(self, tmp: Path, places: dict):
         self._tmp = tmp
-        self.places = places
+        from configs.common_interface import PlacePose
+        self.places = {k: v if v is not None else PlacePose(
+            np.array([0.32, 0.05, 0.02]), 0.0) for k, v in places.items()}
         self.profile_dir = tmp
 
     def urdf_path_resolved(self) -> Path:
@@ -543,7 +552,7 @@ def _happy_run_one_trial(tmp_path, monkeypatch, *, trace=None, valid_count=1):
     monkeypatch.setattr(rppt, "vision", FakeVisionModule(_target(valid_count=valid_count)))
     # 观察脚本：确认开始→成功→未掉落→x/y/z→yaw→损伤none→观察30→图像默认
     monkeypatch.setattr(rppt, "_prompt", PromptScript(
-        ["yes", "y", "n", "0.352", "0.001", "0.0205", "1.0", "", "30", ""]))
+        ["yes", "y", "n", "0.322", "0.051", "0.0205", "1.0", "", "30", ""]))
     out = tmp_path / "out.jsonl"
     code = rppt.run(["--profile", str(profile), "--trials", str(trials),
                      "--output", str(out), "--operator", "op-1",
@@ -624,7 +633,7 @@ def test_操作者EOF干净退出且已记录样本保留(tmp_path, monkeypatch)
     monkeypatch.setattr(rppt, "vision", FakeVisionModule(_target()))
     # 第一次完整记录，第二次"开始确认"即 EOF → 干净退出。
     monkeypatch.setattr(rppt, "_prompt", PromptScript(
-        ["yes", "y", "n", "0.352", "0.001", "0.0205", "1.0", "", "30", ""]))
+        ["yes", "y", "n", "0.322", "0.051", "0.0205", "1.0", "", "30", ""]))
     out = tmp_path / "out.jsonl"
     code = rppt.run(["--profile", str(profile), "--trials", str(trials),
                      "--output", str(out), "--operator", "op", "--vision-config", str(profile)])

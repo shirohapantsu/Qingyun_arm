@@ -88,7 +88,7 @@ MAX_RECORD_SAMPLES = 480000
 
 # 模板占位模型名（P1 §3.1 末段：模板占位模型名不能用于真实请求，init 拒绝）。
 # 以 app.mock.json 的字面占位 "mock" 为核心，附带常见模板占位写法（大小写不敏感、
-# 去空白后比对）；真实模型 "qwen-audio-3.1-asr-flash" 不在其中。
+# 去空白后比对）；模型 "qwen3-asr-flash" 不在其中。
 _PLACEHOLDER_MODEL_NAMES = frozenset(
     {
         "mock",
@@ -118,11 +118,8 @@ _DASHSCOPE_KEY_NAME = "dashscope_api_key"
 # 取 init 校验后存于 _state 的配置值——换地域/换域名只改 app.json，不改代码）
 # ---------------------------------------------------------------------------
 
-# 音频以 data URI 内联上传（§3.1：input_audio.data = "data:audio/wav;base64,<音频>"）。
+# DashScope 原生 content.audio 使用 data URI 内联上传。
 AUDIO_DATA_URI_PREFIX = "data:audio/wav;base64,"
-# parameters 逐字：{"format":"wav","sample_rate":"16000"}（sample_rate 是**字符串**）。
-AUDIO_FORMAT = "wav"
-AUDIO_SAMPLE_RATE = str(TARGET_SAMPLE_RATE)
 # 关闭 DashScope 的服务端 SSE：本适配是同步一次性请求。
 SSE_HEADER_NAME = "X-DashScope-SSE"
 SSE_HEADER_VALUE = "disable"
@@ -337,7 +334,7 @@ def _open_input_stream():
 
 
 class _SoundDeviceInput:
-    """sounddevice.RawInputStream 的设备层薄封装（不在测试路径执行）。"""
+    """sounddevice.RawInputStream 的 PCM16 适配器。"""
 
     def __init__(self, raw) -> None:
         self._raw = raw
@@ -345,19 +342,29 @@ class _SoundDeviceInput:
         self.channels = int(raw.channels) or 1
 
     def drain(self) -> None:
-        # 排空旧数据：丢弃进入本函数前积压的缓冲（§3 要点）。
+        # 只丢弃进入时已可读的帧；新到的数据属于本次录音，不能继续追着清空。
         try:
-            while self._raw.read(VAD_FRAME_SAMPLES)[1] == False:  # noqa: E712
-                pass
-        except Exception:
-            pass
+            remaining = int(self._raw.read_available)
+            while remaining > 0:
+                count = min(VAD_FRAME_SAMPLES, remaining)
+                self._raw.read(count)
+                remaining -= count
+        except Exception as exc:
+            raise ASRHardError(f"清空输入缓冲失败：{exc}") from exc
 
     def read(self):
         try:
             data, overflowed = self._raw.read(VAD_FRAME_SAMPLES)
+            if overflowed:
+                raise ASRHardError("输入缓冲溢出，音频不完整")
+            array = __import__("array")
+            samples = array.array("h")
+            samples.frombytes(bytes(data))  # PortAudio 的 int16 为本机字节序
+            if len(samples) % self.channels:
+                raise ASRHardError("PCM16 输入不能按声道完整拆分")
         except Exception as exc:
             raise ASRHardError(f"读取输入流失败：{exc}") from exc
-        return (list(data), self.channels)
+        return (list(samples), self.channels)
 
     def close(self) -> None:
         try:
@@ -424,7 +431,7 @@ class _SileroVad:
 
     def probability(self, frame):  # pragma: no cover - 目标机路径（本机无 torch）
         torch = __import__("torch")
-        window = torch.FloatTensor([float(s) for s in frame])
+        window = torch.FloatTensor([float(s) / 32768.0 for s in frame])
         with torch.no_grad():
             prob = self._model(window, TARGET_SAMPLE_RATE)
         return float(prob.view(-1)[0].item())
@@ -679,12 +686,12 @@ def _build_request_payload(model: str, data_uri: str) -> dict:
                 {
                     "role": "user",
                     "content": [
-                        {"type": "input_audio", "input_audio": {"data": data_uri}}
+                        {"audio": data_uri}
                     ],
                 }
             ]
         },
-        "parameters": {"format": AUDIO_FORMAT, "sample_rate": AUDIO_SAMPLE_RATE},
+        "parameters": {"result_format": "message", "asr_options": {"enable_itn": False}},
     }
 
 
@@ -735,11 +742,7 @@ def _provider_error_code(response) -> "str | None":
 
 
 def _extract_transcript_text(body: bytes) -> str:
-    """成功路径的唯一出口：读 ``output.text``（**允许空串**）。
-
-    坏 JSON / 顶层非对象 / 缺 output / 缺 text / text 非字符串（含"多余嵌套结构"）
-    一律 :class:`_TranscribeFailure`，由 ``_transcribe`` 归类后抛 ASRHardError（§3.1）。
-    """
+    """解析 DashScope 原生 message 响应的文本内容，允许空字符串。"""
     json_module = __import__("json")
     try:
         document = json_module.loads(body.decode("utf-8"))
@@ -762,14 +765,19 @@ def _extract_transcript_text(body: bytes) -> str:
         raise _TranscribeFailure(
             "bad_payload", f"output 不是 JSON 对象（{type(output).__name__}）"
         )
-    if "text" not in output:
-        raise _TranscribeFailure("bad_payload", "响应缺 output.text 字段")
-    transcript = output["text"]
-    if not isinstance(transcript, str):
-        raise _TranscribeFailure(
-            "bad_payload", f"output.text 非字符串（{type(transcript).__name__}）"
-        )
-    return transcript
+    choices = output.get("choices")
+    if not isinstance(choices, list) or len(choices) != 1 or not isinstance(choices[0], dict):
+        raise _TranscribeFailure("bad_payload", "响应需要一条 output.choices 消息")
+    if choices[0].get("finish_reason") != "stop":
+        raise _TranscribeFailure("bad_payload", "ASR 响应未正常结束或已截断")
+    message = choices[0].get("message")
+    content = message.get("content") if isinstance(message, dict) else None
+    if not isinstance(content, list) or not content:
+        raise _TranscribeFailure("bad_payload", "响应缺 message.content 文本数组")
+    if any(not isinstance(part, dict) or not isinstance(part.get("text"), str)
+           for part in content):
+        raise _TranscribeFailure("bad_payload", "message.content 的 text 必须是字符串")
+    return "".join(part["text"] for part in content)
 
 
 def _close_quietly(closer) -> None:
@@ -852,7 +860,7 @@ def _transcribe(wav_bytes: bytes) -> str:
 
     步骤：取 ``_state`` 的 model/endpoint/cloud_total_timeout_s/api_key → 组装 §3.1
     逐字请求 → 在 :class:`_CloudDeadline` 下发起**一次** httpx 同步 POST → 读
-    ``output.text``（允许空串）。任何网络/鉴权/限流/服务/坏 JSON/缺字段/超时都归类
+    ``output.choices`` 的 message 文本（允许空串）。任何网络/鉴权/限流/服务/坏 JSON/缺字段/超时都归类
     记脱敏日志后抛 :class:`ASRHardError` 并保留来源；不自动重试、不跨地域 fallback、
     不替换模型（D12/D20）。
     """

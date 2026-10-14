@@ -84,7 +84,7 @@ def app_data(tmp: Path) -> dict[str, Any]:
         "prompt_path": "../assets/prompt.md",
         "log_dir": "../logs",
         "asr": {
-            "model": "qwen-audio-3.1-asr-flash",
+            "model": "qwen3-asr-flash",
             "endpoint": "https://dashscope.aliyuncs.com/api/v1/services/aigc/"
                         "multimodal-generation/generation",
             "cloud_total_timeout_s": 30.0,
@@ -177,7 +177,7 @@ def real_secrets(tmp_path, monkeypatch):
 def test_生产模板可加载且字段与P1一致(tmp_path):
     cfg = load_app_config(APP_TEMPLATE, entry="production")
     assert cfg.mock is None
-    assert cfg.asr.model == "qwen-audio-3.1-asr-flash"
+    assert cfg.asr.model == "qwen3-asr-flash"
     assert cfg.asr.endpoint == (
         "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation"
     )

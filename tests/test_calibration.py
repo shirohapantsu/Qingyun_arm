@@ -67,6 +67,8 @@ def _mark_records_physical(jsonl_path: Path, candidate_path: Path) -> None:
     motor_calib = cand_dir / cand["model"]["motor_calibration_path"]
     resource_sha = {"urdf": _sha(urdf), "motor_calibration": _sha(motor_calib)}
     place_id = sorted(cand["places"])[0]
+    place_position = [float(v) for v in cand["places"][place_id]["position"]]
+    place_yaw = float(cand["places"][place_id]["yaw_deg"])
     observe_min = float(cand["acceptance"]["damage_observe_minutes"])
 
     rows = [json.loads(line) for line in
@@ -90,10 +92,11 @@ def _mark_records_physical(jsonl_path: Path, candidate_path: Path) -> None:
         drop = k == 30
         tx, ty, tz = 0.35, 0.001 * (k % 3), 0.020
         if success:
-            ax, ay, az = tx + 0.002, ty + 0.001, tz + 0.0005   # 中心误差 ~2.3mm
-            t_yaw, a_yaw = 0.0, 1.0                            # yaw 误差 1.0°
-            cerr = round(((ax - tx) ** 2 + (ay - ty) ** 2 + (az - tz) ** 2) ** 0.5, 9)
-            yerr = round(abs(t_yaw - a_yaw), 9)
+            px, py, pz = place_position
+            ax, ay, az = px + 0.002, py + 0.001, pz + 0.0005   # 中心误差 ~2.3mm
+            t_yaw, a_yaw = 0.0, place_yaw + 1.0
+            cerr = round(((ax - px) ** 2 + (ay - py) ** 2 + (az - pz) ** 2) ** 0.5, 9)
+            yerr = round(abs(place_yaw - a_yaw), 9)
         else:
             ax = ay = az = t_yaw = a_yaw = cerr = yerr = None
         pp_rows.append({
@@ -103,6 +106,7 @@ def _mark_records_physical(jsonl_path: Path, candidate_path: Path) -> None:
                 "record_type": "sample", "trial_id": f"pp-{k}",
                 "profile_parameter_sha256": param_sha,
                 "target_position_m": [tx, ty, tz], "target_yaw_deg": t_yaw if success else 0.0,
+                "planned_place_position_m": place_position, "planned_place_yaw_deg": place_yaw,
                 "grade": "B", "place_id": place_id,
                 "start_ns": 2 + k, "end_ns": 2 + k + 1,
                 "software_status": "SUCCESS" if success else "GRASP_MISS",

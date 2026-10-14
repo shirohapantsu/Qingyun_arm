@@ -1,0 +1,12 @@
+{"finding": "R01", "no_overflow": true, "read_available": 0, "drain_returned": false}
+{"finding": "R02", "expected_pcm_samples": [0, 256, -1], "actual": [0, 0, 0, 1, 255, 255]}
+{"finding": "R03", "peak_received_by_model": 32767.0, "expected_peak": 0.999969482421875}
+{"finding": "R04", "request_entry_keys": ["type", "input_audio"], "official_response_rejected": "bad_payload: 响应缺 output.text 字段"}
+{"finding": "R05", "actual_place_equals_configured_place": true, "reported_center_error_m": 0.06264982, "reported_yaw_error_deg": 30.0, "expected_errors": 0}
+{"finding": "R09", "inherited_loader_gap": true, "stages": {}, "real_loader_accepted": true}
+{"finding": "R06", "verdict": "PASS", "resources": 0, "demo_acceptance_and_weights_and_visual_reports_missing": true, "complete_profile_stage_count": 8}
+{"finding": "R08", "actual_success": "false", "actual_pose_missing": true, "all_pick_place_checks_passed": true, "unchanged_acceptance_min_trials": 30}
+{"finding": "R08", "actual_yaw": "NaN", "damage_observe_minutes": "NaN", "all_pick_place_checks_passed": true, "unchanged_acceptance_min_trials": 30}
+{"finding": "R10", "exit_code": 0, "original_sample_csv_overwritten_by_report": true}
+{"finding": "R07", "conforming_vision_log_failed": "runlog 未初始化：先 init(log_dir) 再调用 event", "actual_motor_writes": 0}
+{"finding": "R11", "configured_startup_timeout_s": 0.31, "ready_at_s": 0.315, "result": "ready"}

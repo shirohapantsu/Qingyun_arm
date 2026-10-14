@@ -70,7 +70,7 @@ P4/P5 必须明确区分“智能体可编码并离线验证的工具”和“�
 | D17 | 启动时已上力 | 要求六轴全部卸力，否则拒绝启动且不追加舵机写入 | P1 §4.1；P5 §4 |
 | D18 | demo实物尺寸 | 本期草莓样品保证不超过运动包络记录的长、宽、高；不额外引入逐个量具登记 | P3 §6；P4 §3；P5 §4 |
 | D19 | 视觉几何实现 | 采用OBB区域深度点方案：剔除桌面，在base系估计几何；无分割模型，深度不足/混入邻物时拒绝 | P3 §4/§6；P4 §2.3 |
-| D20 | 云模型与地域 | ASR=qwen-audio-3.1-asr-flash，北京DashScope；LLM=deepseek-flash，DeepSeek官方API | P1配置；P2 §3/§4 |
+| D20 | 云模型与地域 | ASR=qwen3-asr-flash，北京DashScope；LLM=deepseek-flash，DeepSeek官方API | P1配置；P2 §3/§4 |
 
 以下是本轮工程接口选择，不冒充用户逐项确认：registry关键字注入、run_session仅业务循环、共享cold_start_recover；任务日志context；fixture replay格式；专用完整draft loader；运动内存trace；P4验收条件模板；同步REST与Linux主线程deadline。用户已授权修订到可开发程度，这些选择作为当前编码要求，后续变更应同步消费者和测试。
 

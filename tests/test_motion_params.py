@@ -7,6 +7,8 @@ null 未测参数、模式与 status 的配套关系、限位三重交集、三�
 
 from __future__ import annotations
 
+from tests.support_validation import complete_report_stages
+
 import copy
 import json
 
@@ -388,7 +390,7 @@ def test_real模式能加载一份完整验收过的配置(tmp_path):
         "parameter_sha256": param_hash,
         "operator": "tester",
         "operator_reviewed": True,
-        "stages": {},
+        "stages": complete_report_stages(),
         "overall_pass": True,
     }
     report_path = tmp_path / "reports" / "validation.json"

@@ -632,8 +632,12 @@ def run(argv: Sequence[str] | None = None) -> int:
     try:
         if not profile_path.is_file():
             raise InputError(f"profile 不存在：{profile_path}")
-        if output_path.resolve() == profile_path.resolve():
-            raise InputError("--output 不得等于 --profile（禁止改写输入 profile 源）")
+        paths = (("--profile", profile_path), ("--input", records_path),
+                 ("--output", output_path), ("--report", report_path))
+        for i, (left, lp) in enumerate(paths):
+            for right, rp in paths[i + 1:]:
+                if lp.resolve() == rp.resolve() or (lp.exists() and rp.exists() and lp.samefile(rp)):
+                    raise InputError(f"{left} 不得等于 {right}（禁止覆盖输入或另一输出）")
         try:
             raw_profile = json.loads(profile_path.read_text(encoding="utf-8"))
         except json.JSONDecodeError as exc:

@@ -1630,7 +1630,7 @@ class Sts3215MotorController:
             # (b) 反馈预置：完整反馈 + 速度/范围校验 + 旧目标读回 + 编码当前反馈。
             report["phase"] = "反馈预置"
             self._startup_begin_phase(report, "seed")
-            fb_before = self.get_feedback()
+            fb_before = self._read_feedback(deadline_s)
             self._startup_record_feedback(report, "feedback_before", fb_before)
             self._startup_check_static(fb_before)
             old_goal = [
@@ -1707,7 +1707,7 @@ class Sts3215MotorController:
             self._protocol.reset_input()
             self._startup_wait(_STARTUP_SETTLE_BEFORE_FEEDBACK_S, deadline_s)
             self._protocol.reset_input()
-            fb_after = self.get_feedback()
+            fb_after = self._read_feedback(deadline_s)
             self._startup_record_feedback(report, "feedback_after", fb_after)
             pos_change = np.abs(fb_after.angles_deg - fb_before.angles_deg)
             grip_change = abs(fb_after.gripper_pct - fb_before.gripper_pct)
@@ -1731,6 +1731,8 @@ class Sts3215MotorController:
             self._startup_end_phase(report, "settle")
 
             # 全部通过 → READY。
+            if self._clock() >= deadline_s:
+                raise MotorCommunicationError("启动握手总时限已到期，拒绝标记 READY")
             self._torque_enabled = True
             self._startup_ready = True
             report["result"] = "ready"
@@ -2051,11 +2053,17 @@ class Sts3215MotorController:
           * 电流与速度必须是换算后的物理量（4.3：禁止把寄存器整数原样填进带
             mA/deg_s 名称的接口）。
         """
+        return self._read_feedback()
+
+    def _read_feedback(self, outer_deadline_s: float | None = None) -> JointFeedback:
+        """反馈事务沿用上层握手截止点，运行期默认采用自己的读超时。"""
         self._require_connected()
         sample_start_ns = self._monotonic_ns()
         # 整次方法只有一个 deadline；六台块读共用它，所以 6 次单播事务加起来
         # 也不能超过 read_timeout_s。
         deadline_s = self._clock() + self.timing.read_timeout_s
+        if outer_deadline_s is not None:
+            deadline_s = min(deadline_s, outer_deadline_s)
         ids = [ax.servo_id for ax in self.mapping.axes]
 
         block = self._protocol.bulk_read(ids, self._fb_addr, self._fb_len, deadline_s)

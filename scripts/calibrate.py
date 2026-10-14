@@ -37,6 +37,7 @@ if str(ROOT) not in sys.path:
 
 from configs.common_interface import JOINT_NAMES, MOTOR_NAMES  # noqa: E402
 from configs.motion_params import (  # noqa: E402
+    CALIBRATION_STAGES,
     ParamsError,
     effective_joint_limits,
     parameter_sha256,
@@ -53,9 +54,7 @@ from libs.so_arm_core.motors.encoding_utils import decode_sign_magnitude  # noqa
 from libs.so_arm_core.motors.feetech.tables import MODEL_ENCODING_TABLE  # noqa: E402
 
 # 八个固定阶段（指南 1.2），顺序就是第 3 节规定的测量顺序。
-STAGES: tuple[str, ...] = (
-    "motor", "joints", "tool", "workcell", "timing", "motion", "grasp", "pick_place",
-)
+STAGES = CALIBRATION_STAGES
 # 阶段 -> 前置阶段。capture --hardware 与 validate 都按这条链检查前置是否已经有
 # 通过的报告（指南 3.3"capture 的实机模式逐阶段检查前置参数及报告"）。
 PREREQUISITES: dict[str, tuple[str, ...]] = {
@@ -2531,6 +2530,7 @@ def _check(name: str, field_path: str, measured: float, limit: float, comparison
 # 但键本身不得缺失——缺键是手工 JSONL 绕过的典型形态）。
 PICK_PLACE_REQUIRED_SAMPLE_KEYS: tuple[str, ...] = (
     "trial_id", "profile_parameter_sha256", "target_position_m", "target_yaw_deg",
+    "planned_place_position_m", "planned_place_yaw_deg",
     "grade", "place_id", "began_descend", "descent_evidence",
     "software_status", "software_stage", "holding", "recovery_required",
     "actual_success", "actual_drop", "actual_place_position_m", "actual_place_yaw_deg",
@@ -2564,13 +2564,22 @@ def _place_yaw_error_deg(target_yaw: Any, actual_yaw: Any) -> float:
 def _finite_vec3(value: Any) -> bool:
     if not isinstance(value, (list, tuple)) or len(value) != 3:
         return False
-    return all(isinstance(v, (int, float)) and not isinstance(v, bool)
-               and math.isfinite(float(v)) for v in value)
+    return all(_finite_number(v) for v in value)
+
+
+def _finite_number(value: Any) -> bool:
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        return False
+    try:
+        return math.isfinite(float(value))
+    except OverflowError:
+        return False
 
 
 def pick_place_integrity_checks(
     meta: dict[str, Any], samples: Sequence[tuple[str, dict[str, Any]]], *,
     candidate_param_sha: str, urdf_sha: str, motor_sha: str,
+    places: dict[str, Any],
 ) -> list[dict[str, Any]]:
     """返回 pick_place hardware 记录的**结构性**完整性结论（每项 {name, ok, detail}）。
 
@@ -2604,9 +2613,10 @@ def pick_place_integrity_checks(
         f"候选={candidate_param_sha[:12]}…，metadata={meta.get('profile_parameter_sha256')!r}")
 
     trial_ids = [p.get("trial_id") for _, p in samples]
+    valid_ids = [t for t in trial_ids if isinstance(t, str) and t.strip()]
     add("trial_id 全部存在且唯一",
-        all(isinstance(t, str) and t for t in trial_ids) and len(set(trial_ids)) == len(trial_ids),
-        f"共 {len(trial_ids)} 条，唯一 {len(set(trial_ids))} 个")
+        len(valid_ids) == len(trial_ids) and len(set(valid_ids)) == len(trial_ids),
+        f"共 {len(trial_ids)} 条，有效唯一 {len(set(valid_ids))} 个")
     sample_ids = [sid for sid, _ in samples]
     add("sample_id 唯一", len(set(sample_ids)) == len(sample_ids),
         f"共 {len(sample_ids)} 条，唯一 {len(set(sample_ids))} 个")
@@ -2629,30 +2639,64 @@ def pick_place_integrity_checks(
     add("观察/证据字段齐备", not missing_keys,
         f"缺键样本：{missing_keys[:3]}" if missing_keys else "")
 
+    bad_values, bad_places = [], []
+    for sid, p in samples:
+        for key in ("actual_success", "actual_drop"):
+            if not _is_real_bool(p.get(key)):
+                bad_values.append((sid, key))
+        recovery = p.get("recovery_required")
+        if not (_is_real_bool(recovery) or (recovery is None and p.get("software_status") in
+                                           (None, "SKIPPED_MULTI_TARGET"))):
+            bad_values.append((sid, "recovery_required"))
+        for key in ("target_yaw_deg", "actual_place_yaw_deg", "place_error_center_m",
+                    "place_error_yaw_deg", "feedback_span_s", "stop_latency_s",
+                    "damage_observe_minutes"):
+            value = p.get(key)
+            if value is not None and (not _finite_number(value) or
+                    (key not in ("target_yaw_deg", "actual_place_yaw_deg") and value < 0)):
+                bad_values.append((sid, key))
+        label = p.get("damage_label")
+        if label is not None and (not isinstance(label, str) or not label.strip()):
+            bad_values.append((sid, "damage_label"))
+        for key in ("target_position_m", "actual_place_position_m"):
+            if p.get(key) is not None and not _finite_vec3(p[key]):
+                bad_values.append((sid, key))
+        pid = p.get("place_id")
+        place = places.get(pid) if isinstance(pid, str) else None
+        planned = p.get("planned_place_position_m")
+        planned_yaw = p.get("planned_place_yaw_deg")
+        if (not isinstance(place, dict) or not _finite_vec3(planned)
+                or not _finite_number(planned_yaw) or not _finite_vec3(place.get("position"))
+                or not _finite_number(place.get("yaw_deg"))
+                or _place_center_error_m(planned, place["position"]) > _PLACE_ERROR_TOL_M
+                or _place_yaw_error_deg(planned_yaw, place["yaw_deg"]) > _PLACE_ERROR_TOL_DEG):
+            bad_places.append((sid, pid))
+    add("观察值类型与有限性合法", not bad_values, f"非法字段：{bad_values[:5]}")
+    add("计划落点与当前配置一致", not bad_places, f"不一致落点：{bad_places[:5]}")
+
     # 实际成功的试验必须有实际位置/yaw，且中心与 yaw 误差可由 target/actual 复算一致。
     bad_recompute = []
     for sid, p in samples:
         if not _is_real_bool(p.get("actual_success")) or not p.get("actual_success"):
             continue
-        tgt = p.get("target_position_m")
+        tgt = p.get("planned_place_position_m")
         act = p.get("actual_place_position_m")
-        ty, ay = p.get("target_yaw_deg"), p.get("actual_place_yaw_deg")
+        ty, ay = p.get("planned_place_yaw_deg"), p.get("actual_place_yaw_deg")
         if not _finite_vec3(tgt) or not _finite_vec3(act):
             bad_recompute.append((p.get("trial_id"), "位置缺失/非有限"))
             continue
-        if not isinstance(ty, (int, float)) or isinstance(ty, bool) \
-                or not isinstance(ay, (int, float)) or isinstance(ay, bool):
+        if not _finite_number(ty) or not _finite_number(ay):
             bad_recompute.append((p.get("trial_id"), "yaw 缺失"))
             continue
         ce = _place_center_error_m(tgt, act)
         ye = _place_yaw_error_deg(ty, ay)
         sc, sy = p.get("place_error_center_m"), p.get("place_error_yaw_deg")
-        if not isinstance(sc, (int, float)) or isinstance(sc, bool) \
+        if not _finite_number(sc) \
                 or abs(float(sc) - ce) > _PLACE_ERROR_TOL_M:
             bad_recompute.append((p.get("trial_id"),
                                   f"中心误差不可复算（存 {sc!r} 重算 {ce:.6f}）"))
             continue
-        if not isinstance(sy, (int, float)) or isinstance(sy, bool) \
+        if not _finite_number(sy) \
                 or abs(float(sy) - ye) > _PLACE_ERROR_TOL_DEG:
             bad_recompute.append((p.get("trial_id"),
                                   f"yaw 误差不可复算（存 {sy!r} 重算 {ye:.6f}）"))
@@ -2905,6 +2949,29 @@ def _stage_checks(stage: str, raw: dict, records: list[Record], input_sha: str,
             checks.append(_check("预张开口大于闭合轴宽度(m)", "gripper.preopen_pct", pre_gap,
                                  need, ">=", "offline", refs))
     elif stage == "pick_place":
+        # ---- hardware pick_place 完整性关卡（P4 §2.8.3）----
+        # 只施加于声称 hardware 的记录：模拟源走 mock 证据、由 real 加载的证据等级
+        # 关卡拒绝，不在此列（"simulated 不得成为 physical 证据"的既有语义保持）。
+        meta = metadata_of(stage_records)
+        if meta.get("source") != "simulated":
+            prof_dir = Path(args_profile_dir["current"])
+            try:
+                urdf_sha = sha256_file(_resolve_from(
+                    prof_dir, raw["model"]["urdf_path"]))
+                motor_sha = sha256_file(_resolve_from(
+                    prof_dir, raw["model"]["motor_calibration_path"]))
+            except OSError as exc:
+                urdf_sha = motor_sha = f"<unreadable:{exc}>"
+            cand_sha = parameter_sha256(raw)
+            pairs = [(r.sample_id, r.payload) for r in samples_of(stage_records)]
+            for item in pick_place_integrity_checks(
+                    meta, pairs, candidate_param_sha=cand_sha,
+                    urdf_sha=urdf_sha, motor_sha=motor_sha, places=raw["places"]):
+                checks.append(_check(f"完整性：{item['name']}", "acceptance",
+                                     1.0 if item["ok"] else 0.0, 1.0, "==", ev_type, refs))
+            if any(not c["passed"] for c in checks):
+                return checks  # 坏 schema 不得进入 truthiness/float 统计
+
         # 分母 = 开始 DESCEND 的次数（指南 11）。began_descend=False 明确未下降，排除；
         # null（unknown）不静默当 False、不丢出分母（P4 §2.8.2）——保留在分母内，另由
         # 下方"began_descend 为 bool"完整性检查令报告不通过。
@@ -2923,8 +2990,8 @@ def _stage_checks(stage: str, raw: dict, records: list[Record], input_sha: str,
                                  float(P["acceptance"]["max_yaw_error_deg"]), "<=",
                                  ev_type, refs))
         if n:
-            succ = sum(1 for p in denom_rows if p.get("actual_success"))
-            drop = sum(1 for p in denom_rows if p.get("actual_drop"))
+            succ = sum(1 for p in denom_rows if p.get("actual_success") is True)
+            drop = sum(1 for p in denom_rows if p.get("actual_drop") is True)
             dmg_rows = [p for p in denom_rows if p.get("damage_observe_minutes")]
             dmg = sum(1 for p in dmg_rows if p.get("damage_label") not in (None, "none"))
             checks.append(_check("实际成功率", "acceptance.min_grasp_success_rate",
@@ -2943,26 +3010,7 @@ def _stage_checks(stage: str, raw: dict, records: list[Record], input_sha: str,
                                      float(P["acceptance"]["max_position_error_m"]), "<=",
                                      ev_type, refs))
 
-        # ---- hardware pick_place 完整性关卡（P4 §2.8.3）----
-        # 只施加于声称 hardware 的记录：模拟源走 mock 证据、由 real 加载的证据等级
-        # 关卡拒绝，不在此列（"simulated 不得成为 physical 证据"的既有语义保持）。
-        meta = metadata_of(stage_records)
-        if meta.get("source") == "hardware":
-            prof_dir = Path(args_profile_dir["current"])
-            try:
-                urdf_sha = sha256_file(_resolve_from(
-                    prof_dir, raw["model"]["urdf_path"]))
-                motor_sha = sha256_file(_resolve_from(
-                    prof_dir, raw["model"]["motor_calibration_path"]))
-            except OSError as exc:
-                urdf_sha = motor_sha = f"<unreadable:{exc}>"
-            cand_sha = parameter_sha256(raw)
-            pairs = [(r.sample_id, r.payload) for r in samples_of(stage_records)]
-            for item in pick_place_integrity_checks(
-                    meta, pairs, candidate_param_sha=cand_sha,
-                    urdf_sha=urdf_sha, motor_sha=motor_sha):
-                checks.append(_check(f"完整性：{item['name']}", "acceptance",
-                                     1.0 if item["ok"] else 0.0, 1.0, "==", ev_type, refs))
+        if meta.get("source") != "simulated":
             # began_descend 必须为 bool：null（unknown）保留在分母、但令报告不通过。
             unknown_bd = [p.get("trial_id") for p in denom_rows
                           if p.get("began_descend") is None]
@@ -2972,9 +3020,10 @@ def _stage_checks(stage: str, raw: dict, records: list[Record], input_sha: str,
             # 损伤观察时长达标：缺失/未到观察期记 pending，报告不能通过。
             need_obs = float(P["acceptance"]["damage_observe_minutes"])
             short_obs = [p.get("trial_id") for p in denom_rows
-                         if not isinstance(p.get("damage_observe_minutes"), (int, float))
-                         or isinstance(p.get("damage_observe_minutes"), bool)
-                         or float(p["damage_observe_minutes"]) < need_obs]
+                         if not _finite_number(p.get("damage_observe_minutes"))
+                         or float(p["damage_observe_minutes"]) < need_obs
+                         or not isinstance(p.get("damage_label"), str)
+                         or not p["damage_label"].strip()]
             checks.append(_check(
                 "损伤观察时长达标(min)", "acceptance.damage_observe_minutes",
                 1.0 if not short_obs else 0.0, 1.0, "==", ev_type, refs))

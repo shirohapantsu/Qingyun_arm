@@ -55,6 +55,9 @@ LOAD_LIMIT_TOL_DEG = 1e-6
 LOAD_AXIS_SPAN_M = 1e-9
 
 STATUSES = ("draft", "verified", "simulation")
+CALIBRATION_STAGES = (
+    "motor", "joints", "tool", "workcell", "timing", "motion", "grasp", "pick_place",
+)
 
 # 模块对外公开的名字。三个 profile 加载入口按用途区分：
 #   * load_motion_params            —— 生产运行（mode="real"/"mock"）。
@@ -64,6 +67,8 @@ __all__ = [
     "ParamsError",
     "SCHEMA_VERSION",
     "STATUSES",
+    "CALIBRATION_STAGES",
+    "validate_calibration_report",
     "ModelParams",
     "MotorParams",
     "JointsParams",
@@ -1356,6 +1361,31 @@ def load_calibration_motion_params(profile_path: Path) -> MotionParams:
     return _parse_and_validate(Path(profile_path), d, status, check_hashes=True)
 
 
+def validate_calibration_report(report: Any) -> None:
+    """生产运行要求八阶段全过，且每阶段具有通过的 physical 检查。"""
+    field = "verification.report_path"
+    if not isinstance(report, dict):
+        raise ParamsError(field, "报告顶层必须是对象")
+    for flag in ("overall_pass", "operator_reviewed"):
+        if report.get(flag) is not True:
+            raise ParamsError(field, f"报告 {flag} 必须严格为 true")
+    stages = report.get("stages")
+    if not isinstance(stages, dict) or set(stages) != set(CALIBRATION_STAGES):
+        raise ParamsError(field, "报告 stages 必须完整包含八个标定阶段")
+    for stage in CALIBRATION_STAGES:
+        info = stages[stage]
+        if not isinstance(info, dict) or info.get("passed") is not True:
+            raise ParamsError(field, f"阶段 {stage} 的 passed 必须严格为 true")
+        checks = info.get("checks")
+        if not isinstance(checks, list) or not checks:
+            raise ParamsError(field, f"阶段 {stage} 的 checks 不能为空")
+        if any(not isinstance(c, dict) or c.get("passed") is not True
+               or c.get("evidence_type") not in ("physical", "offline", "mock") for c in checks):
+            raise ParamsError(field, f"阶段 {stage} 含未通过或非法的检查项")
+        if not any(c["evidence_type"] == "physical" for c in checks):
+            raise ParamsError(field, f"阶段 {stage} 没有通过的 physical 证据，禁止实机运行")
+
+
 def _check_report_binding(profile_path: Path, params: MotionParams, raw: Mapping[str, Any]) -> None:
     """real 模式：确认加载的参数确实就是被验收过的那一份。
 
@@ -1375,28 +1405,16 @@ def _check_report_binding(profile_path: Path, params: MotionParams, raw: Mapping
         report = json.loads(report_path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
         raise ParamsError("verification.report_path", f"报告不是合法 JSON：{exc}") from exc
+    validate_calibration_report(report)
     if report.get("profile_id") != params.profile_id:
         raise ParamsError(
             "verification.report_path",
             f"报告 profile_id={report.get('profile_id')!r} 与配置 {params.profile_id!r} 不符",
         )
-    if not report.get("overall_pass"):
-        raise ParamsError("verification.report_path", "报告 overall_pass 不为 true，禁止实机运行")
-    if not report.get("operator_reviewed"):
-        raise ParamsError("verification.report_path", "报告缺少人工复核标记 operator_reviewed")
     # P2-6：证据等级关卡。报告里的每项 check 都带 evidence_type；某个阶段的
     # 全部检查都只有 mock/offline 证据时，这份"verified"从未被真机数据支撑，
     # 绝不允许驱动实机（指南 1.3 的 physical/mock 区分就是为了这一刻，不能只
     # 靠 promote 时的一次终端提示）。哈希链路保证报告与参数不能单方面篡改。
-    stages = report.get("stages") or {}
-    for stage, info in sorted(stages.items()):
-        checks = (info or {}).get("checks") or []
-        if not any(c.get("evidence_type") == "physical" for c in checks):
-            raise ParamsError(
-                "verification.report_path",
-                f"阶段 {stage} 的验收报告没有任何 physical 证据（全是 mock/offline），"
-                "纯仿真证据的配置禁止用于实机运行",
-            )
     expect = parameter_sha256(raw)
     if report.get("parameter_sha256") != expect:
         raise ParamsError(

@@ -915,8 +915,18 @@ def test_E2E_05b_人工确认回车后恢复继续到任务完成(tmp_path, monk
     assert done["reason"] == "NO_TARGET_STREAK" and done["success"] == 0
     assert done["failure_counts"] == {"GRASP_UNCERTAIN": 1}
     assert done["ignore"] == 0 and done["no_target_streak"] == 3
-    assert done["consecutive_failures"] == 0, "NoTarget 不清零失败预算，但 ignore 归零"
-    assert case.of("terminate") == []
+    # P1 §6.1 计数器表 / D02 / P1-T08：NoTarget 只清零 ignore、**不**清零连续失败预算
+    # （consecutive_failures 不变），只有 SUCCESS 同时清零两者。本场景 GRASP_UNCERTAIN
+    # 计一次失败后全程无 SUCCESS（其后只有 NoTarget），故审计值应为 1——与本行原注释
+    # "NoTarget 不清零失败预算" 一致；原断言值 0 与注释/规格相反，予以纠正。
+    assert done["consecutive_failures"] == 1, "NoTarget 不清零失败预算，仅 ignore 归零（P1 §6.1/T08/D02）"
+    # run_session 是 while True，只能经 terminate→SystemExit 退出（与 E2E-01/09 同构）：
+    # 会话末尾注入的 _KI 必落一条 KEYBOARD_INTERRUPT terminate，故此处不可能"无 terminate"
+    # （原断言 case.of("terminate") == [] 恒不成立）。任务本身以 NoTarget×3 正常完成，
+    # 不存在任务级 terminate，因此该 terminate 不带 task_instance_id（对齐 E2E-01 的钉法）。
+    terminate = case.sole("terminate")
+    assert terminate["status"] == "KEYBOARD_INTERRUPT", "唯一 terminate 是会话末尾注入的 Ctrl-C"
+    assert "task_instance_id" not in terminate, "本任务正常完成，不得出现任务级 terminate"
 
 
 # ---------------------------------------------------------------------------

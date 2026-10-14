@@ -470,7 +470,7 @@ def _valid_init_env(monkeypatch, tmp_path, *, key="sk-dashscope-real-key"):
 def test_T12_init重复调用抛ASRHardError(monkeypatch, tmp_path):
     _valid_init_env(monkeypatch, tmp_path)
     cfg = SimpleNamespace(asr=SimpleNamespace(
-        model="qwen-audio-3.1-asr-flash", endpoint=_VALID_ENDPOINT,
+        model="qwen3-asr-flash", endpoint=_VALID_ENDPOINT,
         cloud_total_timeout_s=30.0))
     asr.init(cfg)
     assert asr._state is not None
@@ -500,7 +500,7 @@ def test_init拒绝占位模型名(monkeypatch, tmp_path, model):
 def test_init要求https完整endpoint(monkeypatch, tmp_path, endpoint):
     _valid_init_env(monkeypatch, tmp_path)
     cfg = SimpleNamespace(asr=SimpleNamespace(
-        model="qwen-audio-3.1-asr-flash", endpoint=endpoint, cloud_total_timeout_s=30.0))
+        model="qwen3-asr-flash", endpoint=endpoint, cloud_total_timeout_s=30.0))
     with pytest.raises(asr.ASRHardError):
         asr.init(cfg)
 
@@ -509,7 +509,7 @@ def test_init要求https完整endpoint(monkeypatch, tmp_path, endpoint):
 def test_init要求正有限cloud_total_timeout(monkeypatch, tmp_path, timeout):
     _valid_init_env(monkeypatch, tmp_path)
     cfg = SimpleNamespace(asr=SimpleNamespace(
-        model="qwen-audio-3.1-asr-flash", endpoint=_VALID_ENDPOINT,
+        model="qwen3-asr-flash", endpoint=_VALID_ENDPOINT,
         cloud_total_timeout_s=timeout))
     with pytest.raises(asr.ASRHardError):
         asr.init(cfg)
@@ -518,12 +518,12 @@ def test_init要求正有限cloud_total_timeout(monkeypatch, tmp_path, timeout):
 def test_init成功设置运行态且日志不回显key(monkeypatch, tmp_path, capsys):
     _valid_init_env(monkeypatch, tmp_path, key="super-secret-dashscope")
     cfg = SimpleNamespace(asr=SimpleNamespace(
-        model="qwen-audio-3.1-asr-flash", endpoint=_VALID_ENDPOINT,
+        model="qwen3-asr-flash", endpoint=_VALID_ENDPOINT,
         cloud_total_timeout_s=30.0))
     asr.init(cfg)
     assert asr._state is not None
     assert asr._state.api_key == "super-secret-dashscope"
-    assert asr._state.model == "qwen-audio-3.1-asr-flash"
+    assert asr._state.model == "qwen3-asr-flash"
     # 任何输出都不得含 key 值（D12）。
     captured = capsys.readouterr()
     assert "super-secret-dashscope" not in captured.out + captured.err
@@ -545,7 +545,7 @@ def test_T13缺失或全空白密钥init拒绝(monkeypatch, tmp_path, key):
     monkeypatch.setattr(asr, "_enumerate_input_devices", lambda: ["mic0"])
     monkeypatch.setattr(asr, "_load_vad", lambda: ScriptVAD([]))
     cfg = SimpleNamespace(asr=SimpleNamespace(
-        model="qwen-audio-3.1-asr-flash", endpoint=_VALID_ENDPOINT,
+        model="qwen3-asr-flash", endpoint=_VALID_ENDPOINT,
         cloud_total_timeout_s=30.0))
     with pytest.raises(asr.ASRHardError):
         asr.init(cfg)
@@ -562,7 +562,7 @@ def test_T13异常消息不回显key(monkeypatch, tmp_path):
     monkeypatch.setattr(asr, "_enumerate_input_devices", lambda: ["mic0"])
     monkeypatch.setattr(asr, "_load_vad", lambda: ScriptVAD([]))
     cfg = SimpleNamespace(asr=SimpleNamespace(
-        model="qwen-audio-3.1-asr-flash", endpoint=_VALID_ENDPOINT,
+        model="qwen3-asr-flash", endpoint=_VALID_ENDPOINT,
         cloud_total_timeout_s=30.0))
     with pytest.raises(asr.ASRHardError) as info:
         asr.init(cfg)
@@ -645,7 +645,7 @@ def test_T15_段结束后新listen回到WAITING且先排空再读(monkeypatch):
 
 DASHSCOPE_KEY_FOR_TESTS = "sk-unit-test-dashscope-0123456789-abcdef"
 AUDIO_FIXTURE = b"RIFF\x24\x00\x00\x00WAVEfmt \x10\x00\x00\x00" + bytes(48)
-MODEL_ID = "qwen-audio-3.1-asr-flash"
+MODEL_ID = "qwen3-asr-flash"
 
 
 def arm_cloud_state(monkeypatch, **overrides):
@@ -714,9 +714,14 @@ def install_stub_http_layer(monkeypatch, responder) -> StubHttp:
     return stub
 
 
+def asr_message_payload(text):
+    return {"output": {"choices": [{"finish_reason": "stop", "message": {
+        "role": "assistant", "content": [{"text": text}]}}]}}
+
+
 def ok_response(text="分拣草莓"):
-    """DashScope 成功响应的最小合法形态（§3.1：读 output.text）。"""
-    return httpx.Response(200, json={"output": {"text": text}})
+    """DashScope 成功响应的最小合法形态（§3.1：读 output.choices 消息文本）。"""
+    return httpx.Response(200, json=asr_message_payload(text))
 
 
 def response_body(payload):
@@ -850,8 +855,15 @@ STATUS_PATH = sys.argv[1]
 GAP_S = float(sys.argv[2])
 STALL_S = float(sys.argv[3])
 SLOW_TEXT = sys.argv[4]
-SLOW_BODY = json.dumps({"output": {"text": SLOW_TEXT}}).encode("utf-8")
-OK_BODY = json.dumps({"output": {"text": "分拣草莓"}}).encode("utf-8")
+
+
+def asr_message_payload(text):
+    return {"output": {"choices": [{"finish_reason": "stop", "message": {
+        "role": "assistant", "content": [{"text": text}]}}]}}
+
+
+SLOW_BODY = json.dumps(asr_message_payload(SLOW_TEXT)).encode("utf-8")
+OK_BODY = json.dumps(asr_message_payload("分拣草莓")).encode("utf-8")
 STALL_DECLARE = 100000
 
 
@@ -1089,7 +1101,7 @@ def test_T18_专用deadline异常不继承OSError也不继承Exception():
 def test_T18_成功请求后旧处理器恢复计时器取消且响应已关闭(monkeypatch):
     handler_before, _ = alarm_state()
     arm_cloud_state(monkeypatch, cloud_total_timeout_s=10.0)
-    body = json.dumps({"output": {"text": "拿草莓"}}).encode("utf-8")
+    body = json.dumps(asr_message_payload("拿草莓")).encode("utf-8")
     stream = ChunkStream([body[:10], body[10:]])
     stub = install_stub_http_layer(
         monkeypatch, lambda request: stream_response(200, stream))
@@ -1107,7 +1119,7 @@ def test_T18_成功请求后旧处理器恢复计时器取消且响应已关闭(
 def test_T18_到期失败后同样恢复signal并关闭未完成响应(monkeypatch):
     handler_before, _ = alarm_state()
     arm_cloud_state(monkeypatch, cloud_total_timeout_s=0.3)
-    body = json.dumps({"output": {"text": "拿草莓"}}).encode("utf-8")
+    body = json.dumps(asr_message_payload("拿草莓")).encode("utf-8")
     # 两片之间睡 0.2s：0.3s 的闹钟必然落在"响应还没读完"的时候
     stream = ChunkStream([body[:10], body[10:]], gap_s=0.2)
     stub = install_stub_http_layer(
@@ -1162,7 +1174,7 @@ def test_T18_到期后的下一次请求不被旧闹钟打断(monkeypatch):
     time.sleep(0.6)
 
     # 第二次：同样的响应节奏、充足预算 → 必须成功（说明没有遗留闹钟在打断）
-    body = json.dumps({"output": {"text": "第二条"}}).encode("utf-8")
+    body = json.dumps(asr_message_payload("第二条")).encode("utf-8")
     second = ChunkStream([body[:12], body[12:]], gap_s=0.1)
     arm_cloud_state(monkeypatch, cloud_total_timeout_s=10.0)
     second_stub = install_stub_http_layer(monkeypatch,
@@ -1247,7 +1259,7 @@ def test_T18_每次请求单独起表_第二次请求拿到完整预算(monkeypa
 # ---------------------------------------------------------------------------
 
 
-def test_T19_请求逐字段符合DashScope协议并正确解析output_text(monkeypatch):
+def test_T19_请求逐字段符合DashScope协议并正确解析message文本(monkeypatch):
     arm_cloud_state(monkeypatch)
     captured: list[httpx.Request] = []
 
@@ -1274,17 +1286,15 @@ def test_T19_请求逐字段符合DashScope协议并正确解析output_text(monk
     body = json.loads(request.content.decode("utf-8"))
     assert set(body) == {"model", "input", "parameters"}
     assert body["model"] == MODEL_ID                      # 模型 ID 取配置（D12/D20）
-    assert body["parameters"] == {"format": "wav", "sample_rate": "16000"}
+    assert body["parameters"] == {"result_format": "message", "asr_options": {"enable_itn": False}}
     assert set(body["input"]) == {"messages"}
     messages = body["input"]["messages"]
     assert len(messages) == 1, "不携带历史音频/对话"
     assert messages[0]["role"] == "user"
     content = messages[0]["content"]
     assert isinstance(content, list) and len(content) == 1
-    assert set(content[0]) == {"type", "input_audio"}
-    assert content[0]["type"] == "input_audio"
-    assert set(content[0]["input_audio"]) == {"data"}
-    data_uri = content[0]["input_audio"]["data"]
+    assert set(content[0]) == {"audio"}
+    data_uri = content[0]["audio"]
     assert data_uri.startswith(AUDIO_DATA_URI_PREFIX), "data:audio/wav;base64, 前缀"
     assert base64.b64decode(data_uri.split(",", 1)[1]) == wav, "上传的就是这段 WAV"
     # 分项超时 = 剩余预算（起算即整段总时限，且绝不超过它）
@@ -1293,10 +1303,10 @@ def test_T19_请求逐字段符合DashScope协议并正确解析output_text(monk
 
 
 @pytest.mark.parametrize("payload,expected", [
-    ({"output": {"text": "分拣草莓"}}, "分拣草莓"),
-    ({"output": {"text": ""}}, ""),                     # 空串是合法结果（§3.1）
-    ({"output": {"text": "   "}}, "   "),               # 空白由 listen 侧判为"无口令"
-    ({"output": {"text": "草莓"}, "request_id": "r-1", "usage": {"characters": 8}}, "草莓"),
+    (asr_message_payload("分拣草莓"), "分拣草莓"),
+    (asr_message_payload(""), ""),                     # 空串是合法结果（§3.1）
+    (asr_message_payload("   "), "   "),               # 空白由 listen 侧判为"无口令"
+    ({**asr_message_payload("草莓"), "request_id": "r-1", "usage": {"characters": 8}}, "草莓"),
 ])
 def test_T19_成功响应fixture解析(monkeypatch, payload, expected):
     arm_cloud_state(monkeypatch)
@@ -1502,7 +1512,7 @@ def test_整链路录音结束后由真实适配上传并返回文本(monkeypatc
 
     assert stub.count == 1 and stream.stopped is True
     body = json.loads(stub.requests[0].content.decode("utf-8"))
-    data = body["input"]["messages"][0]["content"][0]["input_audio"]["data"]
+    data = body["input"]["messages"][0]["content"][0]["audio"]
     uploaded = decode_wav(base64.b64decode(data.split(",", 1)[1]))
     assert uploaded["channels"] == 1
     assert uploaded["sampwidth"] == 2
