@@ -1,0 +1,57 @@
+[
+  {
+    "command": [
+      "/home/shiroha_pantsu/miniconda3/envs/Qingyun/bin/python",
+      "-m",
+      "compileall",
+      "-q",
+      "qingyun/grabbing/vision.py",
+      "qingyun/grabbing/_vision_pipeline.py",
+      "scripts/vision_api.py",
+      "scripts/preview_vision_pipeline.py",
+      "scripts/calibrate_vision_touch.py",
+      "scripts/generate_vision_markers.py",
+      "scripts/preview_vision_alignment.py",
+      "scripts/preview_vision_camera.py",
+      "scripts/vision_radar_npu.py"
+    ],
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "bash",
+      "-n",
+      "scripts/install_vision_usb_rules.sh"
+    ],
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "output": ""
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--exit-code",
+      "--",
+      "main.py",
+      "configs/common_interface.py",
+      "configs/motion_params.py",
+      "qingyun/plans",
+      "qingyun/grabbing/arm_control.py",
+      "qingyun/grabbing/motor_control.py",
+      "qingyun/asr.py",
+      "qingyun/cloud_model.py"
+    ],
+    "exit_code": 0,
+    "output": ""
+  }
+]

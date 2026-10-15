@@ -102,3 +102,8 @@ onnxruntime>=1.16,<1.20
 
 # --- 开发期测试 ---
 pytest>=8
+
+# 视觉几何 / ArUco 标定与离线测试（开发机 OpenCV 4.10.0.84 已验证）
+# 不同时安装 opencv-python / headless 等变体，以免覆盖 cv2。
+opencv-contrib-python>=4.10,<5
+# 真机推理额外依赖见 configs/requirements.vision.txt（普通回放不加载）。

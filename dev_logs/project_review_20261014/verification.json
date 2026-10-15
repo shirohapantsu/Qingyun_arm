@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-14",
+  "base_commit": "70a37a4cbf0873780728f5c75992cf4072ca9f9c",
+  "scope": "current working tree including uncommitted vision migration",
+  "syntax": {
+    "python_files_at_start": 118,
+    "parse_errors": 0,
+    "json_files": 326,
+    "json_parse_errors": 0,
+    "shell": "bash -n scripts/install_vision_usb_rules.sh passed"
+  },
+  "pytest": {
+    "collected": 1313,
+    "full_run": {
+      "passed": 1305,
+      "setup_errors": 8,
+      "warnings": 1,
+      "seconds": 1139.34
+    },
+    "local_http_rerun": {
+      "passed": 8,
+      "deselected": 240,
+      "seconds": 4.9
+    },
+    "result": "all 1313 existing cases passed across full run and local HTTP rerun"
+  },
+  "runtime": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "opencv": "4.13.0",
+    "dependency_setup": "existing Qingyun environment and temporary module path for existing cv2; no packages installed"
+  },
+  "reproduction_count": 14,
+  "all_bugs_reproduced": true,
+  "hardware_used": false,
+  "source_sha256": {
+    "main.py": "5a80d6ad80f4f87f95b28348302b5c90061776865ee0584fd52cbb5faee65013",
+    "configs/app_config.py": "783b7437b87502fb794718b2f7f861897b83a3b1f75efe4971568aa9514b63f7",
+    "configs/common_interface.py": "66ad4292ad764fccc2ade8ef0f62b6f02602f6a68cd662ecc41eefff3d7f45dc",
+    "configs/motion_params.py": "3c8c0a636080baa902690f8684f0c098cd140d21b2acd7401c55b3da98646a59",
+    "qingyun/asr.py": "3d13cc3625c69033eb66d44405ec0d8eb6832d21cb44e5b1023fdb9acfdde303",
+    "qingyun/cloud_model.py": "34d055d7e052ee11cfee0e8beeaa73a3ad5c4c63c300c7dc6a0989a1c9b48540",
+    "qingyun/grabbing/arm_control.py": "8487f58dfc436a4418c9ab918234c7fa4b6dfb2d2e07eb69b2dbed09f4541ed3",
+    "qingyun/grabbing/executor.py": "554c41056f6455748ea42edf2ec03bced1396e6d81a5a80a52b835987350d64b",
+    "qingyun/grabbing/kinematics_ext.py": "89d8d8c23e4e9aad83a7f83041f8e84cd936541ca7aae14a1ed000438126a015",
+    "qingyun/grabbing/safety.py": "20de8c268c864307e4546466952a7075a51487f66313ac13156ddcae4eff0ad8",
+    "qingyun/grabbing/trajectory.py": "a2cf53542499b5f519c42297ec0ea8d32c18c08893683028edc3afbabc550cc4",
+    "qingyun/grabbing/_vision_pipeline.py": "b42b89cd6d26e192fadc0dd36b0f3830388bd86ddaca5a93ef794828a59a3a02",
+    "qingyun/grabbing/vision.py": "c6d7f9ec892203cd072f9f9a523873aa3244957996bf33ba2b0eb016ea86f1ba",
+    "scripts/calibrate.py": "5a440d604e4dcb3590735a6dcbfb6d4d43a7f0a6a5402668e2c1c385b9310083",
+    "scripts/tool_tcp_ref.py": "e749609de09285fe80d4efce3bf9e5afc616ab93fbf1f38e01fca00f8a176751",
+    "scripts/tool_capture_sample.py": "78b81cd07e778fd824ca6f96216991d71e721959e24ddd448e7f9feed448c1bf"
+  }
+}

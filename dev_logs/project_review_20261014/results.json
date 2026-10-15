@@ -1,0 +1,211 @@
+[
+  {
+    "check": "two_node_acceleration",
+    "result": {
+      "nodes": 2,
+      "error": "zero-size array to reduction operation maximum which has no identity"
+    },
+    "bug_reproduced": true
+  },
+  {
+    "check": "primitive_stops_without_hold",
+    "result": {
+      "latched": true,
+      "holds": 0,
+      "sent": 2,
+      "goal": 11.666666666666668,
+      "actual": 11.334222982206184
+    },
+    "bug_reproduced": true
+  },
+  {
+    "check": "command_intervals_shorter_than_tick",
+    "result": {
+      "tick_s": 0.03333333333333333,
+      "first_intervals_s": [
+        0.013333333333321207,
+        0.033333333333416704,
+        0.03333333333330302
+      ],
+      "min_interval_s": 0.013333333333321207
+    },
+    "bug_reproduced": true
+  },
+  {
+    "check": "whole_route_replayed_after_offset",
+    "result": {
+      "played": [
+        {
+          "name": "route0",
+          "from": 10.0,
+          "to": 1.0
+        },
+        {
+          "name": "route1",
+          "from": 1.0,
+          "to": 2.0
+        },
+        {
+          "name": "route2",
+          "from": 2.0,
+          "to": 3.0
+        },
+        {
+          "name": "route1",
+          "from": 1.0,
+          "to": 2.0
+        },
+        {
+          "name": "route2",
+          "from": 2.0,
+          "to": 3.0
+        }
+      ],
+      "expected_final": 3.0
+    },
+    "bug_reproduced": true
+  },
+  {
+    "check": "oversize_height_accepted",
+    "result": {
+      "valid_count": 1,
+      "height_m": 0.055,
+      "envelope_height_m": 0.04,
+      "position": [
+        0.3384999632835388,
+        -1.862645149230957e-09,
+        0.0275
+      ]
+    },
+    "bug_reproduced": true
+  },
+  {
+    "check": "live_resolution_sparse_components",
+    "result": {
+      "valid_depth_points": 400,
+      "max_component_points": 4,
+      "required_points": 32,
+      "rejection": "no_depth"
+    },
+    "bug_reproduced": true
+  },
+  {
+    "check": "tool_reference_double_radians",
+    "result": {
+      "correct": [
+        0.8660303369681148,
+        -0.49999145531658656,
+        7.829202067920367e-06
+      ],
+      "actual": [
+        0.9999583340666145,
+        -0.00912852930834086,
+        9.131749975247171e-06
+      ],
+      "axis_error_deg": 29.476401223138154
+    },
+    "bug_reproduced": true
+  },
+  {
+    "check": "old_stage_report_rebound_and_promoted",
+    "result": {
+      "parameter_changed": true,
+      "all_pass": true,
+      "old_motor_checks_retained": true,
+      "promoted_status": "verified",
+      "real_reload": "verified"
+    },
+    "bug_reproduced": true
+  },
+  {
+    "check": "independent_tool_measurement_ignored",
+    "result": {
+      "observed_tcp": [
+        100,
+        100,
+        100
+      ],
+      "checks": [
+        {
+          "name": "工具旋转正交残差",
+          "passed": true,
+          "measured": 0.0
+        },
+        {
+          "name": "TCP 平移标定点数",
+          "passed": true,
+          "measured": 3.0
+        },
+        {
+          "name": "独立 TCP 中点误差(m)",
+          "passed": true,
+          "measured": 0.002
+        }
+      ],
+      "all_pass": true
+    },
+    "bug_reproduced": true
+  },
+  {
+    "check": "nonpositive_physical_parameters_accepted",
+    "result": {
+      "velocity": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "envelope": [
+        -0.1,
+        0.04,
+        0.04
+      ]
+    },
+    "bug_reproduced": true
+  },
+  {
+    "check": "reset_accepts_moving_robot",
+    "result": {
+      "joint_speeds_deg_s": [
+        60.0,
+        60.0,
+        60.0,
+        60.0,
+        60.0
+      ],
+      "gripper_speed_pct_s": 50.0,
+      "latch_cleared": true
+    },
+    "bug_reproduced": true
+  },
+  {
+    "check": "acceptable_ik_candidate_discarded",
+    "result": {
+      "valid_candidate_acceptable": true,
+      "outcome": "IK_FAILED",
+      "reason": "经 2 次求解、2 个初值仍未收敛：残差未达标 e_pos=0.00mm e_tilt=0.000deg e_yaw=2.200deg"
+    },
+    "bug_reproduced": true
+  },
+  {
+    "check": "old_live_frame_recorded_as_current",
+    "result": {
+      "sensor_timestamp_s": 1.0,
+      "recorded_rgb_time_s": 100.0,
+      "recorded_depth_time_s": 100.0,
+      "accepted": true
+    },
+    "bug_reproduced": true
+  },
+  {
+    "check": "open_gripper_closes_in_one_large_step",
+    "result": {
+      "initial_pct": 55.0,
+      "first_goal_pct": 37.65,
+      "command_jump_pct": 17.35,
+      "allowed_step_pct": 0.6666666666666666
+    },
+    "bug_reproduced": true
+  }
+]

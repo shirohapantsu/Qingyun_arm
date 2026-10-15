@@ -1,0 +1,6 @@
+# 先安装根 requirements.txt；仅真机现场按对应后端额外安装。
+# RK3588: rknn-toolkit-lite2（厂商提供的 arm64/Python 匹配 wheel；不可在 x86 替代）
+# Astra Pro OpenNI Python 绑定；共享库位于 libs/OpenNI2_arm64/。
+openni==2.3.0
+# 仅 .pt YOLO-OBB backend 需要；RKNN 不加载 torch/ultralytics。
+ultralytics>=8.3,<9

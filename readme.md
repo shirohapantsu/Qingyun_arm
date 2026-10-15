@@ -3,66 +3,50 @@
 
 本项目由山西农业大学嵌入式实验室开发
 
-> ### ⚠️ 当前实现状态（待完成）
->
-> **本工程目前还不能端到端运行。** `python main.py` 不会有任何输出且退出码为 0——
-> `main.py` 是 0 字节占位文件，**程序入口尚未实现**。
->
-> 按实际文件行数核对（`wc -l`，2026-09-23 重新核对）：
->
-> | 模块 | 状态 | 行数 |
-> |---|---|---|
-> | `qingyun/grabbing/motor_control.py` | 已实现 | 2104 |
-> | `qingyun/grabbing/arm_control.py` | 已实现 | 1015 |
-> | `qingyun/grabbing/safety.py` | 已实现 | 718 |
-> | `qingyun/grabbing/kinematics_ext.py` | 已实现 | 580 |
-> | `qingyun/grabbing/executor.py` | 已实现 | 379 |
-> | `qingyun/grabbing/trajectory.py` | 已实现 | 314 |
-> | `configs/common_interface.py`、`configs/motion_params.py` | 已实现 | 159 / 1441 |
-> | **`main.py`**（程序入口） | **待实现（0 字节）** | 0 |
-> | **`qingyun/grabbing/vision.py`**（1号：视觉） | **待实现（0 字节）** | 0 |
-> | **`qingyun/asr.py`**（语音转文字） | **待实现（0 字节）** | 0 |
-> | **`qingyun/cloud_model.py`**（云端大模型） | **待实现（0 字节）** | 0 |
-> | **`qingyun/shutdown.py`**（终止出口；P1 删除原 `watchdog.py` 新增本模块） | **待实现（0 字节）** | 0 |
->
-> 另外，**真机标定尚未完成**：`calibration/` 下目前只有仿真配置可用，真机参数仍在
-> 逐阶段测量中，进度与已知问题见
-> [真机标定问题记录](dev_logs/真机标定问题记录.md)。在完成 8 阶段实机标定并通过
-> `scripts/calibrate.py promote` 之前，**不得驱动真机**。
->
-> 目前可用的部分是 `qingyun/grabbing/` 运动控制模块及其离线测试套件。
+## 当前实现状态（2026-10-14）
+
+上层任务编排、语音/云模型接口、运动控制和视觉入口已实现。视觉从 GitHub `feature/vision` 移入 `feature-mergeVision`，与本地公共接口、plans、运动阈值保持一致。默认 mock 支持原生 RGB-D fixture/replay，无需相机或权重；真机仍需模型、相机/手眼实测标定、独立验收与 verified profile。
+
+```bash
+python scripts/vision_api.py --mode mock
+python scripts/preview_vision_pipeline.py --mode mock
+python scripts/run_mock.py
+python -m pytest tests -q
+```
+
+运行前安装 `requirements.txt`。生产 `main.py` 固定读取 `configs/app.local.json`；mock 入口读取 `configs/app.mock.json`。默认 mock 场景的第二任务包含抓空故障演练，并按本地契约终止；不是两个成功任务的演示。视觉目录/配置/模型部署见 [视觉模块迁移与使用](docs/vision/视觉模块迁移与使用.md)，本次验证结果见 [开发日志](dev_logs/vision开发/视觉迁移_20261014_开发日志.md)。
 
 ## 开发规范
 
-### 1.工程结构图
-```
+### 1. 工程结构图
+
+```text
 Qingyun_arm
-├── configs                     # 配置文件
-│   ├── common_interface.py     # 冻结的公共接口契约
-│   └── motion_params.py        # profile.json 加载与校验（已实现）
-├── libs                        # 库文件
-│   └── so_arm_core             # vendor 自 LeRobot 0.5.1，见 libs/so_arm_core/SOURCE.md
-├── main.py                     # 程序入口            ⚠️ 待实现（0 字节）
-├── calibration                 # 标定包（仿真可用，真机标定进行中）
-├── docs                        # 技术与标定文档
-├── scripts
-│   └── calibrate.py            # 8 阶段标定 CLI（已实现）
-├── qingyun                     # 核心功能包
-│   ├── asr.py                  # 语音转文字模块      ⚠️ 待实现（0 字节）
-│   ├── cloud_model.py          # 云端大模型模块      ⚠️ 待实现（0 字节）
-│   ├── shutdown.py             # 终止出口（P1 替换原 watchdog）⚠️ 待实现
-│   └── grabbing                # 抓取模块（本期主要交付）
-│       ├── arm_control.py      # 入口与编排（已实现）
-│       ├── motor_control.py    # STS3215 驱动与换算（已实现）
-│       ├── executor.py         # 轨迹回放（已实现）
-│       ├── safety.py           # 限位与碰撞校验（已实现）
-│       ├── trajectory.py       # 速度规划（已实现）
-│       ├── kinematics_ext.py   # FK/IK 与工具变换（已实现）
-│       └── vision.py           # 视觉接口            ⚠️ 待实现（0 字节）
-└── readme.md
+├── configs/                     # 配置模板、公共契约、参数加载
+│   ├── common_interface.py      # 本地六字段视觉契约与运动协议
+│   ├── motion_params.py
+│   ├── app.json / app.mock.json
+│   ├── vision.json              # 视觉模板；实际配置 vision.local.json
+│   └── vision/                  # 相机内参、base←RGB 外参模板
+├── libs/                        # vendor 库与来源说明
+│   ├── so_arm_core/
+│   └── OpenNI2_arm64/
+├── models/vision/                # 手动部署模型；权重不入库
+├── calibration/                 # 标定包、标定纸、参考资料和候选产物
+├── docs/                        # 当前技术文档及归档资料
+├── dev_logs/                    # 开发日志与测试记录
+├── scripts/                     # CLI、标定、硬件诊断和 mock 入口
+├── qingyun/                     # 生产核心功能包
+│   ├── asr.py / cloud_model.py / runlog.py / shutdown.py
+│   ├── plans/
+│   └── grabbing/
+│       ├── arm_control.py / motor_control.py / executor.py
+│       ├── safety.py / trajectory.py / kinematics_ext.py
+│       ├── vision.py            # 固定视觉入口，导入无设备副作用
+│       └── _vision_pipeline.py  # init 延迟加载的私有视觉管线
+├── tests/                       # 自动测试；真机预览放 scripts
+└── main.py                      # 生产入口
 ```
-> 上表为 2026-09-23 的实际状态。标 **⚠️ 待实现** 的文件当前无有效代码（0 字节占位或待新增），
-> 里面没有任何代码；导入或执行它们不会报错，只会静默什么都不做。
 
 ### 2. 任务说明与分工
 
@@ -263,8 +247,8 @@ git push origin release/v0.1-grabbing
 git fetch origin
 git checkout release/v0.1-grabbing
 python main.py
-#    ⚠️ 待实现：main.py 目前是 0 字节占位文件，这条命令会静默返回且退出码 0。
-#    它"跑通了"不代表抓取闭环可用，必须等入口与 vision 模块实现后再以此步验收。
+#    生产入口使用 app.local.json，并要求实测标定和 verified profile。
+#    离线视觉/运动回归使用 scripts/run_mock.py 与 tests，不能代替真机验收。
 
 # 3. 验证无误后合并到 main，并创建 GitHub Release Tag
 git checkout main
@@ -278,9 +262,8 @@ git push origin main --tags
 1. **香橙派真机“只读”铁律**：
    * 严禁在香橙派 5 上直接修改业务代码或进行 Git 合并操作。
    * 香橙派只做一件事：从 GitHub 拉取通过测试的代码并执行（`git pull` $\rightarrow$ `python main.py`）。
-   * ⚠️ **待完成**：上面这条链路目前走不通——`main.py` 与 `qingyun/grabbing/vision.py`
-     都还是 0 字节占位。在入口实现之前，真机上唯一可用的验证路径是离线测试套件与
-     `scripts/calibrate.py` 的只读采集（**注意：只读采集不等于可以运动**）。
+   * **现场验收**：入口与视觉已实现，离线链路已接入；真机仍需部署模型、完成相机/手眼
+     与运动参数实测及 verified profile 发布。离线测试不作为真机精度验收证据。
 2. **`common_interface.py` 契约绝对冻结**：
    * 任何人不得单方面修改公共数据结构与枚举。若确需增减字段，必须 3 人协商一致后单独提交 `refactor(interface)` PR。
 3. **严禁将大文件与权重提交至 Git 仓库**：

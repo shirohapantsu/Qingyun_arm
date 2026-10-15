@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-14",
+  "timezone": "Asia/Shanghai",
+  "branch": "feature-mergeVision",
+  "source_commit": "4e8b5757ac9d634457adabb3863440f854319734",
+  "pytest": {
+    "passed": 1313,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 1,
+    "duration_s": 1167.24,
+    "exit_code": 0,
+    "log": "pytest_full_final.log",
+    "log_sha256": "aea03ed6ab7f92f12579b2a86acd9389ba551873c3166ccf70bb4459044c4ace"
+  },
+  "model_content_downloaded": false,
+  "hardware_tested": false,
+  "git_committed": false
+}

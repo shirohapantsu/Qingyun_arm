@@ -1,0 +1,347 @@
+{
+  "source_branch": "feature/vision",
+  "source_commit": "4e8b5757ac9d634457adabb3863440f854319734",
+  "local_branch": "feature-mergeVision",
+  "files": [
+    {
+      "source": ".gitignore",
+      "source_sha256": "f3af8f8a528cbe4dce2d5e5479fefeab6e95b6cc0f235ceebbbe130b5129bb61",
+      "action": "kept_local",
+      "reason": "本地接口/入口/已有模块优先；不覆盖本地文件"
+    },
+    {
+      "source": "YOLO/api_vision.py",
+      "source_sha256": "2324a215de53cf307e2a42b159aae1e1a1397b3578b3f563de12a82ed91efbb3",
+      "destination": "scripts/vision_api.py",
+      "destination_sha256": "20b625537017c77c6dffb0913d4c025c685149e3ce63f2fde333487197d821e8",
+      "action": "adapted"
+    },
+    {
+      "source": "YOLO/yolo_3d_radar_npu.py",
+      "source_sha256": "cbf44b71d34c5fdd68cda99e9e27c3c8a2b800d7dc82980a5e567d2aecfd2769",
+      "destination": "scripts/vision_radar_npu.py",
+      "destination_sha256": "73e2b0aab99075e258f6197339a46998872fab680b772c0223b6f517743d9bc7",
+      "action": "adapted"
+    },
+    {
+      "source": "calibration_assets/calibration_sheet_A4.png",
+      "source_sha256": "522545e01c0765941a5e5af9300c2230571649d40867cd3187bc3ace3abf0045",
+      "destination": "calibration/vision/assets/calibration_sheet_A4.png",
+      "destination_sha256": "522545e01c0765941a5e5af9300c2230571649d40867cd3187bc3ace3abf0045",
+      "action": "copied"
+    },
+    {
+      "source": "calibration_assets/calibration_snapshot.jpg",
+      "source_sha256": "744f56a58fcc252fb8c5f7d4b2d2e800ef04c4065732c804f86b7a16fa884d3e",
+      "destination": "calibration/vision/reference/calibration_snapshot.jpg",
+      "destination_sha256": "744f56a58fcc252fb8c5f7d4b2d2e800ef04c4065732c804f86b7a16fa884d3e",
+      "action": "copied"
+    },
+    {
+      "source": "calibration_assets/live_test.jpg",
+      "source_sha256": "e4e2788b35349079f53fcb687ae7e13cf61218d2c8484998bf5f1f10df730ebe",
+      "destination": "calibration/vision/reference/live_test.jpg",
+      "destination_sha256": "e4e2788b35349079f53fcb687ae7e13cf61218d2c8484998bf5f1f10df730ebe",
+      "action": "copied"
+    },
+    {
+      "source": "calibration_assets/marker_1.png",
+      "source_sha256": "86db1dce8dcd77c6e106990f4dc6edbabea1453c0e9adb4e6d468b6824c5c2be",
+      "destination": "calibration/vision/assets/marker_1.png",
+      "destination_sha256": "86db1dce8dcd77c6e106990f4dc6edbabea1453c0e9adb4e6d468b6824c5c2be",
+      "action": "copied"
+    },
+    {
+      "source": "calibration_assets/marker_2.png",
+      "source_sha256": "cc5419111e74cdfbebb7f7ef62ce2d47472dca0ce6386f81eebb9d872defdd7f",
+      "destination": "calibration/vision/assets/marker_2.png",
+      "destination_sha256": "cc5419111e74cdfbebb7f7ef62ce2d47472dca0ce6386f81eebb9d872defdd7f",
+      "action": "copied"
+    },
+    {
+      "source": "calibration_assets/marker_3.png",
+      "source_sha256": "839c5ba84cf7cd9ca5cca5eb9406b5c9269bd2c9611ae1d076d796bbefd041cd",
+      "destination": "calibration/vision/assets/marker_3.png",
+      "destination_sha256": "839c5ba84cf7cd9ca5cca5eb9406b5c9269bd2c9611ae1d076d796bbefd041cd",
+      "action": "copied"
+    },
+    {
+      "source": "calibration_assets/marker_4.png",
+      "source_sha256": "1942d3f7a895679686f8f2a94c9e20341a7b8ddf6367400c43db4e7ce76eaafd",
+      "destination": "calibration/vision/assets/marker_4.png",
+      "destination_sha256": "1942d3f7a895679686f8f2a94c9e20341a7b8ddf6367400c43db4e7ce76eaafd",
+      "action": "copied"
+    },
+    {
+      "source": "calibration_assets/marker_5.png",
+      "source_sha256": "e2d75ab3175d12dff8b386b57b2b9efa5396955d15a631a4b78c1feab6bd5e63",
+      "destination": "calibration/vision/assets/marker_5.png",
+      "destination_sha256": "e2d75ab3175d12dff8b386b57b2b9efa5396955d15a631a4b78c1feab6bd5e63",
+      "action": "copied"
+    },
+    {
+      "source": "calibration_assets/marker_6.png",
+      "source_sha256": "3654993ccbb1abdb26b578022de518dc6dd74f228d8a58dd560a990886393dd8",
+      "destination": "calibration/vision/assets/marker_6.png",
+      "destination_sha256": "3654993ccbb1abdb26b578022de518dc6dd74f228d8a58dd560a990886393dd8",
+      "action": "copied"
+    },
+    {
+      "source": "configs/common_interface.py",
+      "source_sha256": "66ad4292ad764fccc2ade8ef0f62b6f02602f6a68cd662ecc41eefff3d7f45dc",
+      "action": "kept_local",
+      "reason": "本地接口/入口/已有模块优先；不覆盖本地文件"
+    },
+    {
+      "source": "configs/vision/T_base_camera.json",
+      "source_sha256": "6b766f5bfc634786d2fccca678431ff5826619b26cc67865ac05a4deeadbc9fe",
+      "destination": "calibration/vision/reference/T_base_camera_identity.json",
+      "destination_sha256": "6b766f5bfc634786d2fccca678431ff5826619b26cc67865ac05a4deeadbc9fe",
+      "action": "copied"
+    },
+    {
+      "source": "configs/vision/camera_intrinsics.json",
+      "source_sha256": "977977e9eddf8bb2e02cf90792c6e8bfed408ea4040bf004b2e544afeea73728",
+      "destination": "calibration/vision/reference/camera_intrinsics_legacy.json",
+      "destination_sha256": "977977e9eddf8bb2e02cf90792c6e8bfed408ea4040bf004b2e544afeea73728",
+      "action": "copied"
+    },
+    {
+      "source": "configs/vision.json",
+      "source_sha256": "9a6a0266fa6d08b6599955e3790f9576f9c73a42970089b81cfd23137618ca6c",
+      "destination": "configs/vision.json",
+      "destination_sha256": "a42bf9ddb07762de9c184257e8a80707c1e4a99c3dccf65b92178416e5f2878d",
+      "action": "adapted"
+    },
+    {
+      "source": "data/camera_params/astra_pro_calib.json",
+      "source_sha256": "cf3d6f0411d8aa188cd105489f182172d6b63678ef9eeff24781c99d5742b751",
+      "destination": "calibration/vision/reference/astra_pro_calib.json",
+      "destination_sha256": "cf3d6f0411d8aa188cd105489f182172d6b63678ef9eeff24781c99d5742b751",
+      "action": "copied"
+    },
+    {
+      "source": "doc/P3_视觉检测与目标选择技术文档.md",
+      "source_sha256": "14e345ba88124b8a7c2a59248a069378a7fc5d40ffdbcf5c0455a89b3cff60ed",
+      "destination": "docs/vision/原分支P3技术文档.md",
+      "destination_sha256": "3e379a24af70f7c113e0b211cbb3518b3aea56694a10917a17d78238b4317915",
+      "action": "adapted"
+    },
+    {
+      "source": "doc/Walkthrough.md",
+      "source_sha256": "7c2b271efd927ed4b7e7a3b812e01567b3d3d7f69a0adf7e079a8f33ed6297ef",
+      "destination": "dev_logs/vision开发/原分支手眼标定交付记录.md",
+      "destination_sha256": "ca7d313cbdf38e56defccbd927b8e33431d870a3293e552a6dd7e1cb160bb469",
+      "action": "adapted"
+    },
+    {
+      "source": "doc/手眼标定工程实战落地方案.md",
+      "source_sha256": "feac40da1ec8839852edf6ce13a2639c602e9dfee689738c0b6c69f22b48f903",
+      "destination": "docs/vision/手眼标定工程实战落地方案.md",
+      "destination_sha256": "53c34c8a25a4e8ef8a4d443aff7ff502ad90cc5f1fbaf6280eb6261f797d4560",
+      "action": "adapted"
+    },
+    {
+      "source": "install_rules.sh",
+      "source_sha256": "93626d042c2c01f8e7be10aab7df269c434efdbca2090fe01cfdc024a65d7a19",
+      "destination": "scripts/install_vision_usb_rules.sh",
+      "destination_sha256": "ec165cf38611d3773242adf32b4c886c897206cdd883733d5f5e63b820a53388",
+      "action": "adapted"
+    },
+    {
+      "source": "libs/OpenNI2_arm64/NiViewer",
+      "source_sha256": "5238eeb647a9bd56a6dcd4f9ab375d4fd23b730c0c2f3c3582099effeab02b3d",
+      "destination": "libs/OpenNI2_arm64/NiViewer",
+      "destination_sha256": "5238eeb647a9bd56a6dcd4f9ab375d4fd23b730c0c2f3c3582099effeab02b3d",
+      "action": "copied"
+    },
+    {
+      "source": "libs/OpenNI2_arm64/OpenNI.ini",
+      "source_sha256": "3896e8f831c6a56576e9e93a2e5b3e1d3fa72041e7d01e1d7f23b7cd907e7eff",
+      "destination": "libs/OpenNI2_arm64/OpenNI.ini",
+      "destination_sha256": "3896e8f831c6a56576e9e93a2e5b3e1d3fa72041e7d01e1d7f23b7cd907e7eff",
+      "action": "copied"
+    },
+    {
+      "source": "libs/OpenNI2_arm64/OpenNI2/Drivers/OniFile.ini",
+      "source_sha256": "f50a20ca76350f8e5e81b50477714f9a1b1db9b49047f5089b90644526ba9505",
+      "destination": "libs/OpenNI2_arm64/OpenNI2/Drivers/OniFile.ini",
+      "destination_sha256": "f50a20ca76350f8e5e81b50477714f9a1b1db9b49047f5089b90644526ba9505",
+      "action": "copied"
+    },
+    {
+      "source": "libs/OpenNI2_arm64/OpenNI2/Drivers/libOniFile.so",
+      "source_sha256": "3d3fd4c42a42a5475c30e6ffb8ba37f320dbda7425fe675e9d6de3dcbeb8a373",
+      "destination": "libs/OpenNI2_arm64/OpenNI2/Drivers/libOniFile.so",
+      "destination_sha256": "3d3fd4c42a42a5475c30e6ffb8ba37f320dbda7425fe675e9d6de3dcbeb8a373",
+      "action": "copied"
+    },
+    {
+      "source": "libs/OpenNI2_arm64/OpenNI2/Drivers/liborbbec.so",
+      "source_sha256": "abdef7a830793579930d5889544aa5d1c3f2c4614293f332fd22c2e9cc2581ed",
+      "destination": "libs/OpenNI2_arm64/OpenNI2/Drivers/liborbbec.so",
+      "destination_sha256": "abdef7a830793579930d5889544aa5d1c3f2c4614293f332fd22c2e9cc2581ed",
+      "action": "copied"
+    },
+    {
+      "source": "libs/OpenNI2_arm64/OpenNI2/Drivers/orbbec.ini",
+      "source_sha256": "bd8f6a89a7d9e659f2f6b998393b145eca7d33d1e499dd036ba914cd0dacce32",
+      "destination": "libs/OpenNI2_arm64/OpenNI2/Drivers/orbbec.ini",
+      "destination_sha256": "bd8f6a89a7d9e659f2f6b998393b145eca7d33d1e499dd036ba914cd0dacce32",
+      "action": "copied"
+    },
+    {
+      "source": "libs/OpenNI2_arm64/PS1080Console",
+      "source_sha256": "e8b8097aa4cfa2d5934514d7885e5a0b1ffb8c1c8bb2aa985c113ef465544bda",
+      "destination": "libs/OpenNI2_arm64/PS1080Console",
+      "destination_sha256": "e8b8097aa4cfa2d5934514d7885e5a0b1ffb8c1c8bb2aa985c113ef465544bda",
+      "action": "copied"
+    },
+    {
+      "source": "libs/OpenNI2_arm64/SimpleRead",
+      "source_sha256": "212554c35768a8f7de897b1ff8c7818f980635401ee06b80bab41375ea135e5b",
+      "destination": "libs/OpenNI2_arm64/SimpleRead",
+      "destination_sha256": "212554c35768a8f7de897b1ff8c7818f980635401ee06b80bab41375ea135e5b",
+      "action": "copied"
+    },
+    {
+      "source": "libs/OpenNI2_arm64/libOpenNI2.so",
+      "source_sha256": "7f0dfca9067de833d8ab92beae21250df9150d0efe5265bf0a5497f98771ff07",
+      "destination": "libs/OpenNI2_arm64/libOpenNI2.so",
+      "destination_sha256": "7f0dfca9067de833d8ab92beae21250df9150d0efe5265bf0a5497f98771ff07",
+      "action": "copied"
+    },
+    {
+      "source": "main.py",
+      "source_sha256": "5a80d6ad80f4f87f95b28348302b5c90061776865ee0584fd52cbb5faee65013",
+      "action": "kept_local",
+      "reason": "本地接口/入口/已有模块优先；不覆盖本地文件"
+    },
+    {
+      "source": "orbbec-usb.rules",
+      "source_sha256": "583425ad565ca09352e7465c85db8ccf4e453f8e43f2ce4ce100b18a33daf71c",
+      "destination": "libs/OpenNI2_arm64/orbbec-usb.rules",
+      "destination_sha256": "583425ad565ca09352e7465c85db8ccf4e453f8e43f2ce4ce100b18a33daf71c",
+      "action": "copied"
+    },
+    {
+      "source": "qingyun/asr.py",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "action": "kept_local",
+      "reason": "本地接口/入口/已有模块优先；不覆盖本地文件"
+    },
+    {
+      "source": "qingyun/calibration/generate_markers.py",
+      "source_sha256": "6538ac9640a64727885b86cf03ebe4f51e9da0382d9e356ae84088fad166e878",
+      "destination": "scripts/generate_vision_markers.py",
+      "destination_sha256": "971fc5679202e851ca55bf7c71a9faaac0dc5b333e98874569554daaed41eb39",
+      "action": "adapted"
+    },
+    {
+      "source": "qingyun/calibration/touch_calibrator.py",
+      "source_sha256": "bb7811ada6af55caf337039b76dd9850091a1fdc336b43e85cb80e39ee7d371d",
+      "destination": "scripts/calibrate_vision_touch.py",
+      "destination_sha256": "f50c4d5a05ec17cf4a955e4eb11b465672aec1fa7185d0ad3cb4dbe94762e737",
+      "action": "adapted"
+    },
+    {
+      "source": "qingyun/cloud_model.py",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "action": "kept_local",
+      "reason": "本地接口/入口/已有模块优先；不覆盖本地文件"
+    },
+    {
+      "source": "qingyun/grabbing/vision.py",
+      "source_sha256": "bb0f60bb34a29fbdbd16091bbf39c1ea066d3433f7425e3860b22b11bc00f4da",
+      "destination": "qingyun/grabbing/vision.py",
+      "destination_sha256": "c6d7f9ec892203cd072f9f9a523873aa3244957996bf33ba2b0eb016ea86f1ba",
+      "action": "adapted"
+    },
+    {
+      "source": "qingyun/watchdog.py",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "action": "kept_local",
+      "reason": "本地接口/入口/已有模块优先；不覆盖本地文件"
+    },
+    {
+      "source": "tests/align_test.py",
+      "source_sha256": "4046540c679f9a11522f94cc489c412606b196cbb42844e4df0aced3b577fd30",
+      "destination": "scripts/preview_vision_alignment.py",
+      "destination_sha256": "44140a42c17582daf72e9e62130f6963a6a031f79a230f0a3451ae93e9ce318c",
+      "action": "adapted"
+    },
+    {
+      "source": "tests/demo_vision.py",
+      "source_sha256": "db937bdd826d1e52027915b1fd466a185613fdb378d4d900465e41639b0cedcb",
+      "destination": "scripts/vision_api.py",
+      "destination_sha256": "20b625537017c77c6dffb0913d4c025c685149e3ce63f2fde333487197d821e8",
+      "action": "adapted"
+    },
+    {
+      "source": "tests/demo_vision_ui.py",
+      "source_sha256": "ea1ac7e44275461bc74a7f53af46b8dfece8def0116499763980ab66d86905b3",
+      "destination": "scripts/preview_vision_pipeline.py",
+      "destination_sha256": "f7c0987ae02286dd14fd9b641210b4d8f52b8a1355daceace608f20d34e30692",
+      "action": "adapted"
+    },
+    {
+      "source": "tests/fixtures/vision/0001_color.npy",
+      "source_sha256": "3ba3707f3f5f8c2dabc9c90c3fb224798778b3584cb36a19c257d2ef657f9a29",
+      "action": "replaced",
+      "reason": "替换为本地 raw depth / 配准 / 米制基座语义的合成夹具"
+    },
+    {
+      "source": "tests/fixtures/vision/0001_depth.npy",
+      "source_sha256": "46a5793c76541961c1018b3c59fe1ecdd25f9511ea90b0aba927c15cebe9dfe7",
+      "action": "replaced",
+      "reason": "替换为本地 raw depth / 配准 / 米制基座语义的合成夹具"
+    },
+    {
+      "source": "tests/fixtures/vision/0001_detections.json",
+      "source_sha256": "9d925caa8355a0714742c564797647f147557782deebb8cf57ffc878f9c2f49b",
+      "action": "replaced",
+      "reason": "替换为本地 raw depth / 配准 / 米制基座语义的合成夹具"
+    },
+    {
+      "source": "tests/fixtures/vision/manifest.json",
+      "source_sha256": "8cca88fe3e6933c5394947cbb3fb2fc3cd5d46a67ac94e3580663445b138a8c2",
+      "action": "replaced",
+      "reason": "替换为本地 raw depth / 配准 / 米制基座语义的合成夹具"
+    },
+    {
+      "source": "tests/test_calibration_math.py",
+      "source_sha256": "2930955cad1e5930fa3e9a2eec07848c0752a54da4213271a34d479104d54035",
+      "destination": "tests/test_vision_calibration_math.py",
+      "destination_sha256": "680d819b7b8eee8d346a3aba2eaed8e2b1a63675e977004e27ee2b068c4bfd24",
+      "action": "adapted"
+    },
+    {
+      "source": "tests/test_camera.py",
+      "source_sha256": "9e4f3e13eb66bed89a9e0898d65a97083ec5078a09f9c3370dcf1d99bc9031e1",
+      "destination": "scripts/preview_vision_camera.py",
+      "destination_sha256": "bc3a064276810a973b1426582b9a700e60f5d0e6629377e79fc50d9540641307",
+      "action": "adapted"
+    },
+    {
+      "source": "tests/test_vision_pipeline.py",
+      "source_sha256": "6cbc905164775887a51677d1ead5f241348881e746a46887602f6ec7d44e63b7",
+      "destination": "tests/test_vision_pipeline.py",
+      "destination_sha256": "898e291242ac3926d1854c2f59630ffae11bf1b19450f81fd7bb92418ffef439",
+      "action": "adapted"
+    }
+  ],
+  "models": [
+    {
+      "source": "YOLO/11l2_berry_best-rk3588.rknn",
+      "git_blob": "c076979992cc485d597f900029b9f641e6766174",
+      "action": "not_downloaded",
+      "object_present": false
+    },
+    {
+      "source": "YOLO/11l_berry_best-rk3588.rknn",
+      "git_blob": "19b3e822b1e82831603ce61ca4c94da59960b065",
+      "action": "not_downloaded",
+      "object_present": false
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "frames": [
+    {
+      "id": "0000",
+      "color": "color.npy",
+      "depth": "target_depth.npy",
+      "detections": "target_detections.json",
+      "rgb_time_s": 0.0,
+      "depth_time_s": 0.0
+    }
+  ]
+}

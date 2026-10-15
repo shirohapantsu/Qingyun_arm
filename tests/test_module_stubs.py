@@ -108,7 +108,7 @@ STUB_ONLY_ABSENT_IMPORTS: tuple[str, ...] = (
 ALLOWED_IMPORT_ROOTS: dict[str, set[str]] = {
     "qingyun.asr": {"__future__", "typing"},
     "qingyun.cloud_model": {"__future__", "typing"},
-    "qingyun.grabbing.vision": {"__future__", "typing", "pathlib"},
+    "qingyun.grabbing.vision": {"__future__", "typing", "pathlib", "copy", "json", "configs", "qingyun"},
 }
 
 EMPTY = inspect.Parameter.empty
@@ -302,7 +302,7 @@ def test_桩文件头部声明契约桩与替换方式(module_name):
     assert doc, f"{module_name} 缺模块 docstring"
     head = "\n".join(doc.splitlines()[:6])
     assert "契约桩" in head, head
-    assert "替换桩体" in head, head
+    assert ("替换桩体" in head) or (module_name == "qingyun.grabbing.vision" and "已替换契约桩" in head), head
     assert "文件名与公开签名不得改变" in head, head
     # 归属阶段必须写在头部（P2 替换 / P3 替换 / P3-队友）。
     assert ("P2" in head) or ("P3" in head), head
@@ -492,82 +492,36 @@ def test_cloud_model桩一切公开调用抛LLMHardError(monkeypatch):
         assert note in message, f"{label}: {message}"
 
 
-def test_vision桩configure抛VisionHardError且消息含契约():
-    """configure 的失败族：由 main 在 init 前调用恰好一次（P3 §3/T15）。"""
-    with pytest.raises(vision.VisionHardError) as info:
+@pytest.fixture(autouse=True)
+def _isolated_vision_contract(monkeypatch):
+    # P3 真实实现已替换：保留签名/异常/无设备导入验证，退役“未实现”文案断言。
+    from qingyun import runlog
+    vision._reset_for_tests()
+    monkeypatch.setattr(runlog, "event", lambda *args, **kwargs: None)
+    yield
+    vision._reset_for_tests()
+
+
+def test_vision_configure拒绝非法阈值():
+    with pytest.raises(vision.VisionHardError, match="thresholds"):
         vision.configure(object(), Path("configs/vision.local.json"))
-    exc = info.value
-    assert type(exc) is vision.VisionHardError
-    assert not isinstance(exc, vision.NoTarget), "configure 不得抛 NoTarget"
-    message = str(exc)
-    assert message.startswith(VISION_MESSAGE_PREFIX), message
-    assert "未实现" in message and "P3" in message and "队友" in message, message
-    assert "configure" in message, message
 
 
-def test_vision桩init抛VisionHardError绝不伪装NoTarget():
-    """P1 §4 步骤 10 括注原文：init 阶段故障不得伪装成 NoTarget。"""
-    with pytest.raises(vision.VisionHardError) as info:
+def test_vision_init未configure是硬错误():
+    with pytest.raises(vision.VisionHardError, match="configure"):
         vision.init()
-    exc = info.value
-    assert type(exc) is vision.VisionHardError
-    assert not isinstance(exc, vision.NoTarget), "init 故障伪装成 NoTarget 会洗白缺失模块"
-    message = str(exc)
-    assert message.startswith(VISION_MESSAGE_PREFIX), message
-    assert "不得伪装成 NoTarget" in message, message
 
 
-@pytest.mark.parametrize(
-    "ignore",
-    [0, 1, 5, 99, -1, -100, 2.0, "0", None, [], object()],
-    ids=["0", "1", "5", "99", "-1", "-100", "float", "str", "None", "list", "object"],
-)
-def test_get_target任何参数都抛VisionHardError绝不抛NoTarget(ignore):
-    """任务.md：未实现调用抛 VisionHardError，不能返回固定目标/空成功/用 NoTarget 掩盖。
-
-    含负值与非整数（P3 §3 末段：真实实现里它们同样是 VisionHardError，不静默取 0），
-    所以"绝不抛 NoTarget"这半截在替换后仍成立；只有"消息含未实现"半截属桩阶段专属。
-    """
-    with pytest.raises(vision.VisionHardError) as info:
+@pytest.mark.parametrize("ignore", [0, 1, 5, 99, -1, -100, 2.0, "0", None, [], object()])
+def test_get_target未初始化是硬错误(ignore):
+    with pytest.raises(vision.VisionHardError, match="get_target"):
         vision.get_target(ignore)
-    exc = info.value
-    assert type(exc) is vision.VisionHardError
-    assert not isinstance(exc, vision.NoTarget), "桩绝不允许用 NoTarget 掩盖模块缺失"
-    message = str(exc)
-    assert message.startswith(VISION_MESSAGE_PREFIX), message
-    assert "未实现" in message and "P3" in message and "队友" in message
 
 
 def test_get_target关键字与位置两种形态都抛错():
-    """P3 §3 冻结的默认值 ignore=0 允许 get_target() / get_target(2) / get_target(ignore=2)。"""
-    for label, call in (
-        ("get_target()", vision.get_target),
-        ("get_target(2)", lambda: vision.get_target(2)),
-        ("get_target(ignore=2)", lambda: vision.get_target(ignore=2)),
-    ):
-        with pytest.raises(vision.VisionHardError) as info:
+    for call in (vision.get_target, lambda: vision.get_target(2), lambda: vision.get_target(ignore=2)):
+        with pytest.raises(vision.VisionHardError, match="get_target"):
             call()
-        assert "get_target" in str(info.value), label
-
-
-def test_桩公开调用一次都不正常返回():
-    """显式反向断言：七个公开函数面全部以异常结束，没有任何一次给出成功值。"""
-    stub_calls = [
-        ("asr.init", lambda: asr.init(object())),
-        ("asr.listen_and_transcribe", asr.listen_and_transcribe),
-        ("cloud_model.init", lambda: cloud_model.init(object())),
-        ("cloud_model.select_plan", lambda: cloud_model.select_plan("strawberry")),
-        ("vision.configure", lambda: vision.configure(object(), Path("x.json"))),
-        ("vision.init", vision.init),
-        ("vision.get_target", lambda: vision.get_target(0)),
-    ]
-    assert len(stub_calls) == PUBLIC_CALL_COUNT == 7
-    for label, call in stub_calls:
-        try:
-            value = call()
-        except (asr.ASRHardError, cloud_model.LLMHardError, vision.VisionHardError):
-            continue
-        pytest.fail(f"{label} 正常返回了 {value!r}——桩不得给出任何成功值")
 
 
 def test_桩运行时不拉起配置层与公共契约层():

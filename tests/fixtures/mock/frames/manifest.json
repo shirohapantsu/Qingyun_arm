@@ -1,5 +1,69 @@
 {
   "schema_version": 1,
-  "frames": [],
-  "_comment": "replay 帧清单占位：帧序列编排（两任务共用一条连续序列、抓后帧删物、三张空桌帧等）归 P5 §2/R04；本任务只提交最小可装配资产，帧消费顺序按 manifest 条目而非文件名。"
+  "frames": [
+    {
+      "id": "0000",
+      "color": "color.npy",
+      "depth": "target_depth.npy",
+      "detections": "target_detections.json",
+      "rgb_time_s": 0.0,
+      "depth_time_s": 0.0
+    },
+    {
+      "id": "0001",
+      "color": "color.npy",
+      "depth": "empty_depth.npy",
+      "detections": "empty_detections.json",
+      "rgb_time_s": 1.0,
+      "depth_time_s": 1.0
+    },
+    {
+      "id": "0002",
+      "color": "color.npy",
+      "depth": "empty_depth.npy",
+      "detections": "empty_detections.json",
+      "rgb_time_s": 2.0,
+      "depth_time_s": 2.0
+    },
+    {
+      "id": "0003",
+      "color": "color.npy",
+      "depth": "empty_depth.npy",
+      "detections": "empty_detections.json",
+      "rgb_time_s": 3.0,
+      "depth_time_s": 3.0
+    },
+    {
+      "id": "0004",
+      "color": "color.npy",
+      "depth": "target_depth.npy",
+      "detections": "target_detections.json",
+      "rgb_time_s": 4.0,
+      "depth_time_s": 4.0
+    },
+    {
+      "id": "0005",
+      "color": "color.npy",
+      "depth": "empty_depth.npy",
+      "detections": "empty_detections.json",
+      "rgb_time_s": 5.0,
+      "depth_time_s": 5.0
+    },
+    {
+      "id": "0006",
+      "color": "color.npy",
+      "depth": "empty_depth.npy",
+      "detections": "empty_detections.json",
+      "rgb_time_s": 6.0,
+      "depth_time_s": 6.0
+    },
+    {
+      "id": "0007",
+      "color": "color.npy",
+      "depth": "empty_depth.npy",
+      "detections": "empty_detections.json",
+      "rgb_time_s": 7.0,
+      "depth_time_s": 7.0
+    }
+  ]
 }

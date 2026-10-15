@@ -103,10 +103,12 @@ def runtime():
     runlog.reset_for_tests()
     shutdown.reset_for_tests()
     run_mock.reset_stubs_for_tests()
+    run_mock.vision_module._reset_for_tests()
     yield
     runlog.reset_for_tests()
     shutdown.reset_for_tests()
     run_mock.reset_stubs_for_tests()
+    run_mock.vision_module._reset_for_tests()
 
 
 class RunlogRecorder:
@@ -721,11 +723,14 @@ def test_T22_mock装配用仿真副本且无真实串口与init(monkeypatch, tmp
     assert isinstance(fake_vision.configure_calls[0]["thresholds"], VisionThresholds)
 
 
-def test_run_mock_main默认vision桩按契约terminate不回退替身(monkeypatch, tmp_path, capsys):
-    """DEC-002：直接跑入口时真实桩抛 VisionHardError → VISION_INIT_FAILED。"""
+def test_run_mock_main视觉坏配置按契约terminate不回退替身(monkeypatch, tmp_path, capsys):
+    """P3 实现替换后：真实视觉坏配置仍终止，不回退替身。"""
     sink = Sink()
     entered: list[str] = []
     cfg = replace(_mock_cfg_with_tmp_logs(), log_dir=tmp_path / "mock_smoke_logs")
+    bad_vision = tmp_path / "bad_vision.json"
+    bad_vision.write_text("{}", encoding="utf-8")
+    cfg = replace(cfg, vision_config_path=bad_vision)
     monkeypatch.setattr(run_mock, "load_app_config", lambda *a, **k: cfg)
     monkeypatch.setattr(run_mock, "runlog", RunlogRecorder(sink))
     monkeypatch.setattr(run_mock, "run_session",
@@ -736,7 +741,7 @@ def test_run_mock_main默认vision桩按契约terminate不回退替身(monkeypat
     assert entered == [], "视觉未就绪绝不进入会话"
     report = _terminate_record(sink)
     assert report["status"] == "VISION_INIT_FAILED"
-    assert "视觉未实现" in report["detail"]
+    assert "VisionHardError" in report["detail"]
     assert sink.of("ready") == [], "桩故障不得洗白成 ready，也不得自动回退替身"
 
 

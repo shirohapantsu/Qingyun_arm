@@ -1,3 +1,37 @@
 {
-  "_comment": "P3 视觉配置 schema 归队友（P3 §4）；本文件在桩阶段不被解析——preflight（P1 §3.2 第 4 条，初审 L7 收窄）只要求文件存在、合法 JSON、顶层对象。P5 起替换为 model.backend=fixture + source.mode=replay 的完整配置（P5 §2）。"
+  "camera": {
+    "type": "orbbec_astra_pro",
+    "depth_mode": "640x480@30",
+    "rgb_device": null,
+    "rgb_size": null,
+    "max_pair_delta_s": 0.03,
+    "acquire_timeout_s": 1.0
+  },
+  "model": {
+    "backend": "fixture",
+    "path": null,
+    "detection_floor": 0.05,
+    "conf_threshold": 0.5,
+    "class_ripe": [
+      "RIPE"
+    ],
+    "class_unripe": [
+      "UNRIPE"
+    ]
+  },
+  "calibration": {
+    "intrinsics_path": "../vision/camera_intrinsics.json",
+    "extrinsic_base_camera_path": "../vision/T_base_camera.json"
+  },
+  "geometry": {
+    "min_points": 8,
+    "inner_scale": 0.8,
+    "depth_neighbor_jump_m": 0.01,
+    "footprint_padding_m": 0.001
+  },
+  "source": {
+    "mode": "replay",
+    "replay_dir": "frames"
+  },
+  "_comment": "P3 \u539f\u751f fixture/replay\uff0c\u5168\u90e8\u5e27\u4e0e\u76f8\u673a\u53c2\u6570\u4e3a simulation \u540d\u4e49\u503c\uff1b\u4e24\u4efb\u52a1\u5171\u7528\u8fde\u7eed\u5e27\uff0c\u76ee\u6807\u540e\u8ddf\u4e09\u5e27\u663e\u5f0f\u7a7a\u684c\u3002"
 }

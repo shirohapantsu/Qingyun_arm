@@ -1,0 +1,70 @@
+........................................................................ [  5%]
+........................................................................ [ 10%]
+........................................................................ [ 16%]
+........................................................................ [ 21%]
+........................................................................ [ 27%]
+........................................................................ [ 32%]
+........................................................................ [ 38%]
+........................................................................ [ 43%]
+..........................................F............................. [ 49%]
+........................................................................ [ 54%]
+........................................................................ [ 60%]
+........................................................................ [ 65%]
+........................................................................ [ 71%]
+........................................................................ [ 76%]
+........................................................................ [ 82%]
+........................................................................ [ 87%]
+........................................................................ [ 93%]
+........................................................................ [ 98%]
+................                                                         [100%]
+=================================== FAILURES ===================================
+____________________________ test_松爪失败返回PLACE_FAIL _____________________________
+
+params = MotionParams(schema_version=1, profile_id='sim_v0', robot_id='SIM_ROBOT', status='simulation', model=ModelParams(urdf_...
+       [ -96.82986738,   96.82986738],
+       [ -94.99984018,   94.99984018],
+       [-157.21102462,  162.78934171]]))
+
+    def test_松爪失败返回PLACE_FAIL(params):
+        """闭爪成功后再让夹爪卡住，RELEASE 阶段应报 PLACE_FAIL。"""
+        arm, st, motor = make_arm(params)
+        motor.place_object(0.022)
+        r_ok = arm.grasp_and_place(graspable(params, 0.34, 0.04))
+        assert r_ok.status is GraspStatus.SUCCESS
+        arm.reset_fault() if arm._fault_latched else None
+        # 第二次：走到 LOWER 之后再冻结夹爪
+        motor.place_object(0.024)
+        original = motor._advance
+        stage_box = {"arm": arm}
+    
+        def freeze_after_lower(dt):
+            if stage_box["arm"]._stage in (AC.STAGE_RELEASE,):
+                return
+            original(dt)
+    
+        motor._advance = freeze_after_lower
+        r = arm.grasp_and_place(graspable(params, 0.36, 0.03))
+>       assert r.status is GraspStatus.PLACE_FAIL, r
+E       AssertionError: GraspResult(status=<GraspStatus.ABORTED: 'ABORTED'>, stage='FAULT_HOLD', reason='KeyboardInterrupt', place_id='default', holding=<HoldingState.HOLDING: 'HOLDING'>, recovery_required=True)
+E       assert <GraspStatus.ABORTED: 'ABORTED'> is <GraspStatus.PLACE_FAIL: 'PLACE_FAIL'>
+E        +  where <GraspStatus.ABORTED: 'ABORTED'> = GraspResult(status=<GraspStatus.ABORTED: 'ABORTED'>, stage='FAULT_HOLD', reason='KeyboardInterrupt', place_id='default', holding=<HoldingState.HOLDING: 'HOLDING'>, recovery_required=True).status
+E        +  and   <GraspStatus.PLACE_FAIL: 'PLACE_FAIL'> = GraspStatus.PLACE_FAIL
+
+tests/test_grasp_flow.py:556: AssertionError
+----------------------------- Captured stderr call -----------------------------
+WARNING: Robot has the following self collisions in neutral position:
+  -base_link_2 collides with shoulder_link_2
+  -shoulder_link_0 collides with upper_arm_link_1
+  -upper_arm_link_0 collides with lower_arm_link_0
+  -lower_arm_link_2 collides with wrist_link_1
+  -wrist_link_0 collides with gripper_link_1
+  -gripper_link_0 collides with moving_jaw_so101_v1_link_0
+=============================== warnings summary ===============================
+tests/test_grasp_flow.py::test_一次下发对应一次完整同步调用
+  /home/shiroha_pantsu/miniconda3/envs/Qingyun/lib/python3.12/site-packages/cmeel.prefix/lib/python3.12/site-packages/hppfcl/__init__.py:3: DeprecationWarning: Please update your 'hppfcl' imports to 'coal'
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_grasp_flow.py::test_松爪失败返回PLACE_FAIL - AssertionError...
+1 failed, 1311 passed, 1 warning in 1171.53s (0:19:31)

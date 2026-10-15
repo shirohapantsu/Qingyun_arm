@@ -19,10 +19,9 @@
     cloud_model init）、D14；复审 R04（统一模拟时钟/仿真 K）
 
 边界（DEC-002 已定，P1-05 落实）：
-    * vision **不自动回退替身**：装配默认引用真实 ``qingyun.grabbing.vision`` 桩——
-      直接 ``python scripts/run_mock.py`` 时 ``vision.configure`` 抛 VisionHardError
-      → ``terminate("VISION_INIT_FAILED")``，这是契约正确行为（P3 交付前 mock 全链
-      到视觉为止）。pytest（P5 E2E / 本阶段 T22）经 ``assemble(..., vision=FakeVision
+    * vision **不自动回退替身**：装配默认引用真实 ``qingyun.grabbing.vision`` 模块——
+      P3 迁移后默认使用原生 fixture/replay；坏配置仍
+      → ``terminate("VISION_INIT_FAILED")``，不回退替身。pytest（P5 E2E / 本阶段 T22）经 ``assemble(..., vision=FakeVision
       实例)`` 注入替身复用**同一**装配函数与生产 ``run_session``，不复制业务循环。
     * ``install_stubs`` 只替换 asr/cloud_model 模块的**业务函数**（模块属性赋值），
       **不调用真实 init**（D15：跳过 VAD/麦克风/密钥加载）；重复调用拒绝。
@@ -66,7 +65,7 @@ from main import (  # noqa: E402 - 生产共享函数：复用会话与复位/�
 from qingyun import asr as asr_module  # noqa: E402 - 替身替换的目标模块
 from qingyun import cloud_model as cloud_module  # noqa: E402
 from qingyun import runlog, shutdown  # noqa: E402
-from qingyun.grabbing import vision as vision_stub  # noqa: E402 - 默认真实桩（DEC-002）
+from qingyun.grabbing import vision as vision_module  # noqa: E402 - 默认原生视觉（DEC-002）
 from qingyun.grabbing.arm_control import ArmController  # noqa: E402
 from qingyun.plans.strawberry import StrawberryPlan  # noqa: E402
 from tests.mock_motor import MockMotorController, SimTime  # noqa: E402 - D15 豁免
@@ -289,8 +288,8 @@ def assemble(
 ) -> tuple[AppConfig, MotionParams, MockMotorController, ScenarioArmController]:
     """按 P5 §2 装配契约顺序组装 mock 栈并发送 ready。
 
-    返回 ``(cfg, params, motor, arm)``；``vision`` 缺省为**真实桩模块**（DEC-002：
-    直接跑 main() 时在 vision.configure 处按契约终止，不静默回退替身），pytest 传入
+    返回 ``(cfg, params, motor, arm)``；``vision`` 缺省为**原生视觉模块**（DEC-002：
+    fixture/replay 共用生产几何，硬故障终止，不静默回退替身），pytest 传入
     ``tests.support_upper.FakeVision`` 实例复用同一装配。预检与会话使用**同一个**
     ``MOCK_REGISTRY`` 对象；本函数不调用任何真实 asr/cloud init（D15）。
     """
@@ -361,12 +360,11 @@ def assemble(
     except BaseException as exc:  # noqa: BLE001
         shutdown.terminate("COLD_START_RECOVERY_FAILED", repr(exc))
 
-    # 10. vision：默认真实桩（调用即 VisionHardError → VISION_INIT_FAILED，契约
-    #     正确行为）；注入 FakeVision 时记录 configure/init 后继续（DEC-002）。
-    vision_module = vision if vision is not None else vision_stub
+    # 10. 原生视觉默认走 fixture/replay；显式注入替身仍用于业务分支测试。
+    selected_vision = vision if vision is not None else vision_module
     try:
-        vision_module.configure(thresholds_from_params(params), cfg.vision_config_path)
-        vision_module.init()
+        selected_vision.configure(thresholds_from_params(params), cfg.vision_config_path)
+        selected_vision.init()
     except SystemExit:
         raise
     except BaseException as exc:  # noqa: BLE001 - VisionHardError/装配期兜底；故障不得伪装 NoTarget

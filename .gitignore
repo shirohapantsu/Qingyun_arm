@@ -14,3 +14,9 @@ configs/vision.local.json
 # 运行期日志与本地 mock 装配产物（JSONL 冒烟输出，不入库）
 logs/
 configs/demo_acceptance.local.json
+
+# 视觉模型与现场生成图像（只提交模型部署说明）
+models/vision/*
+!models/vision/README.md
+calibration/vision/assets/*snapshot*.jpg
+demo_output.jpg
