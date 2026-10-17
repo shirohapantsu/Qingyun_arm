@@ -751,12 +751,21 @@ class ArmController:
         above_place[2, 3] += self.params.grasp.approach_height_m
         q_above_place = self.ik.solve(above_place, g_close, q_ref).joints_deg
 
+        # lift 用"单次 IK 目标位形 + 关节空间段"替代逐节点笛卡尔链
+        # （2026-10-17 设计变更）：斜向接近后 TCP 竖直链处于腕/肘近奇异区，
+        # warm-start 逐节点 IK 出现分支跳变（差分加速度 6~8 倍超限、8 轮加长
+        # 时长无效）。语义保持"原地竖直提升 lift_height_m"：目标 TCP 只改 z，
+        # 一次 IK 解出 q_lifted 后按关节五次律执行；物体已被夹持，路径不必
+        # 严格直线，持物包络仍按节点 TCP×T_TCP_O 检查（held_obb）。
+        T_lifted = self.model.fk_tcp(q_ref, g_close).copy()
+        T_lifted[2, 3] += self.params.grasp.lift_height_m
+        q_lifted = self.ik.solve(T_lifted, g_close, q_ref).joints_deg
         lift = PlanStep(
             name="lift", stage=STAGE_LIFT, contact_allowed=True, rebuildable=False,
             obb_for_node=held_obb,
-            build=lambda q_from: [make_cartesian_vertical_segment(
-                "lift", self.model, self.ik, self.limits, q_from, g_close,
-                self.params.grasp.lift_height_m, self.params)],
+            build=lambda q_from: [make_joint_segment(
+                "lift", np.asarray(q_from, float), q_lifted, g_close,
+                self.params)],
         )
         transfer = PlanStep(
             name="transfer", stage=STAGE_TRANSFER, contact_allowed=True,
