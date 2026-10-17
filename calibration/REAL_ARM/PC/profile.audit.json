@@ -1,94 +1,126 @@
 {
-  "joints": {
-    "fit_sample_ids": [
-      "0ad5f83eb9",
-      "19d733b35b",
-      "38c2a1ebaf",
-      "3bbc958666",
-      "43647a65ee",
-      "70ec2669ae",
-      "76bdee7293",
-      "7d74263c7a",
-      "806854ebfe",
-      "83754f7b78",
-      "893cdf83f4",
-      "98b1b50082",
-      "98da4fbf23",
-      "a30e14872c",
-      "a5d11b62a2",
-      "a9a3901942",
-      "abb53cc0f2",
-      "b3024dce84",
-      "bed835b938",
-      "c2cdf55264",
-      "c63fcebdd7",
-      "d13cec9c52",
-      "d54cce2dbc",
-      "d88692c77e",
-      "e810c071bc"
-    ],
-    "updated_fields": [
-      "joints.margin_deg",
-      "joints.measured_limits_deg",
-      "joints.sign",
-      "joints.zero_offset_deg"
-    ],
-    "notes": {},
-    "residuals": {
-      "sign_fit_rms_deg": [
-        0.534623,
-        0.820398,
-        0.651994,
-        0.346759,
-        0.79385
-      ],
-      "calibration_raw_limits": [
-        [
-          718,
-          3424
+    "joints": {
+        "fit_sample_ids": [
+            "0ad5f83eb9",
+            "19d733b35b",
+            "38c2a1ebaf",
+            "3bbc958666",
+            "43647a65ee",
+            "70ec2669ae",
+            "76bdee7293",
+            "7d74263c7a",
+            "806854ebfe",
+            "83754f7b78",
+            "893cdf83f4",
+            "98b1b50082",
+            "98da4fbf23",
+            "a30e14872c",
+            "a5d11b62a2",
+            "a9a3901942",
+            "abb53cc0f2",
+            "b3024dce84",
+            "bed835b938",
+            "c2cdf55264",
+            "c63fcebdd7",
+            "d13cec9c52",
+            "d54cce2dbc",
+            "d88692c77e",
+            "e810c071bc"
         ],
-        [
-          865,
-          3333
+        "updated_fields": [
+            "joints.margin_deg",
+            "joints.measured_limits_deg",
+            "joints.sign",
+            "joints.zero_offset_deg"
         ],
-        [
-          796,
-          3095
+        "notes": {},
+        "residuals": {
+            "sign_fit_rms_deg": [
+                0.534623,
+                0.820398,
+                0.651994,
+                0.346759,
+                0.79385
+            ],
+            "calibration_raw_limits": [
+                [
+                    718,
+                    3424
+                ],
+                [
+                    865,
+                    3333
+                ],
+                [
+                    796,
+                    3095
+                ],
+                [
+                    729,
+                    3192
+                ],
+                [
+                    0,
+                    4095
+                ]
+            ],
+            "calibration_bus_limits_deg": [
+                [
+                    -118.945055,
+                    118.945055
+                ],
+                [
+                    -108.483516,
+                    108.483516
+                ],
+                [
+                    -101.054945,
+                    101.054945
+                ],
+                [
+                    -108.263736,
+                    108.263736
+                ],
+                [
+                    -180.0,
+                    180.0
+                ]
+            ],
+            "endpoint_repeat_spread_deg": {},
+            "endpoint_vs_calibration_deg": {},
+            "fk_validation_configs": 10
+        }
+    },
+    "tool": {
+        "fit_sample_ids": [
+            "10aee2365c",
+            "1374f41483",
+            "21a2ec8fa2",
+            "582899850e",
+            "7c3738451b",
+            "7dbcd1a592",
+            "803aa194da",
+            "8d28ae2a70",
+            "9a6d19d1c5",
+            "c8b45efc4e",
+            "d02d049bd2",
+            "d9939d63d4",
+            "ea3caf9131",
+            "f973511378"
         ],
-        [
-          729,
-          3192
+        "updated_fields": [
+            "gripper.angle_table",
+            "gripper.gap_table",
+            "tool.rotation_e_tcp",
+            "tool.translation_samples"
         ],
-        [
-          0,
-          4095
-        ]
-      ],
-      "calibration_bus_limits_deg": [
-        [
-          -118.945055,
-          118.945055
-        ],
-        [
-          -108.483516,
-          108.483516
-        ],
-        [
-          -101.054945,
-          101.054945
-        ],
-        [
-          -108.263736,
-          108.263736
-        ],
-        [
-          -180.0,
-          180.0
-        ]
-      ],
-      "endpoint_repeat_spread_deg": {},
-      "endpoint_vs_calibration_deg": {},
-      "fk_validation_configs": 10
+        "notes": {},
+        "residuals": {
+            "rotation_orthonormality_err": 6.852259935518106e-16,
+            "rotation_mean_deviation": 0.0004070481693864498,
+            "pose_matrix_rank": 3,
+            "pose_matrix_cond": 791.441214211295,
+            "translation_opening_count": 5
+        }
     }
-  }
 }

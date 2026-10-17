@@ -1,0 +1,73 @@
+{
+  "profile_id": "real_pc_v0",
+  "parameter_sha256": "ebf1e6764a5e78c3d04a4918aacd35cbbf43ed6d5553f43e974da6c23a929a2d",
+  "operator": "w",
+  "operator_reviewed": true,
+  "stages": {
+    "tool": {
+      "input_sha256": "a6a022d5ecbd225d6775fe1568da2c42a1ca7928a6dbfb402d996d3e9338d91e",
+      "fit_sample_ids": [
+        "10aee2365c",
+        "1374f41483",
+        "21a2ec8fa2",
+        "582899850e",
+        "7c3738451b",
+        "7dbcd1a592",
+        "803aa194da",
+        "8d28ae2a70",
+        "9a6d19d1c5",
+        "c8b45efc4e",
+        "d02d049bd2",
+        "d9939d63d4",
+        "ea3caf9131",
+        "f973511378"
+      ],
+      "validation_sample_ids": [
+        "471c0e1ff0"
+      ],
+      "checks": [
+        {
+          "name": "工具旋转正交残差",
+          "field_path": "tool.rotation_e_tcp",
+          "measured": 0.0,
+          "limit": 1e-06,
+          "comparison": "<=",
+          "passed": true,
+          "evidence_type": "offline",
+          "evidence_refs": [
+            "a6a022d5ecbd",
+            "471c0e1ff0"
+          ]
+        },
+        {
+          "name": "TCP 平移标定点数",
+          "field_path": "tool.translation_samples",
+          "measured": 5.0,
+          "limit": 3.0,
+          "comparison": ">=",
+          "passed": true,
+          "evidence_type": "physical",
+          "evidence_refs": [
+            "a6a022d5ecbd",
+            "471c0e1ff0"
+          ]
+        },
+        {
+          "name": "独立 TCP 中点误差(m)",
+          "field_path": "tool.position_error_bound_m",
+          "measured": 0.0224,
+          "limit": 0.025,
+          "comparison": "<=",
+          "passed": true,
+          "evidence_type": "offline",
+          "evidence_refs": [
+            "a6a022d5ecbd",
+            "471c0e1ff0"
+          ]
+        }
+      ],
+      "passed": true
+    }
+  },
+  "overall_pass": false
+}

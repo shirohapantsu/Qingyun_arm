@@ -48,8 +48,12 @@ def _kin():
 
 
 def closing_dir_B(q_deg: np.ndarray) -> np.ndarray:
-    """固定指 -> 活动指的单位闭合方向（基座系），由名义 FK 得到。"""
-    T = np.asarray(_kin().forward_kinematics(np.deg2rad(q_deg)), dtype=float)
+    """固定指 -> 活动指的单位闭合方向（基座系），由名义 FK 得到。
+
+    RobotKinematics.forward_kinematics 的入参单位就是 deg（内部自行转 rad），
+    此处直接传 deg；曾因误加 np.deg2rad 造成双重转换、闭合轴全错（2026-10-15 修复）。
+    """
+    T = np.asarray(_kin().forward_kinematics(np.asarray(q_deg, dtype=float)), dtype=float)
     R_B_E = T[:3, :3]
     return R_B_E @ R_E_TCP[:, 0]
 
@@ -62,7 +66,7 @@ def build_row(q_deg, pct, pin_m, fixture_id, load_label="unloaded"):
     c = closing_dir_B(q)
     c = c / np.linalg.norm(c)
     tcp = pin + (gap / 2.0) * c
-    T = np.asarray(_kin().forward_kinematics(np.deg2rad(q)), dtype=float)
+    T = np.asarray(_kin().forward_kinematics(q), dtype=float)
     R_B_E = T[:3, :3]
     R_B_TCP = R_B_E @ R_E_TCP
     T_B_TCP = np.eye(4)
