@@ -3,7 +3,7 @@
 验证内容:
   1. Umeyama / Kabsch SVD 刚体变换算法的数值精度（零噪声下达到 10^-15 级）；
   2. 侧斜视空间点集（含高低台阶）在噪声干扰下的鲁棒性；
-  3. 用户坐标输入解析器的健壮性与智能单位识别；
+  3. 用户坐标输入解析器的健壮性与显式单位转换；
   4. 标定板图像生成的几何正确性与 PnP 求解闭环。
 """
 
@@ -57,7 +57,7 @@ def test_svd_exact_numerical_precision():
 
 
 def test_svd_robustness_with_measurement_noise():
-    """测试在毫米级真实测量噪声下的解算稳定性（验证台阶法抗噪性能）。"""
+    """固定合成噪声下的算法回归，不代表硬件测量精度。"""
     np.random.seed(123)
     rvec_gt = np.array([0.2, 0.5, -0.1])
     R_gt, _ = cv2.Rodrigues(rvec_gt)
@@ -75,7 +75,7 @@ def test_svd_robustness_with_measurement_noise():
 
     pts_base_clean = (R_gt @ pts_cam.T + t_gt).T
 
-    # 加入模拟的真实测量噪声: 高斯分布，标准差 1.0 mm (0.001 m)
+    # 加入合成高斯噪声，标准差 1.0 mm (0.001 m)
     noise_cam = np.random.normal(0, 0.001, pts_cam.shape)
     noise_base = np.random.normal(0, 0.001, pts_base_clean.shape)
 
@@ -94,22 +94,21 @@ def test_svd_robustness_with_measurement_noise():
 
 
 def test_coord_parser_units():
-    """测试坐标解析器对空格、逗号及 mm/m 智能单位转换的正确性。"""
-    # 毫米输入 -> 自动转为米
-    p1 = parse_user_coord_input("150.0  -200.5   35.2")
+    """空格、逗号及显式 mm/m 转换。"""
+    p1 = parse_user_coord_input("150.0  -200.5   35.2", "mm")
     assert np.allclose(p1, [0.150, -0.2005, 0.0352])
 
     # 逗号分隔的毫米输入
-    p2 = parse_user_coord_input("200, -50, 80")
+    p2 = parse_user_coord_input("200, -50, 80", "mm")
     assert np.allclose(p2, [0.200, -0.050, 0.080])
 
     # 纯米制输入
-    p3 = parse_user_coord_input("0.250 -0.120 0.045")
+    p3 = parse_user_coord_input("0.250 -0.120 0.045", "m")
     assert np.allclose(p3, [0.250, -0.120, 0.045])
 
     # 异常输入报错
     with pytest.raises(ValueError):
-        parse_user_coord_input("100 200")  # 只有两个数
+        parse_user_coord_input("100 200", "mm")  # 只有两个数
 
 
 def test_aruco_pnp_detection_pipeline():
